@@ -1,14 +1,14 @@
-// src/features/lesson-player/components/DialogBlock.tsx
 'use client';
 
-import { DialogPayload } from '@/types/lesson';
+import { ArrowLeft, MessageCircle } from 'lucide-react';
+import type { DialogPayload } from '@/types/lesson';
 
 interface Props {
   payload: DialogPayload;
   onNext: () => void;
 }
 
-const CHARACTER_EMOJI: Record<string, string> = {
+const characterEmoji: Record<string, string> = {
   fox: '🦊',
   owl: '🦉',
   bear: '🐻',
@@ -16,24 +16,46 @@ const CHARACTER_EMOJI: Record<string, string> = {
 };
 
 export default function DialogBlock({ payload, onNext }: Props) {
-  const avatar = CHARACTER_EMOJI[payload.character] ?? CHARACTER_EMOJI.default;
+  const avatar =
+    characterEmoji[payload.character.toLocaleLowerCase()] ??
+    characterEmoji.default;
 
   return (
-    <div className="flex flex-col items-center gap-6 p-6 min-h-[60vh] justify-center">
-      <div className="text-8xl animate-bounce">{avatar}</div>
+    <div className="flex min-h-[430px] flex-col items-center justify-center p-5 sm:p-8">
+      <div className="mb-6 flex items-end justify-center gap-4 sm:gap-6">
+        <div className="relative grid size-24 shrink-0 place-items-center overflow-hidden rounded-[30px] bg-gradient-to-br from-[#ffd94a] to-[#ffaf36] text-6xl shadow-[0_7px_0_#e99320] sm:size-28">
+          {payload.avatarUrl ? (
+            <img
+              src={payload.avatarUrl}
+              alt={payload.character}
+              className="h-full w-full object-cover"
+              onError={(event) => {
+                event.currentTarget.style.display = 'none';
+              }}
+            />
+          ) : (
+            avatar
+          )}
+          <span className="absolute bottom-2 end-2 grid size-7 place-items-center rounded-full bg-white text-[#7c5cff] shadow">
+            <MessageCircle size={15} className="fill-current" />
+          </span>
+        </div>
+      </div>
 
-      <div className="relative bg-white rounded-3xl shadow-lg p-6 max-w-sm w-full border-4 border-yellow-300">
-        <div className="absolute -top-3 right-8 w-6 h-6 bg-white border-l-4 border-t-4 border-yellow-300 rotate-45" />
-        <p className="text-xl text-gray-700 leading-relaxed text-right font-medium">
+      <div className="relative mb-7 w-full max-w-lg rounded-[24px] border-2 border-[#ffe2a6] bg-[#fffaf0] p-5 shadow-[0_5px_0_#f4d48f] sm:p-6">
+        <span className="absolute -top-3 start-12 size-6 rotate-45 border-s-2 border-t-2 border-[#ffe2a6] bg-[#fffaf0]" />
+        <p className="text-base font-bold leading-8 text-slate-700 sm:text-lg sm:leading-9">
           {payload.text}
         </p>
       </div>
 
       <button
+        type="button"
         onClick={onNext}
-        className="mt-4 bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-4 px-10 rounded-full text-xl shadow-md active:scale-95 transition-transform"
+        className="flex h-14 w-full max-w-sm items-center justify-center gap-2 rounded-2xl bg-[#58cc59] text-base font-black text-white shadow-[0_6px_0_#3da83e] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3da83e]"
       >
-        بعدی ➡️
+        ادامه داستان
+        <ArrowLeft size={20} strokeWidth={3} />
       </button>
     </div>
   );

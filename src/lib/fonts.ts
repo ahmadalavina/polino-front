@@ -1,12 +1,53 @@
-// src/lib/fonts.ts
 import localFont from 'next/font/local';
 
-export const estedad = localFont({
+export const iranYekanX = localFont({
   src: [
-    { path: '../../public/fonts/Estedad-Regular.woff2', weight: '400' },
-    { path: '../../public/fonts/Estedad-Bold.woff2', weight: '700' },
-    { path: '../../public/fonts/Estedad-Black.woff2', weight: '900' },
+    {
+      path: '../../public/fonts/IRANYekanX_Thin.ttf',
+      weight: '100',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/IRANYekanX_UltraLight.ttf',
+      weight: '200',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/IRANYekanX_Light.ttf',
+      weight: '300',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/IRANYekanX_Regular.ttf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/IRANYekanX_Medium.ttf',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/IRANYekanX_DemiBold.ttf',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/IRANYekanX_Bold.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/IRANYekanX_ExtraBold.ttf',
+      weight: '800',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/IRANYekanX_Black.ttf',
+      weight: '900',
+      style: 'normal',
+    },
   ],
-  variable: '--font-estedad',
+  variable: '--font-iran-yekan-x',
   display: 'swap',
 });

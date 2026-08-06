@@ -49,3 +49,19 @@ export interface LessonResult {
   correctAnswers: number;
   totalQuestions: number;
 }
+
+export interface Lesson {
+  id: number;
+  title: string;
+  order: number;
+  description?: string;
+  rewardXp?: number;
+  rewardCoins?: number;
+}
+
+export interface CourseDetail {
+  id: number;
+  title: string;
+  description?: string;
+  lessons: Lesson[];
+}
