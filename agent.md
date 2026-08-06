@@ -47,3 +47,10 @@ This document provides context, technical specifications, and development guidel
 ### C. Tooling & Workspace Rules
 
 - No Automatic Linting/Formatting on Commands: Do NOT run npm run lint, eslint, or formatter commands automatically after generating code or running commands. Let the local IDE setup or the pre-commit/build pipelines handle formatting and linting. Keep command execution clean and lightweight.
+
+---
+
+## 4. Backend Integration
+- **API Documentation:** Full Swagger (OpenAPI) docs are in `swagger.json` at the project root. Always check it for endpoint paths, request/response schemas, and parameters before implementing any API call.
+- **Base URL:** Read from `NEXT_PUBLIC_API_BASE_URL` in `.env`. Never hardcode it.
+- **Auth:** set mock JWT in the `Authorization: Bearer <token>` header on all authenticated requests.
