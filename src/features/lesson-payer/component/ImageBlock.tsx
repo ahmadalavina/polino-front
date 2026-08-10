@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowLeft, ImageIcon } from 'lucide-react';
+import { resolveMediaUrl } from '@/lib/media';
 import type { ImagePayload } from '@/types/lesson';
 
 interface Props {
@@ -9,6 +10,8 @@ interface Props {
 }
 
 export default function ImageBlock({ payload, onNext }: Props) {
+  const imageUrl = resolveMediaUrl(payload.url);
+
   return (
     <div className="flex min-h-[430px] flex-col items-center justify-center p-5 sm:p-8">
       <div className="relative mb-5 flex min-h-64 w-full max-w-lg items-center justify-center overflow-hidden rounded-[26px] border-4 border-[#d9d0ff] bg-[#f7f5ff] shadow-[0_7px_0_#b9a8ff]">
@@ -17,9 +20,9 @@ export default function ImageBlock({ payload, onNext }: Props) {
           className="text-[#7c5cff]/30"
           size={58}
         />
-        {payload.url && (
+        {imageUrl && (
           <img
-            src={payload.url}
+            src={imageUrl}
             alt={payload.caption ?? 'تصویر درس'}
             className="absolute inset-0 h-full w-full object-cover"
             onError={(event) => {

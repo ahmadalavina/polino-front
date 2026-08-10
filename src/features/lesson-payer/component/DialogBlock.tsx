@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowLeft, MessageCircle } from 'lucide-react';
+import { resolveMediaUrl } from '@/lib/media';
 import type { DialogPayload } from '@/types/lesson';
 
 interface Props {
@@ -16,6 +17,7 @@ const characterEmoji: Record<string, string> = {
 };
 
 export default function DialogBlock({ payload, onNext }: Props) {
+  const avatarUrl = resolveMediaUrl(payload.avatarUrl);
   const avatar =
     characterEmoji[payload.character.toLocaleLowerCase()] ??
     characterEmoji.default;
@@ -24,9 +26,9 @@ export default function DialogBlock({ payload, onNext }: Props) {
     <div className="flex min-h-[430px] flex-col items-center justify-center p-5 sm:p-8">
       <div className="mb-6 flex items-end justify-center gap-4 sm:gap-6">
         <div className="relative grid size-24 shrink-0 place-items-center overflow-hidden rounded-[30px] bg-gradient-to-br from-[#ffd94a] to-[#ffaf36] text-6xl shadow-[0_7px_0_#e99320] sm:size-28">
-          {payload.avatarUrl ? (
+          {avatarUrl ? (
             <img
-              src={payload.avatarUrl}
+              src={avatarUrl}
               alt={payload.character}
               className="h-full w-full object-cover"
               onError={(event) => {

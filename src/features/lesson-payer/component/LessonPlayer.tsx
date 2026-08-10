@@ -11,16 +11,25 @@ import {
 } from 'lucide-react';
 import type {
   DialogPayload,
+  DragDropPayload,
   ImagePayload,
   LessonBlock,
   LessonData,
   LessonResult,
+  MediaPayload,
   QuizPayload,
+  RewardPayload,
+  StoryPayload,
 } from '@/types/lesson';
+import AnimationBlock from './AnimationBlock';
 import DialogBlock from './DialogBlock';
+import DragDropBlock from './DragDropBlock';
 import ImageBlock from './ImageBlock';
 import QuizBlock from './QuizBlock';
 import LessonResultScreen from './LessonResult';
+import RewardBlock from './RewardBlock';
+import StoryBlock from './StoryBlock';
+import VideoBlock from './VideoBlock';
 
 interface Props {
   lesson: LessonData;
@@ -29,20 +38,57 @@ interface Props {
 }
 
 const blockLabels: Partial<Record<LessonBlock['type'], string>> = {
-  dialog: 'داستان',
+  dialog: 'گفت‌وگو',
   image: 'تصویر آموزشی',
   quiz: 'سؤال',
+  story: 'داستان',
+  reward: 'جایزه',
+  animation: 'انیمیشن',
+  video: 'ویدیو',
+  drag_drop: 'بازی جورچین',
 };
 
 export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [done, setDone] = useState(false);
-  const [quizResults, setQuizResults] = useState<Record<number, boolean>>({});
+  const [activityResults, setActivityResults] = useState<
+    Record<number, boolean>
+  >({});
 
-  const blocks = useMemo(
-    () => [...lesson.blocks].sort((a, b) => a.sortOrder - b.sortOrder),
-    [lesson.blocks],
-  );
+  const blocks = useMemo(() => {
+    return lesson.blocks
+      .map((block, originalIndex) => ({ block, originalIndex }))
+      .sort(
+        (first, second) =>
+          (first.block.sortOrder ?? first.originalIndex) -
+          (second.block.sortOrder ?? second.originalIndex),
+      )
+      .map(({ block }) => block);
+  }, [lesson.blocks]);
+
+  const rewards = useMemo(() => {
+    const rewardBlocks = lesson.blocks.filter(
+      (block) => block.type === 'reward',
+    );
+
+    if (rewardBlocks.length === 0) {
+      return {
+        xp: lesson.rewardXp ?? 0,
+        coins: lesson.rewardCoins ?? 0,
+      };
+    }
+
+    return rewardBlocks.reduce(
+      (total, block) => {
+        const payload = block.payload as RewardPayload;
+        return {
+          xp: total.xp + (payload.xp ?? 0),
+          coins: total.coins + (payload.coins ?? 0),
+        };
+      },
+      { xp: 0, coins: 0 },
+    );
+  }, [lesson.blocks, lesson.rewardCoins, lesson.rewardXp]);
 
   function handleNext() {
     if (currentIndex + 1 >= blocks.length) {
@@ -57,8 +103,8 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
     setCurrentIndex((index) => Math.max(0, index - 1));
   }
 
-  function handleQuizNext(blockId: number, isCorrect: boolean) {
-    setQuizResults((results) => ({ ...results, [blockId]: isCorrect }));
+  function handleActivityNext(blockId: number, isCorrect: boolean) {
+    setActivityResults((results) => ({ ...results, [blockId]: isCorrect }));
     handleNext();
   }
 
@@ -85,7 +131,47 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
           <QuizBlock
             key={block.id}
             payload={block.payload as QuizPayload}
-            onNext={(isCorrect) => handleQuizNext(block.id, isCorrect)}
+            onNext={(isCorrect) => handleActivityNext(block.id, isCorrect)}
+          />
+        );
+      case 'story':
+        return (
+          <StoryBlock
+            key={block.id}
+            payload={block.payload as StoryPayload}
+            onNext={handleNext}
+          />
+        );
+      case 'reward':
+        return (
+          <RewardBlock
+            key={block.id}
+            payload={block.payload as RewardPayload}
+            onNext={handleNext}
+          />
+        );
+      case 'animation':
+        return (
+          <AnimationBlock
+            key={block.id}
+            payload={block.payload as MediaPayload}
+            onNext={handleNext}
+          />
+        );
+      case 'video':
+        return (
+          <VideoBlock
+            key={block.id}
+            payload={block.payload as MediaPayload}
+            onNext={handleNext}
+          />
+        );
+      case 'drag_drop':
+        return (
+          <DragDropBlock
+            key={block.id}
+            payload={block.payload as DragDropPayload}
+            onNext={(isCorrect) => handleActivityNext(block.id, isCorrect)}
           />
         );
       default:
@@ -114,10 +200,10 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
   }
 
   if (done) {
-    const answers = Object.values(quizResults);
+    const answers = Object.values(activityResults);
     const result: LessonResult = {
-      xpEarned: lesson.rewardXp,
-      coinsEarned: lesson.rewardCoins,
+      xpEarned: rewards.xp,
+      coinsEarned: rewards.coins,
       correctAnswers: answers.filter(Boolean).length,
       totalQuestions: answers.length,
     };
@@ -193,11 +279,11 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
         <div className="flex shrink-0 items-center gap-2">
           <div className="hidden items-center gap-1.5 rounded-full border-2 border-slate-100 bg-white px-3 py-2 text-xs font-black text-[#7c5cff] shadow-sm sm:flex">
             <Sparkles size={16} />
-            {lesson.rewardXp}
+            {rewards.xp}
           </div>
           <div className="flex items-center gap-1.5 rounded-full border-2 border-slate-100 bg-white px-3 py-2 text-xs font-black text-[#d99100] shadow-sm">
             <Coins size={16} className="fill-current text-amber-400" />
-            {lesson.rewardCoins}
+            {rewards.coins}
           </div>
         </div>
       </header>

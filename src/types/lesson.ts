@@ -1,6 +1,14 @@
 // src/types/lesson.ts
 
-export type BlockType = 'dialog' | 'image' | 'quiz' | 'story' | 'reward' | 'animation' | 'video' | 'drag_drop';
+export type BlockType =
+  | 'dialog'
+  | 'image'
+  | 'quiz'
+  | 'story'
+  | 'reward'
+  | 'animation'
+  | 'video'
+  | 'drag_drop';
 
 export interface DialogPayload {
   character: string;
@@ -28,18 +36,50 @@ export interface QuizPayload {
   options: QuestionOption[];
 }
 
+export interface StoryPayload {
+  title?: string;
+  text: string;
+}
+
+export interface RewardPayload {
+  xp: number;
+  coins: number;
+  message?: string;
+}
+
+export interface MediaPayload {
+  url: string;
+  caption?: string;
+}
+
+export interface DragDropPayload {
+  items: string[];
+  targets: string[];
+  instruction?: string;
+}
+
+export type LessonBlockPayload =
+  | DialogPayload
+  | ImagePayload
+  | QuizPayload
+  | StoryPayload
+  | RewardPayload
+  | MediaPayload
+  | DragDropPayload;
+
 export interface LessonBlock {
   id: number;
-  sortOrder: number;
+  sortOrder?: number;
   type: BlockType;
-  payload: DialogPayload | ImagePayload | QuizPayload | Record<string, unknown>;
+  payload: LessonBlockPayload;
 }
 
 export interface LessonData {
   id: number;
   title: string;
-  rewardXp: number;
-  rewardCoins: number;
+  description?: string;
+  rewardXp?: number;
+  rewardCoins?: number;
   blocks: LessonBlock[];
 }
 

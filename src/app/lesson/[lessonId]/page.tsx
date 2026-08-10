@@ -21,8 +21,13 @@ export default function LessonPage() {
 
     setLoading(true);
     setHasError(false);
+    setLesson(null);
 
-    if (!lessonId || !Number.isInteger(lessonIdNumber)) {
+    if (
+      !lessonId ||
+      !Number.isInteger(lessonIdNumber) ||
+      lessonIdNumber <= 0
+    ) {
       setHasError(true);
       setLoading(false);
       return;
@@ -118,6 +123,7 @@ export default function LessonPage() {
 
   return (
     <LessonPlayer
+      key={lesson.id}
       lesson={lesson}
       onExit={() => router.back()}
       onFinish={() => router.back()}
