@@ -5,7 +5,6 @@ import {
   Boxes,
   CheckCircle2,
   Coins,
-  FileJson,
   GraduationCap,
   Layers3,
   LoaderCircle,
@@ -37,6 +36,7 @@ import {
   lessonBlockSchema,
   lessonSchema,
 } from './schemas';
+import BlockPayloadEditor from './components/BlockPayloadEditor';
 
 type AdminSection = 'course' | 'lesson' | 'block';
 type FieldErrors = Record<string, string>;
@@ -1029,31 +1029,14 @@ export default function AdminContentManager() {
                   </div>
                 </FormField>
 
-                <FormField
-                  label="Payload بلاک"
-                  hint="ساختار این JSON مطابق نوع بلاک به API ارسال می‌شود."
-                  error={blockErrors.payload}
-                >
-                  <div className="relative">
-                    <FileJson
-                      className="absolute end-4 top-4 text-[#7c5cff]"
-                      size={21}
-                    />
-                    <textarea
-                      dir="ltr"
-                      rows={13}
-                      value={blockForm.payload}
-                      onChange={(event) =>
-                        setBlockForm((form) => ({
-                          ...form,
-                          payload: event.target.value,
-                        }))
-                      }
-                      spellCheck={false}
-                      className="w-full resize-y rounded-2xl border-2 border-slate-200 bg-[#fafaff] px-4 py-4 pe-12 font-mono text-sm leading-7 text-slate-700 outline-none transition-all focus:border-[#7c5cff] focus:bg-white focus:shadow-[0_0_0_4px_rgba(124,92,255,0.1)]"
-                    />
-                  </div>
-                </FormField>
+                <BlockPayloadEditor
+                  blockType={blockForm.type}
+                  payloadJson={blockForm.payload}
+                  onPayloadChange={(payload) =>
+                    setBlockForm((form) => ({ ...form, payload }))
+                  }
+                  errors={blockErrors}
+                />
 
                 <div className="flex items-center gap-2 rounded-2xl bg-[#fff7d6] p-4 text-xs font-bold leading-6 text-[#8a6100]">
                   <Coins size={19} className="shrink-0 text-amber-500" />
