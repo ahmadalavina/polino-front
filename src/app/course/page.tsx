@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import {
   BookOpen,
   Coins,
@@ -9,6 +10,7 @@ import {
   Search,
   Sparkles,
   Star,
+  UserRound,
   X,
 } from 'lucide-react';
 import CourseCard from '@/components/CourseCard';
@@ -121,6 +123,13 @@ export default function CourseListPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link
+            href="/profile"
+            aria-label="ویرایش پروفایل"
+            className="grid size-11 place-items-center rounded-full border-2 border-slate-100 bg-white text-slate-500 shadow-sm transition-colors hover:border-[#7c5cff] hover:text-[#7c5cff]"
+          >
+            <UserRound size={20} />
+          </Link>
           <div className="flex items-center gap-1.5 rounded-full border-2 border-slate-100 bg-white px-3 py-2 text-sm font-black text-slate-600 shadow-sm">
             <Heart size={18} className="fill-current text-rose-400" />
             ۵

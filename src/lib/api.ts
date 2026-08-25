@@ -9,6 +9,16 @@ import type { CourseDetail, LessonData } from '@/types/lesson';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+  }
+}
+
 function getAuthToken() {
   const storedToken =
     typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -28,10 +38,17 @@ function unwrapData<T>(response: unknown): T {
   return response as T;
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+async function request<T>(
+  path: string,
+  init?: RequestInit,
+  authenticated = true,
+): Promise<T> {
   const headers = new Headers(init?.headers);
   headers.set('Accept-Language', 'fa');
-  headers.set('Authorization', `Bearer ${getAuthToken()}`);
+  if (authenticated) {
+    const token = getAuthToken();
+    if (token) headers.set('Authorization', `Bearer ${token}`);
+  }
   if (init?.body) headers.set('Content-Type', 'application/json');
 
   const response = await fetch(`${BASE_URL}${path}`, {
@@ -51,7 +68,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       message = errorBody.message;
     }
 
-    throw new Error(message);
+    throw new ApiError(message, response.status);
   }
 
   if (response.status === 204) return undefined as T;
@@ -64,14 +81,60 @@ function get<T>(path: string) {
   return request<T>(path);
 }
 
-function post<TPayload, TResponse>(path: string, payload: TPayload) {
+function post<TPayload, TResponse>(
+  path: string,
+  payload: TPayload,
+  authenticated = true,
+) {
   return request<TResponse>(path, {
     method: 'POST',
+    body: JSON.stringify(payload),
+  }, authenticated);
+}
+
+function patch<TPayload, TResponse>(path: string, payload: TPayload) {
+  return request<TResponse>(path, {
+    method: 'PATCH',
     body: JSON.stringify(payload),
   });
 }
 
+export type VerifyOtpResponse = {
+  accessToken?: string;
+  access_token?: string;
+  token?: string;
+  refreshToken?: string;
+  refresh_token?: string;
+  data?: VerifyOtpResponse;
+};
+
+export type UserProfile = {
+  id?: number;
+  nickname?: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
+  birthDate?: string;
+  grade?: number;
+  avatarId?: number;
+};
+
 export const api = {
+  requestOtp: (payload: { mobileNumber: string }) =>
+    post<typeof payload, unknown>('/auth/otp/request', payload, false),
+  verifyOtp: (payload: { mobileNumber: string; otp: string }) =>
+    post<typeof payload, VerifyOtpResponse>('/auth/otp/verify', payload, false),
+  getMyProfile: async () =>
+    unwrapData<UserProfile | null>(
+      await get<UserProfile | null | { data: UserProfile | null }>('/users/me'),
+    ),
+  updateMyProfile: (payload: {
+    firstName?: string;
+    lastName?: string;
+    birthDate?: string;
+    grade?: number;
+    avatarId?: number;
+  }) => patch<typeof payload, UserProfile>('/users/me', payload),
   getLessonPlay: async (id: number) => ({
     data: unwrapData<LessonData>(
       await get<LessonData | { data: LessonData }>(

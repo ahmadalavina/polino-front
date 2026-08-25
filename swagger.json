@@ -199,6 +199,71 @@
         "responses": { "200": { "description": "" } }
       }
     },
+    "/users/me": {
+      "get": {
+        "operationId": "UsersController_getMyProfile",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Authenticated user basic profile" }
+        }
+      },
+      "patch": {
+        "operationId": "UsersController_updateMyProfile",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserProfileDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Updated authenticated user basic profile" }
+        }
+      }
+    },
+    "/users/{id}/admin": {
+      "post": {
+        "operationId": "UsersController_promoteToAdmin",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "x-api-token",
+            "in": "header",
+            "description": "API_TOKEN from the server environment",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "responses": { "200": { "description": "User promoted to admin" } }
+      }
+    },
     "/users/{id}": {
       "get": {
         "operationId": "UsersController_findById",
@@ -742,6 +807,208 @@
         "responses": { "200": { "description": "" } },
         "tags": ["Questions"]
       }
+    },
+    "/rewards/lessons/{lessonId}/claim": {
+      "post": {
+        "operationId": "RewardsController_claimLessonReward",
+        "parameters": [
+          {
+            "name": "lessonId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "number" }
+          },
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "responses": { "201": { "description": "" } },
+        "tags": ["rewards"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/rewards/me": {
+      "get": {
+        "operationId": "RewardsController_getMyRewards",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["rewards"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/auth/otp/request": {
+      "post": {
+        "operationId": "AuthController_requestOtp",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RequestOtpDto" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["auth"]
+      }
+    },
+    "/auth/otp/verify": {
+      "post": {
+        "operationId": "AuthController_verifyOtp",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/VerifyOtpDto" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["auth"]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RefreshTokenDto" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["auth"]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RefreshTokenDto" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["auth"]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["auth"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/scoreboard/courses/{courseId}": {
+      "get": {
+        "operationId": "ScoreboardController_getCourseScoreboard",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["scoreboard"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/scoreboard/lessons/{lessonId}": {
+      "get": {
+        "operationId": "ScoreboardController_getLessonScoreboard",
+        "parameters": [
+          {
+            "name": "lessonId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["scoreboard"],
+        "security": [{ "bearer": [] }]
+      }
     }
   },
   "info": {
@@ -760,15 +1027,20 @@
       "CreateQuizDto": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "example": "آزمون خرید هوشمند" },
+          "title": {
+            "type": "string",
+            "example": "Smart Shopping Quiz",
+            "description": "Quiz title."
+          },
           "description": {
             "type": "string",
-            "example": "آزمون پایان درس خرید"
+            "example": "Final quiz for the smart shopping lesson.",
+            "description": "Optional quiz description."
           },
           "passingScore": {
             "type": "number",
             "example": 70,
-            "description": "Minimum score required"
+            "description": "Minimum score required to pass."
           }
         },
         "required": ["title", "passingScore"]
@@ -776,23 +1048,36 @@
       "UpdateQuizDto": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "example": "آزمون خرید هوشمند" },
+          "title": {
+            "type": "string",
+            "example": "Smart Shopping Quiz",
+            "description": "Quiz title."
+          },
           "description": {
             "type": "string",
-            "example": "آزمون پایان درس خرید"
+            "example": "Final quiz for the smart shopping lesson.",
+            "description": "Optional quiz description."
           },
           "passingScore": {
             "type": "number",
             "example": 70,
-            "description": "Minimum score required"
+            "description": "Minimum score required to pass."
           }
         }
       },
       "AddQuizQuestionDto": {
         "type": "object",
         "properties": {
-          "questionId": { "type": "number", "example": 10 },
-          "sortOrder": { "type": "number", "example": 1 }
+          "questionId": {
+            "type": "number",
+            "example": 10,
+            "description": "Existing question identifier."
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 1,
+            "description": "Display order inside the quiz."
+          }
         },
         "required": ["questionId", "sortOrder"]
       },
@@ -801,18 +1086,38 @@
         "properties": {
           "nickname": {
             "type": "string",
-            "description": "course id that want to assign it"
+            "example": "money_hero",
+            "description": "Unique display nickname."
           },
           "grade": {
             "type": "number",
-            "description": "course id that want to assign it"
+            "example": 3,
+            "minimum": 1,
+            "maximum": 6,
+            "description": "School grade from 1 through 6."
           },
           "avatarId": {
             "type": "number",
-            "description": "course id that want to assign it"
+            "example": 1,
+            "description": "Existing avatar identifier."
           }
         },
-        "required": ["nickname", "grade", "avatarId"]
+        "required": ["nickname", "grade"]
+      },
+      "UpdateUserProfileDto": {
+        "type": "object",
+        "properties": {
+          "firstName": { "type": "string", "example": "Ali" },
+          "lastName": { "type": "string", "example": "Ahmadi" },
+          "birthDate": { "type": "string", "example": "2015-05-20" },
+          "grade": {
+            "type": "number",
+            "example": 4,
+            "minimum": 1,
+            "maximum": 6
+          },
+          "avatarId": { "type": "number", "example": 2 }
+        }
       },
       "AvatarEntity": { "type": "object", "properties": {} },
       "CreateCourseDto": {
@@ -820,20 +1125,30 @@
         "properties": {
           "title": {
             "type": "string",
-            "example": "سواد مالی پایه",
-            "description": "Course title"
+            "example": "Financial Literacy Basics",
+            "description": "Course title."
           },
           "description": {
             "type": "string",
-            "example": "آموزش مفاهیم مالی برای کودکان پایه اول تا ششم"
+            "example": "Core financial concepts for children aged 7 to 12.",
+            "description": "Optional course summary."
           },
-          "cover": { "type": "string", "example": "courses/finance-basic.png" },
+          "cover": {
+            "type": "string",
+            "example": "courses/finance-basics.png",
+            "description": "Optional cover image path or URL."
+          },
           "order": {
             "type": "number",
             "example": 1,
-            "description": "Display order"
+            "description": "Display order in course lists."
           },
-          "isPublished": { "type": "boolean", "example": true, "default": true }
+          "isPublished": {
+            "type": "boolean",
+            "example": true,
+            "default": true,
+            "description": "Publication flag accepted by the current API contract."
+          }
         },
         "required": ["title", "order", "isPublished"]
       },
@@ -843,34 +1158,80 @@
         "properties": {
           "title": {
             "type": "string",
-            "example": "سواد مالی پایه",
-            "description": "Course title"
+            "example": "Financial Literacy Basics",
+            "description": "Course title."
           },
           "description": {
             "type": "string",
-            "example": "آموزش مفاهیم مالی برای کودکان پایه اول تا ششم"
+            "example": "Core financial concepts for children aged 7 to 12.",
+            "description": "Optional course summary."
           },
-          "cover": { "type": "string", "example": "courses/finance-basic.png" },
+          "cover": {
+            "type": "string",
+            "example": "courses/finance-basics.png",
+            "description": "Optional cover image path or URL."
+          },
           "order": {
             "type": "number",
             "example": 1,
-            "description": "Display order"
+            "description": "Display order in course lists."
           },
-          "isPublished": { "type": "boolean", "example": true, "default": true }
+          "isPublished": {
+            "type": "boolean",
+            "example": true,
+            "default": true,
+            "description": "Publication flag accepted by the current API contract."
+          }
         }
       },
       "CreateLessonDto": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "example": "پول چیست؟" },
-          "description": { "type": "string", "example": "آشنایی با مفهوم پول" },
-          "icon": { "type": "string", "example": "money.png" },
-          "sortOrder": { "type": "number", "example": 1 },
-          "rewardXp": { "type": "number", "example": 20 },
-          "rewardCoins": { "type": "number", "example": 5 },
-          "order": { "type": "number", "example": 5 },
-          "courseId": { "type": "number", "example": 1 },
-          "isPublished": { "type": "boolean", "example": true }
+          "title": {
+            "type": "string",
+            "example": "What is money?",
+            "description": "Lesson title."
+          },
+          "description": {
+            "type": "string",
+            "example": "An introduction to the concept of money.",
+            "description": "Optional lesson summary."
+          },
+          "icon": {
+            "type": "string",
+            "example": "money.png",
+            "description": "Optional lesson icon path or URL."
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 1,
+            "description": "Legacy ordering field retained by the request contract. The persisted lesson order is provided by order."
+          },
+          "rewardXp": {
+            "type": "number",
+            "example": 20,
+            "description": "Experience points awarded for lesson completion."
+          },
+          "rewardCoins": {
+            "type": "number",
+            "example": 5,
+            "description": "Coins awarded for lesson completion."
+          },
+          "order": {
+            "type": "number",
+            "example": 1,
+            "description": "Display order inside the course."
+          },
+          "courseId": {
+            "type": "number",
+            "example": 1,
+            "description": "Existing course identifier."
+          },
+          "isPublished": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the lesson is available for publication."
+          }
         },
         "required": [
           "title",
@@ -885,81 +1246,188 @@
       "UpdateLessonDto": {
         "type": "object",
         "properties": {
-          "title": { "type": "string", "example": "پول چیست؟" },
-          "description": { "type": "string", "example": "آشنایی با مفهوم پول" },
-          "icon": { "type": "string", "example": "money.png" },
-          "sortOrder": { "type": "number", "example": 1 },
-          "rewardXp": { "type": "number", "example": 20 },
-          "rewardCoins": { "type": "number", "example": 5 },
-          "order": { "type": "number", "example": 5 },
-          "courseId": { "type": "number", "example": 1 },
-          "isPublished": { "type": "boolean", "example": true }
+          "title": {
+            "type": "string",
+            "example": "What is money?",
+            "description": "Lesson title."
+          },
+          "description": {
+            "type": "string",
+            "example": "An introduction to the concept of money.",
+            "description": "Optional lesson summary."
+          },
+          "icon": {
+            "type": "string",
+            "example": "money.png",
+            "description": "Optional lesson icon path or URL."
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 1,
+            "description": "Legacy ordering field retained by the request contract. The persisted lesson order is provided by order."
+          },
+          "rewardXp": {
+            "type": "number",
+            "example": 20,
+            "description": "Experience points awarded for lesson completion."
+          },
+          "rewardCoins": {
+            "type": "number",
+            "example": 5,
+            "description": "Coins awarded for lesson completion."
+          },
+          "order": {
+            "type": "number",
+            "example": 1,
+            "description": "Display order inside the course."
+          },
+          "courseId": {
+            "type": "number",
+            "example": 1,
+            "description": "Existing course identifier."
+          },
+          "isPublished": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the lesson is available for publication."
+          }
         }
+      },
+      "GuidedLessonBlockPayloadDto": {
+        "type": "object",
+        "properties": {
+          "introduction": {
+            "type": "string",
+            "example": "Read the guide before interacting with this block.",
+            "description": "Required for drop_down, question_block, and film_and_image blocks."
+          }
+        },
+        "required": ["introduction"]
+      },
+      "QuizLessonBlockPayloadDto": {
+        "type": "object",
+        "properties": {
+          "quizId": {
+            "type": "number",
+            "example": 2,
+            "description": "Quiz loaded by the game endpoint for a quiz block."
+          }
+        },
+        "required": ["quizId"]
+      },
+      "LessonBlockType": {
+        "type": "string",
+        "description": "Determines how the client renders and interprets payload.",
+        "enum": [
+          "dialog",
+          "image",
+          "quiz",
+          "story",
+          "reward",
+          "animation",
+          "video",
+          "drag_drop",
+          "drop_down",
+          "question_block",
+          "film_and_image"
+        ]
       },
       "CreateLessonBlockDto": {
         "type": "object",
         "properties": {
-          "sortOrder": { "type": "number", "example": 1 },
+          "sortOrder": {
+            "type": "number",
+            "example": 1,
+            "description": "Display order inside the lesson."
+          },
           "type": {
-            "type": "string",
-            "enum": [
-              "dialog",
-              "image",
-              "quiz",
-              "story",
-              "reward",
-              "animation",
-              "video",
-              "drag_drop"
-            ],
-            "example": "dialog"
+            "example": "dialog",
+            "$ref": "#/components/schemas/LessonBlockType"
           },
           "payload": {
-            "type": "object",
+            "additionalProperties": true,
+            "description": "Flexible block data. drop_down, question_block, and film_and_image require a non-empty introduction. quiz blocks use quizId.",
+            "oneOf": [
+              { "$ref": "#/components/schemas/GuidedLessonBlockPayloadDto" },
+              { "$ref": "#/components/schemas/QuizLessonBlockPayloadDto" },
+              { "type": "object", "additionalProperties": true }
+            ],
             "example": {
-              "character": "fox",
-              "text": "سلام! امروز درباره پول یاد می‌گیریم"
+              "introduction": "Choose one of the available answers.",
+              "label": "Select an answer",
+              "options": [
+                { "label": "Save money", "value": "save" },
+                { "label": "Spend everything", "value": "spend" }
+              ]
             }
           },
-          "lessonId": { "type": "number", "example": 1 }
+          "lessonId": {
+            "type": "number",
+            "example": 1,
+            "description": "Existing lesson that owns this block."
+          }
         },
         "required": ["sortOrder", "type", "payload", "lessonId"]
       },
       "UpdateLessonBlockDto": {
         "type": "object",
         "properties": {
-          "sortOrder": { "type": "number", "example": 1 },
+          "sortOrder": {
+            "type": "number",
+            "example": 1,
+            "description": "Display order inside the lesson."
+          },
           "type": {
-            "type": "string",
-            "enum": [
-              "dialog",
-              "image",
-              "quiz",
-              "story",
-              "reward",
-              "animation",
-              "video",
-              "drag_drop"
-            ],
-            "example": "dialog"
+            "example": "dialog",
+            "$ref": "#/components/schemas/LessonBlockType"
           },
           "payload": {
-            "type": "object",
+            "additionalProperties": true,
+            "description": "Flexible block data. drop_down, question_block, and film_and_image require a non-empty introduction. quiz blocks use quizId.",
+            "oneOf": [
+              { "$ref": "#/components/schemas/GuidedLessonBlockPayloadDto" },
+              { "$ref": "#/components/schemas/QuizLessonBlockPayloadDto" },
+              { "type": "object", "additionalProperties": true }
+            ],
             "example": {
-              "character": "fox",
-              "text": "سلام! امروز درباره پول یاد می‌گیریم"
+              "introduction": "Choose one of the available answers.",
+              "label": "Select an answer",
+              "options": [
+                { "label": "Save money", "value": "save" },
+                { "label": "Spend everything", "value": "spend" }
+              ]
             }
           },
-          "lessonId": { "type": "number", "example": 1 }
+          "lessonId": {
+            "type": "number",
+            "example": 1,
+            "description": "Existing lesson that owns this block."
+          }
         }
       },
       "CreateQuestionOptionDto": {
         "type": "object",
         "properties": {
-          "text": { "type": "string", "example": "خرید غذا" },
-          "isCorrect": { "type": "boolean", "example": true },
-          "sortOrder": { "type": "number", "example": 1 },
-          "questionId": { "type": "number", "example": 1 }
+          "text": {
+            "type": "string",
+            "example": "Food",
+            "description": "Answer option text."
+          },
+          "isCorrect": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether this option is a correct answer."
+          },
+          "sortOrder": {
+            "type": "number",
+            "example": 1,
+            "description": "Display order inside the question."
+          },
+          "questionId": {
+            "type": "number",
+            "example": 1,
+            "description": "Required by the existing validation contract for nested question options."
+          }
         },
         "required": ["text", "isCorrect", "sortOrder", "questionId"]
       },
@@ -968,17 +1436,34 @@
         "properties": {
           "title": {
             "type": "string",
-            "example": "کدام مورد یک نیاز ضروری است؟"
+            "example": "Which item is a need?",
+            "description": "Question text or title."
           },
           "description": {
             "type": "string",
-            "example": "به چیزهایی فکر کن که بدون آن زندگی سخت می‌شود"
+            "example": "Think about things required for everyday life.",
+            "description": "Optional supporting text."
           },
-          "image": { "type": "string", "example": "need.png" },
+          "image": {
+            "type": "string",
+            "example": "questions/needs.png",
+            "description": "Optional image path or URL."
+          },
           "options": {
+            "description": "Complete answer option list. Updating this field replaces existing options transactionally.",
             "example": [
-              { "text": "غذا", "isCorrect": true, "sortOrder": 1 },
-              { "text": "اسباب بازی", "isCorrect": false, "sortOrder": 2 }
+              {
+                "text": "Food",
+                "isCorrect": true,
+                "sortOrder": 1,
+                "questionId": 1
+              },
+              {
+                "text": "A new toy",
+                "isCorrect": false,
+                "sortOrder": 2,
+                "questionId": 1
+              }
             ],
             "type": "array",
             "items": { "$ref": "#/components/schemas/CreateQuestionOptionDto" }
@@ -991,22 +1476,64 @@
         "properties": {
           "title": {
             "type": "string",
-            "example": "کدام مورد یک نیاز ضروری است؟"
+            "example": "Which item is a need?",
+            "description": "Question text or title."
           },
           "description": {
             "type": "string",
-            "example": "به چیزهایی فکر کن که بدون آن زندگی سخت می‌شود"
+            "example": "Think about things required for everyday life.",
+            "description": "Optional supporting text."
           },
-          "image": { "type": "string", "example": "need.png" },
+          "image": {
+            "type": "string",
+            "example": "questions/needs.png",
+            "description": "Optional image path or URL."
+          },
           "options": {
+            "description": "Complete answer option list. Updating this field replaces existing options transactionally.",
             "example": [
-              { "text": "غذا", "isCorrect": true, "sortOrder": 1 },
-              { "text": "اسباب بازی", "isCorrect": false, "sortOrder": 2 }
+              {
+                "text": "Food",
+                "isCorrect": true,
+                "sortOrder": 1,
+                "questionId": 1
+              },
+              {
+                "text": "A new toy",
+                "isCorrect": false,
+                "sortOrder": 2,
+                "questionId": 1
+              }
             ],
             "type": "array",
             "items": { "$ref": "#/components/schemas/CreateQuestionOptionDto" }
           }
         }
+      },
+      "RequestOtpDto": {
+        "type": "object",
+        "properties": {
+          "mobileNumber": { "type": "string", "example": "09121234567" }
+        },
+        "required": ["mobileNumber"]
+      },
+      "VerifyOtpDto": {
+        "type": "object",
+        "properties": {
+          "mobileNumber": { "type": "string", "example": "09121234567" },
+          "otp": { "type": "string", "example": "123456" }
+        },
+        "required": ["mobileNumber", "otp"]
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token returned by OTP verification or refresh."
+          }
+        },
+        "required": ["refreshToken"]
       }
     }
   }
