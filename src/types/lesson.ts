@@ -8,7 +8,12 @@ export type BlockType =
   | 'reward'
   | 'animation'
   | 'video'
-  | 'drag_drop';
+  | 'drag_drop'
+  | 'drop_down'
+  | 'question_block'
+  | 'film_and_image'
+  | 'coin_hunt'
+  | 'memory_financial';
 
 export interface DialogPayload {
   character: string;
@@ -56,6 +61,18 @@ export interface DragDropPayload {
   items: string[];
   targets: string[];
   instruction?: string;
+}
+
+export interface CoinHuntPayload {
+  introduction?: string;
+  title?: string;
+  items?: Array<Record<string, unknown>>;
+}
+
+export interface MemoryFinancialPayload {
+  introduction?: string;
+  title?: string;
+  pairs?: Array<Record<string, unknown>>;
 }
 
 export type LessonBlockPayload =

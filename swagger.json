@@ -5,6 +5,7 @@
       "get": {
         "operationId": "GameController_playLesson",
         "summary": "Get lesson game data",
+        "description": "Returns ordered lesson blocks. COIN_HUNT and MEMORY_FINANCIAL payloads are returned as configured JSON schemas.",
         "parameters": [
           {
             "name": "id",
@@ -19,8 +20,269 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameLessonResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request validation failed or a block-specific business rule was violated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 400 },
+                        "errorCode": { "example": 1 },
+                        "message": { "example": "validation error" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 404 },
+                        "errorCode": { "example": 4 },
+                        "message": { "example": "error in progress" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 500 },
+                        "errorCode": { "example": 4 },
+                        "message": { "example": "error in progress" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
         "tags": ["Game"]
+      }
+    },
+    "/game/blocks/{blockId}/complete": {
+      "post": {
+        "operationId": "GameController_complete",
+        "summary": "Submit a COIN_HUNT or MEMORY_FINANCIAL result",
+        "description": "The server validates IDs, objective completion, attempts, and deterministically calculates score.",
+        "parameters": [
+          {
+            "name": "blockId",
+            "required": true,
+            "in": "path",
+            "example": 3,
+            "schema": { "type": "number" }
+          },
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CompleteGameDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validated game result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameResultResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request validation failed or a block-specific business rule was violated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 400 },
+                        "errorCode": { "example": 1 },
+                        "message": { "example": "validation error" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 404 },
+                        "errorCode": { "example": 4 },
+                        "message": { "example": "error in progress" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 500 },
+                        "errorCode": { "example": 4 },
+                        "message": { "example": "error in progress" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Game"],
+        "security": [{ "bearer": [] }]
+      }
+    },
+    "/game/blocks/{blockId}/result": {
+      "get": {
+        "operationId": "GameController_getResult",
+        "summary": "Get my game result for a block",
+        "parameters": [
+          {
+            "name": "blockId",
+            "required": true,
+            "in": "path",
+            "example": 3,
+            "schema": { "type": "number" }
+          },
+          {
+            "in": "header",
+            "name": "Accept-Language",
+            "required": false,
+            "schema": { "enum": ["fa", "en"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Persisted game result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameResultResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request validation failed or a block-specific business rule was violated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 400 },
+                        "errorCode": { "example": 1 },
+                        "message": { "example": "validation error" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 404 },
+                        "errorCode": { "example": 4 },
+                        "message": { "example": "error in progress" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 500 },
+                        "errorCode": { "example": 4 },
+                        "message": { "example": "error in progress" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Game"],
+        "security": [{ "bearer": [] }]
       }
     },
     "/quizzes": {
@@ -43,11 +305,21 @@
             }
           }
         },
-        "responses": { "201": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuizResponseDto" }
+              }
+            }
+          }
+        },
         "tags": ["Quizzes"]
       },
       "get": {
         "operationId": "QuizzesController_findAll",
+        "summary": "Get quizzes",
         "parameters": [
           {
             "in": "header",
@@ -56,13 +328,26 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/QuizResponseDto" }
+                }
+              }
+            }
+          }
+        },
         "tags": ["Quizzes"]
       }
     },
     "/quizzes/{id}": {
       "get": {
         "operationId": "QuizzesController_findOne",
+        "summary": "Get quiz by id",
         "parameters": [
           {
             "name": "id",
@@ -77,11 +362,21 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuizResponseDto" }
+              }
+            }
+          }
+        },
         "tags": ["Quizzes"]
       },
       "patch": {
         "operationId": "QuizzesController_update",
+        "summary": "Update quiz",
         "parameters": [
           {
             "name": "id",
@@ -104,11 +399,21 @@
             }
           }
         },
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuizResponseDto" }
+              }
+            }
+          }
+        },
         "tags": ["Quizzes"]
       },
       "delete": {
         "operationId": "QuizzesController_remove",
+        "summary": "Delete quiz",
         "parameters": [
           {
             "name": "id",
@@ -123,18 +428,20 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": { "200": { "description": "Deleted quiz record." } },
         "tags": ["Quizzes"]
       }
     },
     "/quizzes/{quizId}/questions": {
       "post": {
         "operationId": "QuizQuestionsController_add",
+        "summary": "Add a question to a quiz",
         "parameters": [
           {
             "name": "quizId",
             "required": true,
             "in": "path",
+            "example": 1,
             "schema": { "type": "number" }
           },
           {
@@ -152,18 +459,31 @@
             }
           }
         },
-        "responses": { "201": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuizQuestionLinkResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["Quiz Questions"]
       }
     },
     "/quizzes/{quizId}/questions/{id}": {
       "delete": {
         "operationId": "QuizQuestionsController_remove",
+        "summary": "Remove a question from a quiz",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "example": 1,
             "schema": { "type": "number" }
           },
           {
@@ -173,13 +493,16 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": { "description": "Quiz question link removed." }
+        },
         "tags": ["Quiz Questions"]
       }
     },
     "/users": {
       "post": {
         "operationId": "UsersController_create",
+        "summary": "Create user profile",
         "parameters": [
           {
             "in": "header",
@@ -196,12 +519,23 @@
             }
           }
         },
-        "responses": { "200": { "description": "" } }
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponseDto" }
+              }
+            }
+          }
+        },
+        "tags": ["Users"]
       }
     },
     "/users/me": {
       "get": {
         "operationId": "UsersController_getMyProfile",
+        "summary": "Get my profile",
         "parameters": [
           {
             "in": "header",
@@ -211,11 +545,21 @@
           }
         ],
         "responses": {
-          "200": { "description": "Authenticated user basic profile" }
-        }
+          "200": {
+            "description": "Authenticated user basic profile",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponseDto" }
+              }
+            }
+          }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
       },
       "patch": {
         "operationId": "UsersController_updateMyProfile",
+        "summary": "Update my profile",
         "parameters": [
           {
             "in": "header",
@@ -233,18 +577,29 @@
           }
         },
         "responses": {
-          "200": { "description": "Updated authenticated user basic profile" }
-        }
+          "200": {
+            "description": "Updated authenticated user basic profile",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponseDto" }
+              }
+            }
+          }
+        },
+        "tags": ["Users"],
+        "security": [{ "bearer": [] }]
       }
     },
     "/users/{id}/admin": {
       "post": {
         "operationId": "UsersController_promoteToAdmin",
+        "summary": "Promote user to admin",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "example": 1,
             "schema": { "type": "number" }
           },
           {
@@ -261,17 +616,29 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "User promoted to admin" } }
+        "responses": {
+          "200": {
+            "description": "User promoted to admin",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponseDto" }
+              }
+            }
+          }
+        },
+        "tags": ["Users"]
       }
     },
     "/users/{id}": {
       "get": {
         "operationId": "UsersController_findById",
+        "summary": "Get user by id",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "example": 1,
             "schema": { "type": "number" }
           },
           {
@@ -281,7 +648,17 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } }
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponseDto" }
+              }
+            }
+          }
+        },
+        "tags": ["Users"]
       }
     },
     "/avatars": {
@@ -303,7 +680,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/AvatarEntity" }
+                  "items": { "$ref": "#/components/schemas/AvatarResponseDto" }
                 }
               }
             }
@@ -336,7 +713,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AvatarEntity" }
+                "schema": { "$ref": "#/components/schemas/AvatarResponseDto" }
               }
             }
           }
@@ -369,7 +746,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CourseEntity" }
+                "schema": {
+                  "$ref": "#/components/schemas/CourseSummaryResponseDto"
+                }
               }
             }
           }
@@ -394,7 +773,9 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/CourseEntity" }
+                  "items": {
+                    "$ref": "#/components/schemas/CourseSummaryResponseDto"
+                  }
                 }
               }
             }
@@ -427,7 +808,9 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/CourseEntity" }
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDetailResponseDto"
+                }
               }
             }
           }
@@ -459,7 +842,18 @@
             }
           }
         },
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseSummaryResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["Courses"]
       },
       "delete": {
@@ -479,7 +873,7 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": { "200": { "description": "Deleted course record." } },
         "tags": ["Courses"]
       }
     },
@@ -503,7 +897,18 @@
             }
           }
         },
-        "responses": { "201": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonSummaryResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["Lessons"]
       },
       "get": {
@@ -517,7 +922,21 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LessonSummaryResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
         "tags": ["Lessons"]
       }
     },
@@ -540,7 +959,18 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonDetailResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["Lessons"]
       },
       "patch": {
@@ -568,7 +998,18 @@
             }
           }
         },
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonSummaryResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["Lessons"]
       },
       "delete": {
@@ -588,7 +1029,7 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": { "200": { "description": "Deleted lesson record." } },
         "tags": ["Lessons"]
       }
     },
@@ -612,7 +1053,18 @@
             }
           }
         },
-        "responses": { "201": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonBlockResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["Lesson Blocks"]
       },
       "get": {
@@ -626,7 +1078,21 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LessonBlockResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
         "tags": ["Lesson Blocks"]
       }
     },
@@ -648,7 +1114,18 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonBlockResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["Lesson Blocks"]
       },
       "patch": {
@@ -676,7 +1153,18 @@
             }
           }
         },
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonBlockResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["Lesson Blocks"]
       },
       "delete": {
@@ -696,7 +1184,9 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": { "description": "Deleted lesson block record." }
+        },
         "tags": ["Lesson Blocks"]
       }
     },
@@ -720,7 +1210,16 @@
             }
           }
         },
-        "responses": { "201": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuestionResponseDto" }
+              }
+            }
+          }
+        },
         "tags": ["Questions"]
       },
       "get": {
@@ -734,7 +1233,21 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestionResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
         "tags": ["Questions"]
       }
     },
@@ -756,7 +1269,16 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuestionResponseDto" }
+              }
+            }
+          }
+        },
         "tags": ["Questions"]
       },
       "patch": {
@@ -784,7 +1306,16 @@
             }
           }
         },
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuestionResponseDto" }
+              }
+            }
+          }
+        },
         "tags": ["Questions"]
       },
       "delete": {
@@ -804,18 +1335,20 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": { "200": { "description": "Deleted question record." } },
         "tags": ["Questions"]
       }
     },
     "/rewards/lessons/{lessonId}/claim": {
       "post": {
         "operationId": "RewardsController_claimLessonReward",
+        "summary": "Claim lesson reward",
         "parameters": [
           {
             "name": "lessonId",
             "required": true,
             "in": "path",
+            "example": 1,
             "schema": { "type": "number" }
           },
           {
@@ -825,7 +1358,16 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "201": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RewardResponseDto" }
+              }
+            }
+          }
+        },
         "tags": ["rewards"],
         "security": [{ "bearer": [] }]
       }
@@ -833,6 +1375,7 @@
     "/rewards/me": {
       "get": {
         "operationId": "RewardsController_getMyRewards",
+        "summary": "List my claimed rewards",
         "parameters": [
           {
             "in": "header",
@@ -841,7 +1384,19 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/RewardResponseDto" }
+                }
+              }
+            }
+          }
+        },
         "tags": ["rewards"],
         "security": [{ "bearer": [] }]
       }
@@ -849,6 +1404,7 @@
     "/auth/otp/request": {
       "post": {
         "operationId": "AuthController_requestOtp",
+        "summary": "Request a one-time password",
         "parameters": [
           {
             "in": "header",
@@ -865,13 +1421,25 @@
             }
           }
         },
-        "responses": { "201": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "OTP challenge created. The OTP is only returned when OTP_EXPOSE_IN_RESPONSE=true.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OtpRequestResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["auth"]
       }
     },
     "/auth/otp/verify": {
       "post": {
         "operationId": "AuthController_verifyOtp",
+        "summary": "Verify OTP and issue access/refresh tokens",
         "parameters": [
           {
             "in": "header",
@@ -888,13 +1456,25 @@
             }
           }
         },
-        "responses": { "201": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPairResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["auth"]
       }
     },
     "/auth/refresh": {
       "post": {
         "operationId": "AuthController_refresh",
+        "summary": "Rotate a refresh token",
         "parameters": [
           {
             "in": "header",
@@ -911,13 +1491,25 @@
             }
           }
         },
-        "responses": { "201": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPairResponseDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["auth"]
       }
     },
     "/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
+        "summary": "Revoke a refresh token",
         "parameters": [
           {
             "in": "header",
@@ -934,13 +1526,14 @@
             }
           }
         },
-        "responses": { "201": { "description": "" } },
+        "responses": { "200": { "description": "Refresh token revoked." } },
         "tags": ["auth"]
       }
     },
     "/auth/me": {
       "get": {
         "operationId": "AuthController_me",
+        "summary": "Get authenticated token user claims",
         "parameters": [
           {
             "in": "header",
@@ -949,7 +1542,18 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticatedUserClaimsDto"
+                }
+              }
+            }
+          }
+        },
         "tags": ["auth"],
         "security": [{ "bearer": [] }]
       }
@@ -957,18 +1561,21 @@
     "/scoreboard/courses/{courseId}": {
       "get": {
         "operationId": "ScoreboardController_getCourseScoreboard",
+        "summary": "Get course leaderboard",
         "parameters": [
           {
             "name": "courseId",
             "required": true,
             "in": "path",
+            "example": 1,
             "schema": { "type": "number" }
           },
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "query",
-            "schema": { "type": "string" }
+            "example": 20,
+            "schema": { "minimum": 1, "maximum": 100 }
           },
           {
             "in": "header",
@@ -977,7 +1584,75 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseScoreboardResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request validation failed or a block-specific business rule was violated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 400 },
+                        "errorCode": { "example": 1 },
+                        "message": { "example": "validation error" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 404 },
+                        "errorCode": { "example": 4 },
+                        "message": { "example": "error in progress" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 500 },
+                        "errorCode": { "example": 4 },
+                        "message": { "example": "error in progress" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
         "tags": ["scoreboard"],
         "security": [{ "bearer": [] }]
       }
@@ -985,18 +1660,21 @@
     "/scoreboard/lessons/{lessonId}": {
       "get": {
         "operationId": "ScoreboardController_getLessonScoreboard",
+        "summary": "Get lesson leaderboard",
         "parameters": [
           {
             "name": "lessonId",
             "required": true,
             "in": "path",
+            "example": 1,
             "schema": { "type": "number" }
           },
           {
             "name": "limit",
-            "required": true,
+            "required": false,
             "in": "query",
-            "schema": { "type": "string" }
+            "example": 20,
+            "schema": { "minimum": 1, "maximum": 100 }
           },
           {
             "in": "header",
@@ -1005,7 +1683,75 @@
             "schema": { "enum": ["fa", "en"] }
           }
         ],
-        "responses": { "200": { "description": "" } },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LessonScoreboardResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request validation failed or a block-specific business rule was violated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 400 },
+                        "errorCode": { "example": 1 },
+                        "message": { "example": "validation error" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The requested resource was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 404 },
+                        "errorCode": { "example": 4 },
+                        "message": { "example": "error in progress" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/ApiErrorEnvelopeDto" },
+                    {
+                      "properties": {
+                        "statusCode": { "example": 500 },
+                        "errorCode": { "example": 4 },
+                        "message": { "example": "error in progress" }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
         "tags": ["scoreboard"],
         "security": [{ "bearer": [] }]
       }
@@ -1024,6 +1770,209 @@
       "bearer": { "scheme": "bearer", "bearerFormat": "JWT", "type": "http" }
     },
     "schemas": {
+      "ApiErrorEnvelopeDto": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": false },
+          "message": { "type": "string", "example": "validation error" },
+          "statusCode": { "type": "number", "example": 400 },
+          "errors": {
+            "example": [
+              "in property title there is problem : title should not be empty"
+            ],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "reference": { "type": "string", "example": "request-reference" },
+          "errorCode": {
+            "type": "number",
+            "example": 1,
+            "description": "Application error code from ExceptionCodes."
+          },
+          "data": { "type": "object", "nullable": true, "example": null }
+        },
+        "required": [
+          "success",
+          "message",
+          "statusCode",
+          "errors",
+          "errorCode",
+          "data"
+        ]
+      },
+      "ApiSuccessEnvelopeDto": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "message": { "type": "string", "example": "done" },
+          "statusCode": {
+            "type": "number",
+            "example": 200,
+            "description": "Application-level status code. Successful responses currently use 200."
+          },
+          "errors": {
+            "example": [],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "reference": {
+            "type": "string",
+            "example": "request-reference",
+            "description": "Present when a request reference is assigned."
+          },
+          "errorCode": { "type": "number", "example": 0 },
+          "businessId": {
+            "type": "number",
+            "example": 12,
+            "description": "Present when business context middleware sets it."
+          },
+          "userId": {
+            "type": "number",
+            "example": 34,
+            "description": "Present when user context middleware sets it."
+          },
+          "data": {
+            "type": "object",
+            "description": "Operation-specific response payload."
+          }
+        },
+        "required": [
+          "success",
+          "message",
+          "statusCode",
+          "errors",
+          "errorCode",
+          "data"
+        ]
+      },
+      "GameBlockResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 3 },
+          "type": {
+            "type": "string",
+            "enum": [
+              "dialog",
+              "image",
+              "quiz",
+              "story",
+              "reward",
+              "animation",
+              "video",
+              "drag_drop",
+              "drop_down",
+              "question_block",
+              "film_and_image",
+              "coin_hunt",
+              "memory_financial"
+            ]
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": { "introduction": "Answer the following question." }
+          }
+        },
+        "required": ["id", "type", "payload"]
+      },
+      "GameLessonResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "title": { "type": "string", "example": "What is money?" },
+          "description": { "type": "string", "nullable": true },
+          "blocks": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GameBlockResponseDto" }
+          }
+        },
+        "required": ["id", "title", "blocks"]
+      },
+      "GameResultResponseDto": {
+        "type": "object",
+        "properties": {
+          "blockId": { "type": "number", "example": 3 },
+          "gameType": {
+            "type": "string",
+            "enum": [
+              "dialog",
+              "image",
+              "quiz",
+              "story",
+              "reward",
+              "animation",
+              "video",
+              "drag_drop",
+              "drop_down",
+              "question_block",
+              "film_and_image",
+              "coin_hunt",
+              "memory_financial"
+            ],
+            "example": "coin_hunt"
+          },
+          "score": { "type": "number", "example": 35 },
+          "completed": { "type": "boolean", "example": true },
+          "attempts": { "type": "number", "example": 5 },
+          "mistakes": { "type": "number", "example": 1 },
+          "result": { "type": "object", "additionalProperties": true },
+          "reward": { "type": "object", "nullable": true, "example": null },
+          "xp": { "type": "number", "example": 0 },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "blockId",
+          "gameType",
+          "score",
+          "completed",
+          "attempts",
+          "mistakes",
+          "result",
+          "xp"
+        ]
+      },
+      "CompleteGameDto": {
+        "type": "object",
+        "properties": {
+          "gameType": {
+            "type": "string",
+            "enum": ["coin_hunt", "memory_financial"],
+            "example": "coin_hunt"
+          },
+          "collectedItemIds": {
+            "example": ["coin-100", "coin-500"],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "matchedPairIds": {
+            "example": ["saving", "loan"],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "attempts": { "type": "number", "example": 8, "minimum": 0 },
+          "mistakes": { "type": "number", "example": 2, "minimum": 0 },
+          "startedAt": {
+            "type": "string",
+            "example": "2026-08-31T10:00:00.000Z",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": "string",
+            "example": "2026-08-31T10:00:25.000Z",
+            "format": "date-time"
+          }
+        },
+        "required": ["gameType"]
+      },
       "CreateQuizDto": {
         "type": "object",
         "properties": {
@@ -1044,6 +1993,102 @@
           }
         },
         "required": ["title", "passingScore"]
+      },
+      "QuestionOptionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "text": { "type": "string", "example": "Food" },
+          "isCorrect": { "type": "boolean", "example": true },
+          "sortOrder": { "type": "number", "example": 1 }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "text",
+          "isCorrect",
+          "sortOrder"
+        ]
+      },
+      "QuestionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "title": { "type": "string", "example": "Which item is a need?" },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "Think about things required for everyday life."
+          },
+          "image": {
+            "type": "string",
+            "nullable": true,
+            "example": "questions/needs.png"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuestionOptionResponseDto"
+            }
+          }
+        },
+        "required": ["id", "createdAt", "updatedAt", "title", "options"]
+      },
+      "QuizQuestionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "question": { "$ref": "#/components/schemas/QuestionResponseDto" },
+          "sortOrder": { "type": "number", "example": 1 }
+        },
+        "required": ["id", "createdAt", "updatedAt", "question", "sortOrder"]
+      },
+      "QuizResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "title": { "type": "string", "example": "Smart Shopping Quiz" },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "Final quiz for the shopping lesson."
+          },
+          "passingScore": { "type": "number", "example": 70 },
+          "questions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/QuizQuestionResponseDto" }
+          }
+        },
+        "required": ["id", "createdAt", "updatedAt", "title", "passingScore"]
       },
       "UpdateQuizDto": {
         "type": "object",
@@ -1081,6 +2126,36 @@
         },
         "required": ["questionId", "sortOrder"]
       },
+      "QuizQuestionLinkResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "quiz": {
+            "type": "object",
+            "properties": { "id": { "type": "number", "example": 1 } }
+          },
+          "question": {
+            "type": "object",
+            "properties": { "id": { "type": "number", "example": 10 } }
+          },
+          "sortOrder": { "type": "number", "example": 1 }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "quiz",
+          "question",
+          "sortOrder"
+        ]
+      },
       "CreateUserDto": {
         "type": "object",
         "properties": {
@@ -1104,6 +2179,157 @@
         },
         "required": ["nickname", "grade"]
       },
+      "AvatarResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "name": { "type": "string", "example": "Fox" },
+          "image": { "type": "string", "example": "avatars/fox.png" },
+          "color": { "type": "string", "example": "#F59E0B" }
+        },
+        "required": ["id", "createdAt", "updatedAt", "name", "image", "color"]
+      },
+      "UserSettingsResponseDto": {
+        "type": "object",
+        "properties": {
+          "language": { "type": "string", "example": "fa" },
+          "soundEnabled": { "type": "boolean", "example": true },
+          "notificationsEnabled": { "type": "boolean", "example": true },
+          "dailyGoal": { "type": "number", "example": 20 }
+        },
+        "required": [
+          "language",
+          "soundEnabled",
+          "notificationsEnabled",
+          "dailyGoal"
+        ]
+      },
+      "CityProgressResponseDto": {
+        "type": "object",
+        "properties": {
+          "currentCity": { "type": "string", "example": "tehran" },
+          "unlockedCities": {
+            "example": ["tehran"],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "buildingsOwned": {
+            "example": ["bank"],
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["currentCity", "unlockedCities", "buildingsOwned"]
+      },
+      "UserResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "ssoId": {
+            "type": "string",
+            "nullable": true,
+            "example": "sso-user-id"
+          },
+          "nickname": { "type": "string", "example": "money_hero" },
+          "firstName": {
+            "type": "string",
+            "nullable": true,
+            "example": "Sara"
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true,
+            "example": "Ahmadi"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["user", "admin"],
+            "example": "child"
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "example": "2017-05-10"
+          },
+          "age": { "type": "number", "nullable": true, "example": 9 },
+          "grade": { "type": "number", "example": 3 },
+          "xp": { "type": "number", "example": 120 },
+          "coins": { "type": "number", "example": 45 },
+          "gems": { "type": "number", "example": 2 },
+          "level": { "type": "number", "example": 4 },
+          "experience": { "type": "number", "example": 120 },
+          "streak": { "type": "number", "example": 3 },
+          "lastActivityDate": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "avatarId": { "type": "number", "nullable": true, "example": 1 },
+          "avatar": {
+            "nullable": true,
+            "allOf": [{ "$ref": "#/components/schemas/AvatarResponseDto" }]
+          },
+          "profileImage": {
+            "type": "string",
+            "nullable": true,
+            "example": "profiles/money-hero.png"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": "11111111-1111-4111-8111-111111111111"
+          },
+          "isActive": { "type": "boolean", "example": true },
+          "settings": {
+            "nullable": true,
+            "allOf": [
+              { "$ref": "#/components/schemas/UserSettingsResponseDto" }
+            ]
+          },
+          "cityProgress": {
+            "nullable": true,
+            "allOf": [
+              { "$ref": "#/components/schemas/CityProgressResponseDto" }
+            ]
+          },
+          "lastLoginAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "nickname",
+          "role",
+          "grade",
+          "xp",
+          "coins",
+          "gems",
+          "level",
+          "experience",
+          "streak",
+          "isActive"
+        ]
+      },
       "UpdateUserProfileDto": {
         "type": "object",
         "properties": {
@@ -1119,7 +2345,6 @@
           "avatarId": { "type": "number", "example": 2 }
         }
       },
-      "AvatarEntity": { "type": "object", "properties": {} },
       "CreateCourseDto": {
         "type": "object",
         "properties": {
@@ -1152,7 +2377,109 @@
         },
         "required": ["title", "order", "isPublished"]
       },
-      "CourseEntity": { "type": "object", "properties": {} },
+      "CourseSummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "title": { "type": "string", "example": "Financial Literacy Basics" },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "Core financial concepts for children."
+          },
+          "cover": {
+            "type": "string",
+            "nullable": true,
+            "example": "courses/finance-basics.png"
+          },
+          "order": { "type": "number", "example": 1 }
+        },
+        "required": ["id", "createdAt", "updatedAt", "title", "order"]
+      },
+      "LessonSummaryResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "title": { "type": "string", "example": "What is money?" },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "An introduction to money."
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "example": "money.png"
+          },
+          "order": { "type": "number", "example": 1 },
+          "courseId": { "type": "number", "nullable": true, "example": 1 },
+          "rewardXp": { "type": "number", "example": 20 },
+          "rewardCoins": { "type": "number", "example": 5 },
+          "isPublished": { "type": "boolean", "example": true },
+          "course": { "$ref": "#/components/schemas/CourseSummaryResponseDto" }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "title",
+          "order",
+          "rewardXp",
+          "rewardCoins",
+          "isPublished"
+        ]
+      },
+      "CourseDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "title": { "type": "string", "example": "Financial Literacy Basics" },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "Core financial concepts for children."
+          },
+          "cover": {
+            "type": "string",
+            "nullable": true,
+            "example": "courses/finance-basics.png"
+          },
+          "order": { "type": "number", "example": 1 },
+          "lessons": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/LessonSummaryResponseDto" }
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "title",
+          "order",
+          "lessons"
+        ]
+      },
       "UpdateCourseDto": {
         "type": "object",
         "properties": {
@@ -1234,13 +2561,107 @@
           }
         },
         "required": [
-          "title",
           "sortOrder",
           "rewardXp",
           "rewardCoins",
           "order",
           "courseId",
           "isPublished"
+        ]
+      },
+      "LessonBlockResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "sortOrder": { "type": "number", "example": 1 },
+          "type": {
+            "type": "string",
+            "enum": [
+              "dialog",
+              "image",
+              "quiz",
+              "story",
+              "reward",
+              "animation",
+              "video",
+              "drag_drop",
+              "drop_down",
+              "question_block",
+              "film_and_image",
+              "coin_hunt",
+              "memory_financial"
+            ],
+            "example": "dialog"
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": {
+              "introduction": "Choose the best answer.",
+              "questionId": 10
+            }
+          },
+          "lesson": { "$ref": "#/components/schemas/LessonSummaryResponseDto" }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "sortOrder",
+          "type",
+          "payload"
+        ]
+      },
+      "LessonDetailResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "title": { "type": "string", "example": "What is money?" },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "An introduction to money."
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "example": "money.png"
+          },
+          "order": { "type": "number", "example": 1 },
+          "courseId": { "type": "number", "nullable": true, "example": 1 },
+          "rewardXp": { "type": "number", "example": 20 },
+          "rewardCoins": { "type": "number", "example": 5 },
+          "isPublished": { "type": "boolean", "example": true },
+          "course": { "$ref": "#/components/schemas/CourseSummaryResponseDto" },
+          "blocks": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/LessonBlockResponseDto" }
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "title",
+          "order",
+          "rewardXp",
+          "rewardCoins",
+          "isPublished",
+          "blocks"
         ]
       },
       "UpdateLessonDto": {
@@ -1329,7 +2750,9 @@
           "drag_drop",
           "drop_down",
           "question_block",
-          "film_and_image"
+          "film_and_image",
+          "coin_hunt",
+          "memory_financial"
         ]
       },
       "CreateLessonBlockDto": {
@@ -1510,12 +2933,37 @@
           }
         }
       },
+      "RewardResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 1 },
+          "lessonId": { "type": "number", "example": 42 },
+          "lessonTitle": { "type": "string", "example": "What is money?" },
+          "xp": { "type": "number", "example": 20 },
+          "coins": { "type": "number", "example": 5 },
+          "createdAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "lessonId", "xp", "coins", "createdAt"]
+      },
       "RequestOtpDto": {
         "type": "object",
         "properties": {
           "mobileNumber": { "type": "string", "example": "09121234567" }
         },
         "required": ["mobileNumber"]
+      },
+      "OtpRequestResponseDto": {
+        "type": "object",
+        "properties": {
+          "mobileNumber": { "type": "string", "example": "+989121234567" },
+          "expiresInSeconds": { "type": "number", "example": 300 },
+          "otp": {
+            "type": "string",
+            "example": "123456",
+            "description": "Only present when OTP_EXPOSE_IN_RESPONSE=true."
+          }
+        },
+        "required": ["mobileNumber", "expiresInSeconds"]
       },
       "VerifyOtpDto": {
         "type": "object",
@@ -1524,6 +2972,36 @@
           "otp": { "type": "string", "example": "123456" }
         },
         "required": ["mobileNumber", "otp"]
+      },
+      "AuthenticatedUserClaimsDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "number", "example": 7 },
+          "mobileNumber": { "type": "string", "example": "+989121234567" },
+          "role": {
+            "type": "string",
+            "example": "child",
+            "enum": ["child", "admin"]
+          }
+        },
+        "required": ["id", "mobileNumber", "role"]
+      },
+      "TokenPairResponseDto": {
+        "type": "object",
+        "properties": {
+          "accessToken": { "type": "string", "example": "access-token" },
+          "accessTokenExpiresIn": { "type": "number", "example": 900 },
+          "refreshToken": { "type": "string", "example": "refresh-token" },
+          "refreshTokenExpiresIn": { "type": "number", "example": 2592000 },
+          "user": { "$ref": "#/components/schemas/AuthenticatedUserClaimsDto" }
+        },
+        "required": [
+          "accessToken",
+          "accessTokenExpiresIn",
+          "refreshToken",
+          "refreshTokenExpiresIn",
+          "user"
+        ]
       },
       "RefreshTokenDto": {
         "type": "object",
@@ -1534,6 +3012,54 @@
           }
         },
         "required": ["refreshToken"]
+      },
+      "LeaderboardEntryResponseDto": {
+        "type": "object",
+        "properties": {
+          "rank": { "type": "number", "example": 1 },
+          "userId": { "type": "number", "example": 7 },
+          "nickname": { "type": "string", "example": "money_hero" },
+          "firstName": {
+            "type": "string",
+            "nullable": true,
+            "example": "Sara"
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true,
+            "example": "Ahmadi"
+          },
+          "score": { "type": "number", "example": 240 },
+          "stars": { "type": "number", "example": 8 },
+          "completedLessons": { "type": "number", "example": 4 }
+        },
+        "required": ["rank", "userId", "nickname", "score", "stars"]
+      },
+      "CourseScoreboardResponseDto": {
+        "type": "object",
+        "properties": {
+          "course": { "$ref": "#/components/schemas/CourseSummaryResponseDto" },
+          "leaderboard": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LeaderboardEntryResponseDto"
+            }
+          }
+        },
+        "required": ["course", "leaderboard"]
+      },
+      "LessonScoreboardResponseDto": {
+        "type": "object",
+        "properties": {
+          "lesson": { "type": "object", "additionalProperties": true },
+          "leaderboard": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LeaderboardEntryResponseDto"
+            }
+          }
+        },
+        "required": ["lesson", "leaderboard"]
       }
     }
   }

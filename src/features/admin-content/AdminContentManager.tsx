@@ -81,7 +81,7 @@ const sections: SectionDefinition[] = [
   },
 ];
 
-const blockTypeLabels: Record<BlockType, string> = {
+const blockTypeLabels: Partial<Record<BlockType, string>> = {
   dialog: 'گفت‌وگو',
   image: 'تصویر',
   quiz: 'آزمون',
@@ -92,7 +92,7 @@ const blockTypeLabels: Record<BlockType, string> = {
   drag_drop: 'کشیدن و رها کردن',
 };
 
-const blockPresets: Record<BlockType, Record<string, unknown>> = {
+const blockPresets: Partial<Record<BlockType, Record<string, unknown>>> = {
   dialog: {
     character: 'fox',
     text: 'سلام! امروز درباره پول یاد می‌گیریم.',
@@ -127,6 +127,53 @@ const blockPresets: Record<BlockType, Record<string, unknown>> = {
     targets: [],
   },
 };
+
+Object.assign(blockTypeLabels, {
+  drop_down: 'انتخاب گزینه',
+  question_block: 'بلوک سوال',
+  film_and_image: 'فیلم و تصویر',
+  coin_hunt: 'شکار سکه',
+  memory_financial: 'حافظه مالی',
+});
+
+Object.assign(blockPresets, {
+  drop_down: { introduction: '', label: '', options: [] },
+  question_block: { introduction: '', label: '', options: [] },
+  film_and_image: { introduction: '', videoUrl: '', imageUrl: '' },
+  coin_hunt_legacy: {
+    title: 'شکار سکه',
+    introduction: 'سکه‌های درست را جمع کن!',
+    items: [
+      { id: 'coin-100', value: 100, collectible: true },
+      { id: 'coin-500', value: 500, collectible: true },
+    ],
+  },
+  memory_financial_legacy: {
+    title: 'حافظه مالی',
+    introduction: 'کارت‌های مرتبط را پیدا کن!',
+    pairs: [
+      { id: 'saving', cardA: 'پس‌انداز', cardB: 'هدف آینده' },
+      { id: 'loan', cardA: 'وام', cardB: 'قرض گرفتن پول' },
+    ],
+  },
+  coin_hunt: {
+    introduction: 'Coin Hunt',
+    duration: 60,
+    target: { type: 'count', value: 2 },
+    scoring: { correct: 10, wrong: -2 },
+    items: [
+      { id: 'coin-100', value: 100 },
+      { id: 'coin-500', value: 500 },
+    ],
+  },
+  memory_financial: {
+    introduction: 'Match the pairs',
+    pairs: [
+      { id: 'saving', first: { type: 'saving' }, second: { type: 'future_goal' } },
+      { id: 'loan', first: { type: 'loan' }, second: { type: 'borrowing' } },
+    ],
+  },
+});
 
 const initialCourseForm = {
   title: '',

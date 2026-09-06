@@ -30,6 +30,7 @@ import LessonResultScreen from './LessonResult';
 import RewardBlock from './RewardBlock';
 import StoryBlock from './StoryBlock';
 import VideoBlock from './VideoBlock';
+import { CoinHuntGame, MemoryFinancialGame } from './GameBlocks';
 
 interface Props {
   lesson: LessonData;
@@ -172,6 +173,24 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
             key={block.id}
             payload={block.payload as DragDropPayload}
             onNext={(isCorrect) => handleActivityNext(block.id, isCorrect)}
+          />
+        );
+      case 'coin_hunt':
+        return (
+          <CoinHuntGame
+            key={block.id}
+            blockId={block.id}
+            payload={block.payload as unknown as Record<string, unknown>}
+            onNext={handleNext}
+          />
+        );
+      case 'memory_financial':
+        return (
+          <MemoryFinancialGame
+            key={block.id}
+            blockId={block.id}
+            payload={block.payload as unknown as Record<string, unknown>}
+            onNext={handleNext}
           />
         );
       default:

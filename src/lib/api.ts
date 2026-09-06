@@ -119,6 +119,29 @@ export type UserProfile = {
   avatarId?: number;
 };
 
+export type CompleteGameDto = {
+  gameType: 'coin_hunt' | 'memory_financial';
+  collectedItemIds?: string[];
+  matchedPairIds?: string[];
+  attempts?: number;
+  mistakes?: number;
+  startedAt?: string;
+  completedAt?: string;
+};
+
+export type GameResultResponse = {
+  blockId: number;
+  gameType: string;
+  score: number;
+  completed: boolean;
+  attempts: number;
+  mistakes: number;
+  result: Record<string, unknown>;
+  reward?: Record<string, unknown> | null;
+  xp: number;
+  coins?: number;
+};
+
 export const api = {
   requestOtp: (payload: { mobileNumber: string }) =>
     post<typeof payload, unknown>('/auth/otp/request', payload, false),
@@ -135,6 +158,13 @@ export const api = {
     grade?: number;
     avatarId?: number;
   }) => patch<typeof payload, UserProfile>('/users/me', payload),
+  completeGame: (blockId: number, payload: CompleteGameDto) =>
+    post<CompleteGameDto, GameResultResponse>(
+      `/game/blocks/${blockId}/complete`,
+      payload,
+    ),
+  getGameResult: (blockId: number) =>
+    get<GameResultResponse>(`/game/blocks/${blockId}/result`),
   getLessonPlay: async (id: number) => ({
     data: unwrapData<LessonData>(
       await get<LessonData | { data: LessonData }>(
@@ -167,4 +197,6 @@ export const api = {
     post<CreateLessonInput, unknown>('/lessons', payload),
   createLessonBlock: (payload: CreateLessonBlockInput) =>
     post<CreateLessonBlockInput, unknown>('/lesson-blocks', payload),
+  updateLessonBlock: (id: number, payload: Partial<CreateLessonBlockInput>) =>
+    patch<Partial<CreateLessonBlockInput>, unknown>(`/lesson-blocks/${id}`, payload),
 };

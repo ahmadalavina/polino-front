@@ -32,7 +32,7 @@ type BlockMeta = {
   color: string;
 };
 
-const blockMeta: Record<BlockType, BlockMeta> = {
+const blockMeta: Partial<Record<BlockType, BlockMeta>> = {
   dialog: { label: "گفت‌وگو", icon: MessageCircle, color: "#7c5cff" },
   image: { label: "تصویر", icon: ImageIcon, color: "#16b8a6" },
   quiz: { label: "آزمون", icon: HelpCircle, color: "#ff8a55" },
@@ -650,6 +650,51 @@ function DialogPreview({ payload }: { payload: Record<string, unknown> }) {
   );
 }
 
+function CoinHuntForm({ payload, onChange }: { payload: Record<string, unknown>; onChange: (p: Record<string, unknown>) => void }) {
+  const items = Array.isArray(payload.items) ? payload.items as Record<string, unknown>[] : [];
+  const update = (index: number, key: string, value: unknown) => onChange({ ...payload, items: items.map((item, i) => i === index ? { ...item, [key]: value } : item) });
+  const target = (payload.target ?? {}) as Record<string, unknown>;
+  const scoring = (payload.scoring ?? {}) as Record<string, unknown>;
+  return <Section title="تنظیمات شکار سکه">
+    <TextInput label="عنوان بازی" value={String(payload.title ?? '')} onChange={(v) => onChange({ ...payload, title: v })} />
+    <label className="block"><FieldLabel>راهنما</FieldLabel><textarea rows={2} value={String(payload.introduction ?? '')} onChange={(e) => onChange({ ...payload, introduction: e.target.value })} className={textareaClass} /></label>
+    <div className="grid gap-3 sm:grid-cols-3">
+      <NumberInput label="مدت (ثانیه)" value={Number(payload.duration ?? 60)} onChange={(v) => onChange({ ...payload, duration: v })} min={1} />
+      <label className="block"><FieldLabel>نوع هدف</FieldLabel><select value={String(target.type ?? 'count')} onChange={(e) => onChange({ ...payload, target: { ...target, type: e.target.value } })} className={fieldClass}><option value="count">تعداد</option><option value="amount">مجموع ارزش</option><option value="item_value">ارزش آیتم</option></select></label>
+      <NumberInput label="مقدار هدف" value={Number(target.value ?? 1)} onChange={(v) => onChange({ ...payload, target: { ...target, value: v } })} min={1} />
+    </div>
+    <div className="grid gap-3 sm:grid-cols-2">
+      <NumberInput label="امتیاز صحیح" value={Number(scoring.correct ?? 10)} onChange={(v) => onChange({ ...payload, scoring: { ...scoring, correct: v } })} />
+      <NumberInput label="امتیاز اشتباه" value={Number(scoring.wrong ?? -2)} onChange={(v) => onChange({ ...payload, scoring: { ...scoring, wrong: v } })} />
+    </div>
+    <div className="space-y-3"><div className="flex items-center justify-between"><FieldLabel>آیتم‌ها</FieldLabel><button type="button" onClick={() => onChange({ ...payload, items: [...items, { id: `coin-${items.length + 1}`, value: 100, collectible: true }] })} className="text-xs font-black text-[#7c5cff]"><Plus size={14} className="inline" /> افزودن</button></div>
+      {items.map((item, index) => <div key={index} className="grid gap-2 rounded-xl border-2 border-slate-100 p-3 sm:grid-cols-[1fr_100px_auto]"><TextInput label="شناسه" value={String(item.id ?? '')} onChange={(v) => update(index, 'id', v)} dir="ltr" /><NumberInput label="ارزش" value={Number(item.value ?? 0)} onChange={(v) => update(index, 'value', v)} min={0} /><button type="button" aria-label="حذف آیتم" onClick={() => onChange({ ...payload, items: items.filter((_, i) => i !== index) })} className="self-end rounded-xl p-3 text-rose-500"><Trash2 size={17} /></button><label className="flex items-center gap-2 text-xs font-bold text-slate-500"><input type="checkbox" checked={item.collectible !== false} onChange={(e) => update(index, 'collectible', e.target.checked)} /> قابل جمع‌آوری</label></div>)}
+    </div>
+  </Section>;
+}
+
+function MemoryFinancialForm({ payload, onChange }: { payload: Record<string, unknown>; onChange: (p: Record<string, unknown>) => void }) {
+  const pairs = Array.isArray(payload.pairs) ? payload.pairs as Record<string, unknown>[] : [];
+  const update = (index: number, side: 'first' | 'second', value: string) => onChange({ ...payload, pairs: pairs.map((pair, i) => i === index ? { ...pair, [side]: { ...(pair[side] as Record<string, unknown> ?? {}), type: value } } : pair) });
+  return <Section title="تنظیمات حافظه مالی">
+    <TextInput label="عنوان بازی" value={String(payload.title ?? '')} onChange={(v) => onChange({ ...payload, title: v })} />
+    <label className="block"><FieldLabel>راهنما</FieldLabel><textarea rows={2} value={String(payload.introduction ?? '')} onChange={(e) => onChange({ ...payload, introduction: e.target.value })} className={textareaClass} /></label>
+    <NumberInput label="حداکثر تلاش (اختیاری)" value={Number(payload.maxAttempts ?? 0)} onChange={(v) => onChange({ ...payload, maxAttempts: v || undefined })} min={1} />
+    <div className="space-y-3"><div className="flex items-center justify-between"><FieldLabel>جفت‌ها</FieldLabel><button type="button" onClick={() => onChange({ ...payload, pairs: [...pairs, { id: `pair-${pairs.length + 1}`, first: { type: '' }, second: { type: '' } }] })} className="text-xs font-black text-[#7c5cff]"><Plus size={14} className="inline" /> افزودن جفت</button></div>
+      {pairs.map((pair, index) => <div key={index} className="grid gap-2 rounded-xl border-2 border-slate-100 p-3 sm:grid-cols-2"><TextInput label={`جفت ${index + 1} - کارت اول`} value={String((pair.first as Record<string, unknown> | undefined)?.type ?? '')} onChange={(v) => update(index, 'first', v)} /><TextInput label="کارت دوم" value={String((pair.second as Record<string, unknown> | undefined)?.type ?? '')} onChange={(v) => update(index, 'second', v)} /><button type="button" onClick={() => onChange({ ...payload, pairs: pairs.filter((_, i) => i !== index) })} className="text-start text-xs font-black text-rose-500"><Trash2 size={15} className="inline" /> حذف جفت</button></div>)}
+    </div>
+  </Section>;
+}
+
+function GamePreview({ payload, type }: { payload: Record<string, unknown>; type: 'coin_hunt' | 'memory_financial' }) {
+  if (type === 'coin_hunt') {
+    const items = Array.isArray(payload.items) ? payload.items as Record<string, unknown>[] : [];
+    return <div className="grid grid-cols-3 gap-2 p-4">{items.map((item, i) => <div key={i} className="rounded-xl bg-amber-50 p-3 text-center text-2xl">🪙<span className="block text-xs font-black">{String(item.value ?? 0)}</span></div>)}</div>;
+  }
+  const pairs = Array.isArray(payload.pairs) ? payload.pairs as Record<string, unknown>[] : [];
+  return <div className="grid grid-cols-2 gap-2 p-4">{pairs.flatMap((pair, i) => [String(pair.cardA ?? 'کارت A'), String(pair.cardB ?? 'کارت B')]).map((label, i) => <div key={i} className="rounded-xl bg-violet-50 p-3 text-center text-xs font-black text-violet-700">{label}</div>)}</div>;
+}
+
 function ImagePreview({ payload }: { payload: Record<string, unknown> }) {
   const url = String(payload.url ?? "");
   const caption = String(payload.caption ?? "");
@@ -823,7 +868,7 @@ function LivePreview({
   blockType: BlockType;
   payload: Record<string, unknown>;
 }) {
-  const meta = blockMeta[blockType];
+  const meta = blockMeta[blockType] ?? { label: blockType, icon: BookOpen, color: '#7c5cff' };
 
   return (
     <div className="overflow-hidden rounded-2xl border-2 border-slate-100 bg-white shadow-[0_12px_40px_rgba(38,61,89,0.08)]">
@@ -843,6 +888,7 @@ function LivePreview({
         {blockType === "animation" && <MediaPreview payload={payload} mediaType="animation" />}
         {blockType === "video" && <MediaPreview payload={payload} mediaType="video" />}
         {blockType === "drag_drop" && <DragDropPreview payload={payload} />}
+        {(blockType === "coin_hunt" || blockType === "memory_financial") && <GamePreview payload={payload} type={blockType} />}
       </div>
     </div>
   );
@@ -857,6 +903,11 @@ export default function BlockPayloadEditor({
   const [showRawJson, setShowRawJson] = useState(false);
 
   const payload = safeParse(payloadJson);
+  const meta = blockMeta[blockType] ?? {
+    label: blockType,
+    icon: BookOpen,
+    color: '#7c5cff',
+  };
   const payloadIsValid = isValidPayload(payloadJson);
 
   function handleChange(patch: Record<string, unknown>) {
@@ -869,17 +920,17 @@ export default function BlockPayloadEditor({
         <div className="flex items-center gap-3">
           <div
             className="grid size-11 shrink-0 place-items-center rounded-xl text-white"
-            style={{ backgroundColor: blockMeta[blockType].color }}
+            style={{ backgroundColor: meta.color }}
           >
             {(() => {
-              const BlockIcon = blockMeta[blockType].icon;
+              const BlockIcon = meta.icon;
               return <BlockIcon size={21} />;
             })()}
           </div>
           <div>
             <p className="text-sm font-black text-slate-800">محتوای بلوک</p>
             <p className="mt-1 text-xs font-bold text-slate-400">
-              تنظیمات {blockMeta[blockType].label} را تکمیل کنید.
+              تنظیمات {meta.label} را تکمیل کنید.
             </p>
           </div>
         </div>
@@ -976,6 +1027,12 @@ export default function BlockPayloadEditor({
               )}
               {blockType === "drag_drop" && (
                 <DragDropForm payload={payload} onChange={handleChange} />
+              )}
+              {blockType === "coin_hunt" && (
+                <CoinHuntForm payload={payload} onChange={handleChange} />
+              )}
+              {blockType === "memory_financial" && (
+                <MemoryFinancialForm payload={payload} onChange={handleChange} />
               )}
             </div>
           )}
