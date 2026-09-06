@@ -37,6 +37,7 @@ export interface CreateLessonInput {
 
 export interface CreateLessonBlockInput {
   sortOrder: number;
+  pageNumber: number;
   type: BlockType;
   payload: Record<string, unknown>;
   lessonId: number;

@@ -26,6 +26,7 @@ export const lessonSchema = z.object({
 });
 
 export const lessonBlockSchema = z.object({
+  pageNumber: z.coerce.number().int().min(1),
   sortOrder: z.coerce.number().int().min(1, 'ترتیب بلاک باید حداقل ۱ باشد.'),
   type: z.enum([
     'dialog',

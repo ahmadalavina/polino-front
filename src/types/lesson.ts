@@ -86,6 +86,7 @@ export type LessonBlockPayload =
 
 export interface LessonBlock {
   id: number;
+  pageNumber?: number;
   sortOrder?: number;
   type: BlockType;
   payload: LessonBlockPayload;

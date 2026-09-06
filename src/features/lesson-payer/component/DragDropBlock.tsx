@@ -30,7 +30,7 @@ export default function DragDropBlock({ payload, onNext }: Props) {
   const isCorrect = placements.every(
     (itemIndex, targetIndex) =>
       itemIndex !== null &&
-      payload.items[itemIndex] === payload.targets[targetIndex],
+      itemIndex === targetIndex,
   );
 
   function placeItem(itemIndex: number, targetIndex: number) {

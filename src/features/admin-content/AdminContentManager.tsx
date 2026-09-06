@@ -199,6 +199,7 @@ const initialBlockForm = {
   courseId: '',
   lessonId: '',
   sortOrder: '1',
+  pageNumber: '1',
   type: 'dialog' as BlockType,
   payload: JSON.stringify(blockPresets.dialog, null, 2),
 };
@@ -913,6 +914,21 @@ export default function AdminContentManager() {
                       className={inputClassName}
                     />
                   </FormField>
+                  {/* <FormField
+                    label="شماره صفحه"
+                    hint="شماره صفحه‌ای که این بلوک در آن نمایش داده می‌شود."
+                    error={blockErrors.pageNumber}
+                  >
+                    <input
+                      type="number"
+                      min={1}
+                      value={blockForm.pageNumber}
+                      onChange={(event) =>
+                        setBlockForm((form) => ({ ...form, pageNumber: event.target.value }))
+                      }
+                      className={inputClassName}
+                    />
+                  </FormField> */}
                   <FormField label="شماره درس" error={lessonErrors.order}>
                     <input
                       type="number"
@@ -1045,6 +1061,21 @@ export default function AdminContentManager() {
                           ...form,
                           sortOrder: event.target.value,
                         }))
+                      }
+                      className={inputClassName}
+                    />
+                  </FormField>
+                  <FormField
+                    label="شماره صفحه"
+                    hint="شماره صفحه‌ای که این بلوک در آن نمایش داده می‌شود."
+                    error={blockErrors.pageNumber}
+                  >
+                    <input
+                      type="number"
+                      min={1}
+                      value={blockForm.pageNumber}
+                      onChange={(event) =>
+                        setBlockForm((form) => ({ ...form, pageNumber: event.target.value }))
                       }
                       className={inputClassName}
                     />

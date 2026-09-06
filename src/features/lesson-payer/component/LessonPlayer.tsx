@@ -61,11 +61,21 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
       .map((block, originalIndex) => ({ block, originalIndex }))
       .sort(
         (first, second) =>
+          (first.block.pageNumber ?? 1) - (second.block.pageNumber ?? 1) ||
           (first.block.sortOrder ?? first.originalIndex) -
           (second.block.sortOrder ?? second.originalIndex),
       )
       .map(({ block }) => block);
   }, [lesson.blocks]);
+
+  const pages = useMemo(() => {
+    const grouped = new Map<number, LessonBlock[]>();
+    blocks.forEach((block) => {
+      const page = block.pageNumber ?? 1;
+      grouped.set(page, [...(grouped.get(page) ?? []), block]);
+    });
+    return [...grouped.entries()].map(([pageNumber, pageBlocks]) => ({ pageNumber, blocks: pageBlocks }));
+  }, [blocks]);
 
   const rewards = useMemo(() => {
     const rewardBlocks = lesson.blocks.filter(
@@ -92,7 +102,7 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
   }, [lesson.blocks, lesson.rewardCoins, lesson.rewardXp]);
 
   function handleNext() {
-    if (currentIndex + 1 >= blocks.length) {
+    if (currentIndex + 1 >= pages.length) {
       setDone(true);
       return;
     }
@@ -264,8 +274,9 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
     );
   }
 
-  const currentBlock = blocks[currentIndex];
-  const progress = ((currentIndex + 1) / blocks.length) * 100;
+  const currentPage = pages[currentIndex];
+  const currentBlock = currentPage?.blocks[0] ?? blocks[0];
+  const progress = ((currentIndex + 1) / pages.length) * 100;
 
   return (
     <main
@@ -324,7 +335,11 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
         </div>
 
         <section className="overflow-hidden rounded-[30px] border-2 border-white bg-white/95 shadow-[0_20px_65px_rgba(38,61,89,0.12)] backdrop-blur">
-          {renderBlock(currentBlock)}
+          {(pages[currentIndex]?.blocks ?? []).map((block, blockIndex, pageBlocks) => (
+            <div key={block.id} className={blockIndex === pageBlocks.length - 1 ? undefined : '[&>div>button:last-child]:hidden'}>
+              {renderBlock(block)}
+            </div>
+          ))}
           {currentIndex > 0 && (
             <div className="border-t-2 border-dashed border-slate-100 px-5 py-4 sm:px-8">
               <button
