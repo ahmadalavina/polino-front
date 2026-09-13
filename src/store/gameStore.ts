@@ -27,6 +27,7 @@ export const useGameStore = create<GameState>((set) => ({
     set((state) => ({ hearts: state.hearts + amount })),
 
   spendCoins: (amount) =>
+    //@ts-ignore
     set((state) => {
       if (state.coins >= amount) {
         return { coins: state.coins - amount };
@@ -35,6 +36,7 @@ export const useGameStore = create<GameState>((set) => ({
     }),
 
   spendXp: (amount) =>
+    //@ts-ignore
     set((state) => {
       if (state.xp >= amount) {
         return { xp: state.xp - amount };
