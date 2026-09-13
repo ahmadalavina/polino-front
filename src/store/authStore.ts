@@ -27,8 +27,10 @@ export const useAuthStore = create<AuthState>()(
       setHydrated: (hydrated) => set({ hydrated }),
 
       setToken: (token, refreshToken) => {
-        localStorage.setItem('token', token);
-        localStorage.setItem('refreshToken', refreshToken);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('token', token);
+          localStorage.setItem('refreshToken', refreshToken);
+        }
         set({ token, refreshToken, isAuthenticated: true });
       },
 
@@ -37,8 +39,10 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+        }
         set({ token: null, refreshToken: null, profile: null, isAuthenticated: false });
       },
 

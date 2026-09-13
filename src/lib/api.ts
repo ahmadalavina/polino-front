@@ -27,6 +27,13 @@ function getAuthToken() {
   return state.token || localToken || process.env.NEXT_PUBLIC_MOCK_JWT || '';
 }
 
+function getRefreshToken() {
+  const state = useAuthStore.getState();
+  const localRefreshToken =
+    typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
+  return state.refreshToken || localRefreshToken || '';
+}
+
 function unwrapData<T>(response: unknown): T {
   if (
     typeof response === 'object' &&
@@ -39,10 +46,69 @@ function unwrapData<T>(response: unknown): T {
   return response as T;
 }
 
+export type TokenPairResponse = {
+  accessToken: string;
+  accessTokenExpiresIn: number;
+  refreshToken: string;
+  refreshTokenExpiresIn: number;
+  user: {
+    id: number;
+    mobileNumber: string;
+    role: 'child' | 'admin';
+  };
+};
+
+let refreshPromise: Promise<string> | null = null;
+
+async function rotateRefreshToken() {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    const refreshToken = getRefreshToken();
+    if (!refreshToken) throw new ApiError('نشست شما به پایان رسیده است.', 401);
+
+    const response = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Accept-Language': 'fa',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!response.ok) {
+      throw new ApiError('امکان تمدید نشست وجود ندارد.', response.status);
+    }
+
+    const responseBody = (await response.json()) as
+      | TokenPairResponse
+      | { data: TokenPairResponse };
+    const tokenPair = unwrapData<TokenPairResponse>(responseBody);
+
+    if (!tokenPair.accessToken || !tokenPair.refreshToken) {
+      throw new ApiError('پاسخ تمدید نشست معتبر نیست.', 401);
+    }
+
+    useAuthStore.getState().setToken(
+      tokenPair.accessToken,
+      tokenPair.refreshToken,
+    );
+    return tokenPair.accessToken;
+  })().catch((error) => {
+    useAuthStore.getState().logout();
+    throw error;
+  }).finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
+}
+
 async function request<T>(
   path: string,
   init?: RequestInit,
   authenticated = true,
+  hasRetried = false,
 ): Promise<T> {
   const headers = new Headers(init?.headers);
   headers.set('Accept-Language', 'fa');
@@ -56,6 +122,13 @@ async function request<T>(
     ...init,
     headers,
   });
+
+  if (response.status === 401 && authenticated && !hasRetried) {
+    const accessToken = await rotateRefreshToken();
+    const retryHeaders = new Headers(init?.headers);
+    retryHeaders.set('Authorization', `Bearer ${accessToken}`);
+    return request<T>(path, { ...init, headers: retryHeaders }, true, true);
+  }
 
   if (!response.ok) {
     let message = `خطای API با کد ${response.status}`;
@@ -148,6 +221,7 @@ export const api = {
     post<typeof payload, unknown>('/auth/otp/request', payload, false),
   verifyOtp: (payload: { mobileNumber: string; otp: string }) =>
     post<typeof payload, VerifyOtpResponse>('/auth/otp/verify', payload, false),
+  refreshSession: () => rotateRefreshToken(),
   getMyProfile: async () =>
     unwrapData<UserProfile | null>(
       await get<UserProfile | null | { data: UserProfile | null }>('/users/me'),

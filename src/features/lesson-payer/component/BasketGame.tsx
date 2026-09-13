@@ -255,11 +255,20 @@ export default function BasketGame({
       >
         <div className="absolute inset-x-0 top-4 text-center text-sm font-black text-sky-700">سکه‌ها را بگیر و از بمب‌ها دوری کن!</div>
         {items.map((item) => (
-          <div key={item.id} className="absolute grid size-[42px] place-items-center text-4xl drop-shadow" style={{ transform: `translate3d(${item.x}px, ${item.y}px, 0)` }}>
-            {item.type === 'coin' ? '🪙' : '💣'}
+          <div
+            key={item.id}
+            className="absolute grid size-[42px] place-items-center text-4xl drop-shadow"
+            style={{ left: 0, top: 0, transform: `translate3d(${item.x}px, ${item.y}px, 0)` }}
+          >
+            {item.type === 'coin' ? '⭐️' : '💣'}
           </div>
         ))}
-        <div className="absolute grid h-[58px] w-[86px] place-items-center text-6xl drop-shadow-lg" style={{ bottom: PLAYER_BOTTOM, transform: `translate3d(${playerX}px, 0, 0)` }}>🧺</div>
+        <div
+          className="absolute grid h-[58px] w-[86px] place-items-center text-6xl drop-shadow-lg"
+          style={{ left: 0, bottom: PLAYER_BOTTOM, transform: `translate3d(${playerX}px, 0, 0)` }}
+        >
+          🧺
+        </div>
 
         {effect && (
           <div key={effect.id} className={`absolute inset-x-4 top-16 rounded-2xl p-3 text-center text-sm font-black shadow-lg ${effect.kind === 'coin' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
