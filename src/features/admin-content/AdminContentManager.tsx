@@ -35,7 +35,9 @@ import {
   courseSchema,
   lessonBlockSchema,
   lessonSchema,
+  validateBlockPayload,
 } from './schemas';
+import { basketGameDefaults } from '@/features/basket-game/basketGame';
 import BlockPayloadEditor from './components/BlockPayloadEditor';
 
 type AdminSection = 'course' | 'lesson' | 'block';
@@ -134,6 +136,8 @@ Object.assign(blockTypeLabels, {
   film_and_image: 'فیلم و تصویر',
   coin_hunt: 'شکار سکه',
   memory_financial: 'حافظه مالی',
+  decision_tree: 'درخت تصمیم',
+  basket_game: 'بازی سبد',
 });
 
 Object.assign(blockPresets, {
@@ -173,6 +177,17 @@ Object.assign(blockPresets, {
       { id: 'loan', first: { type: 'loan' }, second: { type: 'borrowing' } },
     ],
   },
+  decision_tree: {
+    steps: [
+      { id: 'pay-debt', question: 'بدهی داری، اول چی کار می‌کنی؟', choices: ['pay-debt', 'save', 'spend'] },
+      { id: 'save', question: 'پول اضافی داری، اولویت بعدی چیه؟', choices: ['pay-debt', 'save', 'spend'] },
+      { id: 'spend', question: 'بدهی صاف شد، پس‌انداز هم شد، چی می‌مونه؟', choices: ['pay-debt', 'save', 'spend'] },
+    ],
+    correctOrder: { steps: ['pay-debt', 'save', 'spend'] },
+    lesson: { lesson: 'اول بدهی رو بده، بعد پس‌انداز کن، بعد خرج کن.' },
+    scoring: { correct: 10, wrong: -5, maxScore: 30 },
+  },
+  basket_game: basketGameDefaults,
 });
 
 const initialCourseForm = {
@@ -521,6 +536,15 @@ export default function AdminContentManager() {
       });
       return;
     }
+
+    const validatedPayload = validateBlockPayload(blockForm.type, payload);
+    if (!validatedPayload.success) {
+      setBlockErrors({
+        payload: validatedPayload.error.issues[0]?.message ?? 'تنظیمات بازی معتبر نیست.',
+      });
+      return;
+    }
+    payload = validatedPayload.data;
 
     if (!blockForm.courseId) {
       setBlockErrors({ courseId: 'یک دوره انتخاب کنید.' });

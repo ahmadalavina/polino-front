@@ -14,6 +14,10 @@ import {
   HelpCircle,
   BookOpen,
   Check,
+  GitBranch,
+  ArrowUp,
+  ArrowDown,
+  ShoppingBasket,
   type LucideIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -41,6 +45,8 @@ const blockMeta: Partial<Record<BlockType, BlockMeta>> = {
   animation: { label: "انیمیشن", icon: Eye, color: "#8b5cf6" },
   video: { label: "ویدیو", icon: Eye, color: "#ef4444" },
   drag_drop: { label: "کشیدن و رها کردن", icon: GripVertical, color: "#06b6d4" },
+  decision_tree: { label: "درخت تصمیم", icon: GitBranch, color: "#f59e0b" },
+  basket_game: { label: "بازی سبد", icon: ShoppingBasket, color: "#f59e0b" },
 };
 
 function safeParse(json: string): Record<string, unknown> {
@@ -611,6 +617,90 @@ function DragDropForm({
   );
 }
 
+function BasketGameForm({
+  payload,
+  onChange,
+}: {
+  payload: Record<string, unknown>;
+  onChange: (p: Record<string, unknown>) => void;
+}) {
+  const difficulty = (payload.difficulty ?? {}) as Record<string, unknown>;
+  const scoring = (payload.scoring ?? {}) as Record<string, unknown>;
+
+  function updateDifficulty(field: string, value: number) {
+    onChange({ ...payload, difficulty: { ...difficulty, [field]: value } });
+  }
+
+  function updateScoring(field: string, value: number) {
+    onChange({ ...payload, scoring: { ...scoring, [field]: value } });
+  }
+
+  function ConfigField({
+    label,
+    hint,
+    value,
+    onValueChange,
+    min,
+    max,
+    step = 1,
+  }: {
+    label: string;
+    hint: string;
+    value: number;
+    onValueChange: (value: number) => void;
+    min: number;
+    max?: number;
+    step?: number;
+  }) {
+    return (
+      <label className="block">
+        <FieldLabel>{label}</FieldLabel>
+        <input
+          type="number"
+          value={value}
+          min={min}
+          max={max}
+          step={step}
+          onChange={(event) => onValueChange(Number(event.target.value))}
+          className={fieldClass}
+          dir="ltr"
+        />
+        <span className="mt-1.5 block text-xs font-medium leading-5 text-slate-400">
+          {hint}
+        </span>
+      </label>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      <Section title="زمان‌بندی بازی">
+        <ConfigField
+          label="مدت بازی (ثانیه)"
+          hint="مدت اولیه خط زمان؛ باید یک عدد صحیح بزرگ‌تر از صفر باشد."
+          value={Number(payload.durationSeconds ?? 60)}
+          onValueChange={(durationSeconds) => onChange({ ...payload, durationSeconds })}
+          min={1}
+        />
+      </Section>
+      <Section title="درجه سختی">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <ConfigField label="فاصله ایجاد آیتم‌ها (میلی‌ثانیه)" hint="هرچه کمتر باشد، سکه و بمب سریع‌تر ظاهر می‌شوند." value={Number(difficulty.spawnIntervalMs ?? 800)} onValueChange={(value) => updateDifficulty('spawnIntervalMs', value)} min={1} />
+          <ConfigField label="سرعت افتادن آیتم‌ها" hint="سرعت حرکت سکه‌ها و بمب‌ها به سمت پایین." value={Number(difficulty.fallingSpeed ?? 180)} onValueChange={(value) => updateDifficulty('fallingSpeed', value)} min={1} />
+          <ConfigField label="سرعت حرکت بازیکن" hint="سرعت حرکت افقی سبد با کلیدهای جهت‌دار." value={Number(difficulty.playerSpeed ?? 300)} onValueChange={(value) => updateDifficulty('playerSpeed', value)} min={1} />
+          <ConfigField label="احتمال نمایش بمب" hint="عددی بین صفر و یک؛ مثلاً ۰٫۲۵ یعنی ۲۵ درصد." value={Number(difficulty.bombChance ?? 0.25)} onValueChange={(value) => updateDifficulty('bombChance', value)} min={0} max={1} step={0.01} />
+        </div>
+      </Section>
+      <Section title="امتیازدهی و جریمه">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <ConfigField label="تعداد سکه برای هر امتیاز" hint="پس از جمع‌کردن این تعداد سکه، یک امتیاز ثبت می‌شود." value={Number(scoring.coinsPerPoint ?? 3)} onValueChange={(value) => updateScoring('coinsPerPoint', value)} min={1} />
+          <ConfigField label="جریمه زمانی هر بمب (ثانیه)" hint="تعداد ثانیه‌ای که با گرفتن هر بمب از زمان کم می‌شود." value={Number(scoring.bombTimePenaltySeconds ?? 5)} onValueChange={(value) => updateScoring('bombTimePenaltySeconds', value)} min={0} />
+        </div>
+      </Section>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  Live Previews                                                     */
 /* ------------------------------------------------------------------ */
@@ -684,6 +774,277 @@ function MemoryFinancialForm({ payload, onChange }: { payload: Record<string, un
       {pairs.map((pair, index) => <div key={index} className="grid gap-2 rounded-xl border-2 border-slate-100 p-3 sm:grid-cols-2"><TextInput label={`جفت ${index + 1} - کارت اول`} value={String((pair.first as Record<string, unknown> | undefined)?.type ?? '')} onChange={(v) => update(index, 'first', v)} /><TextInput label="کارت دوم" value={String((pair.second as Record<string, unknown> | undefined)?.type ?? '')} onChange={(v) => update(index, 'second', v)} /><button type="button" onClick={() => onChange({ ...payload, pairs: pairs.filter((_, i) => i !== index) })} className="text-start text-xs font-black text-rose-500"><Trash2 size={15} className="inline" /> حذف جفت</button></div>)}
     </div>
   </Section>;
+}
+
+type DecisionStep = {
+  id: string;
+  question: string;
+};
+
+function DecisionTreeForm({
+  payload,
+  onChange,
+}: {
+  payload: Record<string, unknown>;
+  onChange: (p: Record<string, unknown>) => void;
+}) {
+  const steps: DecisionStep[] = Array.isArray(payload.steps)
+    ? payload.steps.map((item, index) => {
+        const step = item as Record<string, unknown>;
+        return {
+          id: String(step.id ?? `step-${index + 1}`),
+          question: String(step.question ?? ""),
+        };
+      })
+    : [];
+  const correctOrderRecord = (payload.correctOrder ?? {}) as Record<
+    string,
+    unknown
+  >;
+  const scoring = (payload.scoring ?? {}) as Record<string, unknown>;
+  const storedOrder = Array.isArray(correctOrderRecord.steps)
+    ? correctOrderRecord.steps.map(String)
+    : [];
+  const stepIds = steps.map((step) => step.id);
+  const correctOrder = [
+    ...storedOrder.filter((id) => stepIds.includes(id)),
+    ...stepIds.filter((id) => !storedOrder.includes(id)),
+  ];
+
+  function commit(nextSteps: DecisionStep[], nextOrder = correctOrder) {
+    onChange({
+      steps: nextSteps,
+      correctOrder: { steps: nextOrder },
+      scoring: { correct: Number(scoring.correct ?? 1) },
+    });
+  }
+
+  function addStep() {
+    let suffix = steps.length + 1;
+    let id = `step-${suffix}`;
+    while (stepIds.includes(id)) {
+      suffix += 1;
+      id = `step-${suffix}`;
+    }
+
+    commit(
+      [...steps, { id, question: "" }],
+      [...correctOrder, id],
+    );
+  }
+
+  function updateStep(index: number, patch: Partial<DecisionStep>) {
+    const previousId = steps[index].id;
+    const nextId = patch.id ?? previousId;
+    const nextSteps = steps.map((step, stepIndex) => {
+      const updated = stepIndex === index ? { ...step, ...patch } : step;
+      return updated;
+    });
+    const nextOrder = correctOrder.map((id) =>
+      id === previousId ? nextId : id,
+    );
+    commit(nextSteps, nextOrder);
+  }
+
+  function removeStep(index: number) {
+    const removedId = steps[index].id;
+    const nextSteps = steps.filter((_, stepIndex) => stepIndex !== index);
+    commit(
+      nextSteps,
+      correctOrder.filter((id) => id !== removedId),
+    );
+  }
+
+  function moveOrder(index: number, direction: -1 | 1) {
+    const destination = index + direction;
+    if (destination < 0 || destination >= correctOrder.length) return;
+    const nextOrder = [...correctOrder];
+    [nextOrder[index], nextOrder[destination]] = [
+      nextOrder[destination],
+      nextOrder[index],
+    ];
+    commit(steps, nextOrder);
+  }
+
+  return (
+    <div className="space-y-5">
+      <Section title="مرحله‌های تصمیم‌گیری">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-bold leading-6 text-slate-400">
+            هر بلوک تصمیم یک شناسه یکتا و متن قابل نمایش برای بازیکن دارد.
+          </p>
+          <button
+            type="button"
+            onClick={addStep}
+            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-xs font-black text-amber-700 transition hover:bg-amber-100"
+          >
+            <Plus size={15} />
+            افزودن مرحله
+          </button>
+        </div>
+
+        {steps.length === 0 && (
+          <div className="rounded-2xl border-2 border-dashed border-amber-200 bg-amber-50/50 p-6 text-center">
+            <GitBranch className="mx-auto mb-2 text-amber-400" size={30} />
+            <p className="text-sm font-black text-slate-600">هنوز مرحله‌ای ساخته نشده است.</p>
+          </div>
+        )}
+
+        {steps.map((step, stepIndex) => (
+          <div
+            key={`${step.id}-${stepIndex}`}
+            className="rounded-2xl border-2 border-amber-100 bg-[#fffdf7] p-4"
+          >
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="grid size-8 place-items-center rounded-xl bg-amber-500 text-sm font-black text-white">
+                  {stepIndex + 1}
+                </span>
+                <p className="text-sm font-black text-slate-700">مرحله {stepIndex + 1}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => removeStep(stepIndex)}
+                aria-label={`حذف مرحله ${stepIndex + 1}`}
+                className="grid size-9 place-items-center rounded-xl border-2 border-rose-100 bg-white text-rose-400 transition hover:border-rose-300 hover:text-rose-600"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+
+            <div className="grid gap-3">
+              <TextInput
+                label="شناسه مرحله"
+                value={step.id}
+                onChange={(value) => updateStep(stepIndex, { id: value })}
+                placeholder="pay-debt"
+                dir="ltr"
+              />
+              <label className="block">
+                <FieldLabel>متن تصمیم</FieldLabel>
+                <textarea
+                  rows={4}
+                  value={step.question}
+                  onChange={(event) =>
+                    updateStep(stepIndex, { question: event.target.value })
+                  }
+                  placeholder="مثلاً: اول قرضم را پرداخت می‌کنم"
+                  className={`${textareaClass} min-h-28`}
+                />
+              </label>
+            </div>
+          </div>
+        ))}
+      </Section>
+
+      <Section title="ترتیب پاسخ صحیح">
+        <p className="text-xs font-bold leading-6 text-slate-400">
+          مرحله‌ها را با فلش‌ها در ترتیب صحیح قرار دهید.
+        </p>
+        {correctOrder.map((id, index) => {
+          const step = steps.find((item) => item.id === id);
+          return (
+            <div
+              key={`${id}-${index}`}
+              className="flex items-center gap-3 rounded-xl border-2 border-slate-100 bg-slate-50 p-3"
+            >
+              <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-[#7c5cff] text-xs font-black text-white">
+                {index + 1}
+              </span>
+              <span className="min-w-0 flex-1 whitespace-pre-wrap break-words text-sm font-bold leading-6 text-slate-700">
+                {step?.question || id}
+              </span>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  disabled={index === 0}
+                  onClick={() => moveOrder(index, -1)}
+                  aria-label="انتقال به بالا"
+                  className="grid size-8 place-items-center rounded-lg bg-white text-slate-500 disabled:opacity-30"
+                >
+                  <ArrowUp size={15} />
+                </button>
+                <button
+                  type="button"
+                  disabled={index === correctOrder.length - 1}
+                  onClick={() => moveOrder(index, 1)}
+                  aria-label="انتقال به پایین"
+                  className="grid size-8 place-items-center rounded-lg bg-white text-slate-500 disabled:opacity-30"
+                >
+                  <ArrowDown size={15} />
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </Section>
+
+      <Section title="امتیازدهی">
+        <NumberInput
+          label="امتیاز ترتیب صحیح"
+          value={Number(scoring.correct ?? 1)}
+          onChange={(value) =>
+            onChange({
+              steps,
+              correctOrder: { steps: correctOrder },
+              scoring: { correct: value },
+            })
+          }
+          min={0}
+        />
+      </Section>
+    </div>
+  );
+}
+
+function DecisionTreePreview({ payload }: { payload: Record<string, unknown> }) {
+  const steps = Array.isArray(payload.steps)
+    ? (payload.steps as Record<string, unknown>[])
+    : [];
+  const correctOrder = (payload.correctOrder ?? {}) as Record<string, unknown>;
+  const orderedIds = Array.isArray(correctOrder.steps)
+    ? correctOrder.steps.map(String)
+    : [];
+  const lesson = (payload.lesson ?? {}) as Record<string, unknown>;
+
+  return (
+    <div className="p-4">
+      <div className="mb-4 flex items-center gap-2 rounded-xl bg-amber-50 p-3 text-xs font-black text-amber-700">
+        <GitBranch size={17} />
+        مسیر صحیح تصمیم‌گیری
+      </div>
+      <div className="space-y-2">
+        {orderedIds.map((id, index) => {
+          const step = steps.find((item) => String(item.id) === id);
+          return (
+            <div key={`${id}-${index}`}>
+              <div className="flex items-center gap-2 rounded-xl border-2 border-amber-100 bg-white p-3">
+                <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-amber-500 text-xs font-black text-white">
+                  {index + 1}
+                </span>
+                <p className="text-xs font-bold leading-6 text-slate-600">
+                  {String(step?.question ?? id)}
+                </p>
+              </div>
+              {index < orderedIds.length - 1 && (
+                <ArrowDown className="mx-auto my-1 text-amber-300" size={16} />
+              )}
+            </div>
+          );
+        })}
+        {orderedIds.length === 0 && (
+          <p className="py-5 text-center text-xs font-bold text-slate-400">
+            هنوز مسیری ساخته نشده است.
+          </p>
+        )}
+      </div>
+      {Boolean(lesson.lesson) && (
+        <p className="mt-4 rounded-xl bg-emerald-50 p-3 text-xs font-bold leading-6 text-emerald-700">
+          {String(lesson.lesson)}
+        </p>
+      )}
+    </div>
+  );
 }
 
 function GamePreview({ payload, type }: { payload: Record<string, unknown>; type: 'coin_hunt' | 'memory_financial' }) {
@@ -861,6 +1222,24 @@ function DragDropPreview({ payload }: { payload: Record<string, unknown> }) {
   );
 }
 
+function BasketGamePreview({ payload }: { payload: Record<string, unknown> }) {
+  const scoring = (payload.scoring ?? {}) as Record<string, unknown>;
+  return (
+    <div className="p-4">
+      <div className="relative h-52 overflow-hidden rounded-2xl bg-gradient-to-b from-sky-100 to-emerald-50">
+        <span className="absolute start-[18%] top-7 text-3xl">🪙</span>
+        <span className="absolute end-[20%] top-14 text-3xl">💣</span>
+        <span className="absolute bottom-3 start-1/2 -translate-x-1/2 text-5xl">🧺</span>
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs font-black">
+        <span className="rounded-xl bg-sky-50 p-2 text-sky-700">⏱ {String(payload.durationSeconds ?? 60)}</span>
+        <span className="rounded-xl bg-amber-50 p-2 text-amber-700">🪙 ۰</span>
+        <span className="rounded-xl bg-violet-50 p-2 text-violet-700">هر {String(scoring.coinsPerPoint ?? 3)} سکه</span>
+      </div>
+    </div>
+  );
+}
+
 function LivePreview({
   blockType,
   payload,
@@ -889,6 +1268,8 @@ function LivePreview({
         {blockType === "video" && <MediaPreview payload={payload} mediaType="video" />}
         {blockType === "drag_drop" && <DragDropPreview payload={payload} />}
         {(blockType === "coin_hunt" || blockType === "memory_financial") && <GamePreview payload={payload} type={blockType} />}
+        {blockType === "decision_tree" && <DecisionTreePreview payload={payload} />}
+        {blockType === "basket_game" && <BasketGamePreview payload={payload} />}
       </div>
     </div>
   );
@@ -1033,6 +1414,12 @@ export default function BlockPayloadEditor({
               )}
               {blockType === "memory_financial" && (
                 <MemoryFinancialForm payload={payload} onChange={handleChange} />
+              )}
+              {blockType === "decision_tree" && (
+                <DecisionTreeForm payload={payload} onChange={handleChange} />
+              )}
+              {blockType === "basket_game" && (
+                <BasketGameForm payload={payload} onChange={handleChange} />
               )}
             </div>
           )}

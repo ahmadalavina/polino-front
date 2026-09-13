@@ -18,6 +18,7 @@ import {
   Trophy,
   UserRound,
 } from 'lucide-react';
+import { useGameStore } from '@/store/gameStore';
 
 type FormData = {
   name: string;
@@ -246,6 +247,8 @@ export default function OnboardingFlow() {
     age: minimumAge,
     grade: null,
   });
+  const hearts = useGameStore((state) => state.hearts);
+  const coins = useGameStore((state) => state.coins);
 
   const currentStepData = steps[currentStep];
   const CurrentIcon = currentStepData.icon;
@@ -329,12 +332,12 @@ export default function OnboardingFlow() {
         <div className="flex items-center gap-2">
           <StatPill
             icon={<Heart size={18} className="fill-current" />}
-            value="۵"
+            value={String(hearts)}
             color="text-rose-400"
           />
           <StatPill
             icon={<Coins size={18} className="fill-current" />}
-            value="۰"
+            value={String(coins)}
             color="text-amber-400"
           />
         </div>

@@ -5,7 +5,8 @@ import type {
   CreateLessonBlockInput,
   CreateLessonInput,
 } from '@/types/admin';
-import type { CourseDetail, LessonData } from '@/types/lesson';
+import type { BasketGameCompletionRequest, CourseDetail, LessonData } from '@/types/lesson';
+import { useAuthStore } from '@/store/authStore';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
 
@@ -20,10 +21,10 @@ export class ApiError extends Error {
 }
 
 function getAuthToken() {
-  const storedToken =
+  const state = useAuthStore.getState();
+  const localToken =
     typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
-  return storedToken || process.env.NEXT_PUBLIC_MOCK_JWT || '';
+  return state.token || localToken || process.env.NEXT_PUBLIC_MOCK_JWT || '';
 }
 
 function unwrapData<T>(response: unknown): T {
@@ -119,7 +120,7 @@ export type UserProfile = {
   avatarId?: number;
 };
 
-export type CompleteGameDto = {
+export type CompleteGameDto = BasketGameCompletionRequest | {
   gameType: 'coin_hunt' | 'memory_financial';
   collectedItemIds?: string[];
   matchedPairIds?: string[];

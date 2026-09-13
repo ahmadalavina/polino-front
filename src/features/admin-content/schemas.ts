@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { basketGamePayloadSchema } from '@/features/basket-game/basketGame';
 
 const optionalText = z
   .string()
@@ -42,7 +43,14 @@ export const lessonBlockSchema = z.object({
     'film_and_image',
     'coin_hunt',
     'memory_financial',
+    'decision_tree',
+    'basket_game',
   ]),
   payload: z.record(z.string(), z.unknown()),
   lessonId: z.coerce.number().int().positive('یک درس انتخاب کنید.'),
 });
+
+export function validateBlockPayload(type: string, payload: unknown) {
+  if (type === 'basket_game') return basketGamePayloadSchema.safeParse(payload);
+  return z.record(z.string(), z.unknown()).safeParse(payload);
+}

@@ -13,7 +13,7 @@ interface Course {
   order: number;
 }
 
-const COVER_BASE_URL = process.env.NEXT_PUBLIC_ASSET_URL || 'http://localhost:3021';
+const COVER_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3021';
 
 export default function CourseCard({ course }: { course: Course }) {
   const router = useRouter();

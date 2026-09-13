@@ -20,8 +20,13 @@ import type {
   QuizPayload,
   RewardPayload,
   StoryPayload,
+  DecisionTreePayload,
+  BasketGamePayload,
 } from '@/types/lesson';
+import { useGameStore } from '@/store/gameStore';
 import AnimationBlock from './AnimationBlock';
+import DecisionTreeBlock from './DecisionTreeBlock';
+import BasketGame from './BasketGame';
 import DialogBlock from './DialogBlock';
 import DragDropBlock from './DragDropBlock';
 import ImageBlock from './ImageBlock';
@@ -47,6 +52,8 @@ const blockLabels: Partial<Record<LessonBlock['type'], string>> = {
   animation: 'انیمیشن',
   video: 'ویدیو',
   drag_drop: 'بازی جورچین',
+  decision_tree: 'درخت تصمیم',
+  basket_game: 'بازی سبد',
 };
 
 export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
@@ -55,6 +62,8 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
   const [activityResults, setActivityResults] = useState<
     Record<number, boolean>
   >({});
+  const addXp = useGameStore((state) => state.addXp);
+  const addCoins = useGameStore((state) => state.addCoins);
 
   const blocks = useMemo(() => {
     return lesson.blocks
@@ -203,6 +212,23 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
             onNext={handleNext}
           />
         );
+      case 'decision_tree':
+        return (
+          <DecisionTreeBlock
+            key={block.id}
+            payload={block.payload as DecisionTreePayload}
+            onNext={(isCorrect) => handleActivityNext(block.id, isCorrect)}
+          />
+        );
+      case 'basket_game':
+        return (
+          <BasketGame
+            key={block.id}
+            blockId={block.id}
+            payload={block.payload as BasketGamePayload}
+            onNext={handleNext}
+          />
+        );
       default:
         return (
           <div className="flex min-h-[430px] flex-col items-center justify-center px-5 py-10 text-center">
@@ -236,6 +262,9 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
       correctAnswers: answers.filter(Boolean).length,
       totalQuestions: answers.length,
     };
+
+    addXp(result.xpEarned);
+    addCoins(result.coinsEarned);
 
     return (
       <LessonResultScreen

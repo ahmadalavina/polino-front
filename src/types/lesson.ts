@@ -13,7 +13,9 @@ export type BlockType =
   | 'question_block'
   | 'film_and_image'
   | 'coin_hunt'
-  | 'memory_financial';
+  | 'memory_financial'
+  | 'decision_tree'
+  | 'basket_game';
 
 export interface DialogPayload {
   character: string;
@@ -75,15 +77,6 @@ export interface MemoryFinancialPayload {
   pairs?: Array<Record<string, unknown>>;
 }
 
-export type LessonBlockPayload =
-  | DialogPayload
-  | ImagePayload
-  | QuizPayload
-  | StoryPayload
-  | RewardPayload
-  | MediaPayload
-  | DragDropPayload;
-
 export interface LessonBlock {
   id: number;
   pageNumber?: number;
@@ -107,6 +100,51 @@ export interface LessonResult {
   correctAnswers: number;
   totalQuestions: number;
 }
+
+export interface DecisionTreePayload {
+  steps: Array<{
+    id: string;
+    question: string;
+  }>;
+  correctOrder: {
+    steps: string[];
+  };
+  scoring: {
+    correct: number;
+  };
+}
+
+export interface BasketGamePayload {
+  durationSeconds: number;
+  difficulty: {
+    spawnIntervalMs: number;
+    fallingSpeed: number;
+    playerSpeed: number;
+    bombChance: number;
+  };
+  scoring: {
+    coinsPerPoint: number;
+    bombTimePenaltySeconds: number;
+  };
+}
+
+export interface BasketGameCompletionRequest {
+  gameType: 'basket_game';
+  basketCoinsCollected: number;
+  basketBombsHit: number;
+  basketElapsedSeconds: number;
+}
+
+export type LessonBlockPayload =
+  | DialogPayload
+  | ImagePayload
+  | QuizPayload
+  | StoryPayload
+  | RewardPayload
+  | MediaPayload
+  | DragDropPayload
+  | DecisionTreePayload
+  | BasketGamePayload;
 
 export interface Lesson {
   id: number;

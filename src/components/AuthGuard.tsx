@@ -3,66 +3,81 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { api, ApiError } from '@/lib/api';
-
-function hasCompletedProfile(profile: unknown) {
-  if (!profile || typeof profile !== 'object') return false;
-  const value = profile as Record<string, unknown>;
-  return Boolean(
-    value.nickname ||
-      value.firstName ||
-      value.name ||
-      value.grade ||
-      value.avatarId,
-  );
-}
+import { useAuthStore } from '@/store/authStore';
 
 export default function AuthGuard({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isChecking, setIsChecking] = useState(true);
+  const [validatedPathname, setValidatedPathname] = useState<string | null>(
+    null,
+  );
+
+  const token = useAuthStore((state) => state.token);
+  const refreshToken = useAuthStore((state) => state.refreshToken);
+  const hydrated = useAuthStore((state) => state.hydrated);
+  const setProfile = useAuthStore((state) => state.setProfile);
+  const logout = useAuthStore((state) => state.logout);
+  const hasCompletedProfile = useAuthStore(
+    (state) => state.hasCompletedProfile,
+  );
 
   useEffect(() => {
     let cancelled = false;
 
     async function checkSession() {
       if (pathname === '/login') {
-        if (!cancelled) setIsChecking(false);
         return;
       }
 
-      const token = localStorage.getItem('token');
-      const refreshToken = localStorage.getItem('refreshToken');
+      if (!hydrated) {
+        return;
+      }
 
       if (!token || !refreshToken) {
-        router.replace('/login');
+        if (!cancelled) {
+          router.replace('/login');
+        }
         return;
       }
 
       try {
-        const profile = await api.getMyProfile();
-        const profileExists = hasCompletedProfile(profile);
+        const apiProfile = await api.getMyProfile();
+        if (apiProfile && !cancelled) {
+          setProfile(apiProfile);
+        }
+        const profileExists = hasCompletedProfile(apiProfile);
 
         if (pathname === '/' && profileExists) {
-          router.replace('/course');
+          if (!cancelled) {
+            router.replace('/course');
+          }
           return;
         }
 
         if (pathname !== '/' && !profileExists) {
-          router.replace('/');
+          if (!cancelled) {
+            router.replace('/');
+          }
           return;
         }
 
-        if (!cancelled) setIsChecking(false);
+        if (!cancelled) setValidatedPathname(pathname);
       } catch (error) {
         if (error instanceof ApiError && error.status === 404) {
-          if (pathname !== '/') router.replace('/');
-          else if (!cancelled) setIsChecking(false);
+          if (!cancelled) {
+            if (pathname !== '/') {
+              router.replace('/');
+            } else {
+              setValidatedPathname(pathname);
+            }
+          }
           return;
         }
 
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        router.replace('/login');
+        if (!cancelled) {
+          logout();
+          router.replace('/login');
+        }
       }
     }
 
@@ -70,9 +85,18 @@ export default function AuthGuard({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [pathname, router]);
-
-  if (pathname === '/login' || !isChecking) return children;
+  }, [
+    pathname,
+    router,
+    token,
+    refreshToken,
+    logout,
+    setProfile,
+    hasCompletedProfile,
+    hydrated,
+  ]);
+  
+  if (pathname === '/login' || validatedPathname === pathname) return children;
 
   return (
     <main className="grid min-h-screen place-items-center bg-[#f6fbff]">

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import CourseCard from '@/components/CourseCard';
 import { api } from '@/lib/api';
+import { useGameStore } from '@/store/gameStore';
 
 interface Course {
   id: number;
@@ -62,6 +63,8 @@ export default function CourseListPage() {
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
+  const hearts = useGameStore((state) => state.hearts);
+  const coins = useGameStore((state) => state.coins);
 
   useEffect(() => {
     let isActive = true;
@@ -132,11 +135,11 @@ export default function CourseListPage() {
           </Link>
           <div className="flex items-center gap-1.5 rounded-full border-2 border-slate-100 bg-white px-3 py-2 text-sm font-black text-slate-600 shadow-sm">
             <Heart size={18} className="fill-current text-rose-400" />
-            ۵
+            {hearts}
           </div>
           <div className="flex items-center gap-1.5 rounded-full border-2 border-slate-100 bg-white px-3 py-2 text-sm font-black text-slate-600 shadow-sm">
             <Coins size={18} className="fill-current text-amber-400" />
-            ۲۰
+            {coins}
           </div>
         </div>
       </header>

@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { api, ApiError, VerifyOtpResponse } from '@/lib/api';
+import { useAuthStore } from '@/store/authStore';
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 60;
@@ -400,6 +401,9 @@ function SuccessStep({ onRestart }: { onRestart: () => void }) {
 
 export default function LoginScreen() {
   const router = useRouter();
+  const setToken = useAuthStore((state) => state.setToken);
+  const setProfile = useAuthStore((state) => state.setProfile);
+  const hasCompletedProfile = useAuthStore((state) => state.hasCompletedProfile);
   const [step, setStep] = useState<LoginStep>('phone');
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
@@ -481,22 +485,15 @@ export default function LoginScreen() {
           'ØªÙˆÚ©Ù†â€ŒÙ‡Ø§ÛŒ ÙˆØ±ÙˆØ¯ Ø§Ø² Ø³Ø±ÙˆÛŒØ³ Ø¯Ø±ÛŒØ§ÙØª Ù†Ø´Ø¯.',
         );
       }
-      localStorage.setItem('token', payload.accessToken);
-      localStorage.setItem('refreshToken', payload.refreshToken);
+      setToken(payload.accessToken, payload.refreshToken);
       try {
-        const profile = await api.getMyProfile();
-        const hasProfile =
-          profile &&
-          typeof profile === 'object' &&
-          Boolean(
-            (profile as Record<string, unknown>).nickname ||
-              (profile as Record<string, unknown>).firstName ||
-              (profile as Record<string, unknown>).name ||
-              (profile as Record<string, unknown>).grade ||
-              (profile as Record<string, unknown>).avatarId,
-          );
+        const apiProfile = await api.getMyProfile();
+        if (apiProfile) {
+          setProfile(apiProfile);
+        }
+        const profileExists = apiProfile && hasCompletedProfile(apiProfile);
 
-        router.replace(hasProfile ? '/course' : '/');
+        router.replace(profileExists ? '/course' : '/');
       } catch (profileError) {
         if (profileError instanceof ApiError && profileError.status === 404) {
           router.replace('/');
