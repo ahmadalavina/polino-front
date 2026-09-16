@@ -20,6 +20,7 @@ export default function AuthGuard({ children }: { children: ReactNode }) {
   const hasCompletedProfile = useAuthStore(
     (state) => state.hasCompletedProfile,
   );
+  const profile = useAuthStore((state) => state.profile);
 
   useEffect(() => {
     let cancelled = false;
@@ -40,10 +41,27 @@ export default function AuthGuard({ children }: { children: ReactNode }) {
         return;
       }
 
+      if (pathname === '/admin' && profile?.role === 'child') {
+        const lastPath =
+          typeof window !== 'undefined'
+            ? sessionStorage.getItem('poolino:last-path')
+            : null;
+        router.replace(lastPath && lastPath !== '/admin' ? lastPath : '/course');
+        return;
+      }
+
       try {
         const apiProfile = await api.getMyProfile();
         if (apiProfile && !cancelled) {
           setProfile(apiProfile);
+        }
+        if (apiProfile?.role === 'child' && pathname === '/admin') {
+          const lastPath =
+            typeof window !== 'undefined'
+              ? sessionStorage.getItem('poolino:last-path')
+              : null;
+          router.replace(lastPath && lastPath !== '/admin' ? lastPath : '/course');
+          return;
         }
         const profileExists = hasCompletedProfile(apiProfile);
 
@@ -94,7 +112,13 @@ export default function AuthGuard({ children }: { children: ReactNode }) {
     setProfile,
     hasCompletedProfile,
     hydrated,
+    profile?.role,
   ]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || pathname === '/login' || pathname === '/admin') return;
+    sessionStorage.setItem('poolino:last-path', pathname);
+  }, [pathname]);
   
   if (pathname === '/login' || validatedPathname === pathname) return children;
 

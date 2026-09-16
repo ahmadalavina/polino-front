@@ -1,5 +1,10 @@
 import { create } from 'zustand';
 
+export interface GameBalance {
+  xp: number;
+  coins: number;
+}
+
 interface GameState {
   coins: number;
   xp: number;
@@ -9,6 +14,7 @@ interface GameState {
   addHearts: (amount: number) => void;
   spendCoins: (amount: number) => boolean;
   spendXp: (amount: number) => boolean;
+  setBalance: (balance: GameBalance) => void;
   reset: () => void;
 }
 
@@ -43,6 +49,12 @@ export const useGameStore = create<GameState>((set) => ({
       }
       return state;
     }),
+
+  setBalance: (balance) =>
+    set((state) => ({
+      xp: balance.xp,
+      coins: balance.coins,
+    })),
 
   reset: () =>
     set({ coins: 0, xp: 0, hearts: 5 }),

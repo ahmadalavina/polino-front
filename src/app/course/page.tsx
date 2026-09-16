@@ -11,11 +11,13 @@ import {
   Sparkles,
   Star,
   UserRound,
+  ShieldCheck,
   X,
 } from 'lucide-react';
 import CourseCard from '@/components/CourseCard';
 import { api } from '@/lib/api';
 import { useGameStore } from '@/store/gameStore';
+import { useAuthStore } from '@/store/authStore';
 
 interface Course {
   id: number;
@@ -65,6 +67,7 @@ export default function CourseListPage() {
   const [reloadKey, setReloadKey] = useState(0);
   const hearts = useGameStore((state) => state.hearts);
   const coins = useGameStore((state) => state.coins);
+  const role = useAuthStore((state) => state.profile?.role);
 
   useEffect(() => {
     let isActive = true;
@@ -126,6 +129,16 @@ export default function CourseListPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          {role === 'admin' && (
+            <Link
+              href="/admin"
+              aria-label="مدیریت محتوا"
+              title="مدیریت محتوا"
+              className="grid size-11 place-items-center rounded-full border-2 border-amber-100 bg-amber-50 text-amber-600 shadow-sm transition-colors hover:border-amber-300 hover:text-amber-700"
+            >
+              <ShieldCheck size={20} />
+            </Link>
+          )}
           <Link
             href="/profile"
             aria-label="ویرایش پروفایل"

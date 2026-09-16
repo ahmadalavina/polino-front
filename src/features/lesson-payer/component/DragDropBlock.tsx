@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -8,19 +8,24 @@ import {
   RotateCcw,
   XCircle,
 } from 'lucide-react';
+import { api, type CompleteGameDto } from '@/lib/api';
+import { useGameStore } from '@/store/gameStore';
 import type { DragDropPayload } from '@/types/lesson';
 
 interface Props {
+  blockId: number;
   payload: DragDropPayload;
-  onNext: (isCorrect: boolean) => void;
+  onNext: () => void;
 }
 
-export default function DragDropBlock({ payload, onNext }: Props) {
+export default function DragDropBlock({ blockId, payload, onNext }: Props) {
   const [placements, setPlacements] = useState<Array<number | null>>(() =>
     payload.targets.map(() => null),
   );
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<boolean | null>(null);
 
   const usedItems = useMemo(
     () => new Set(placements.filter((item): item is number => item !== null)),
@@ -56,14 +61,46 @@ export default function DragDropBlock({ payload, onNext }: Props) {
     setPlacements(payload.targets.map(() => null));
     setSelectedItem(null);
     setChecked(false);
+    setSubmitResult(null);
   }
 
-  function handlePrimaryAction() {
-    if (checked && isCorrect) {
-      onNext(true);
-      return;
+  const handleSubmit = useCallback(async () => {
+    if (!isComplete || isSubmitting) return;
+    setIsSubmitting(true);
+    const dto: CompleteGameDto = {
+      gameType: 'drag_drop',
+      matchedPairIds: placements
+        .map((itemIndex, targetIndex) =>
+          itemIndex === targetIndex ? `${targetIndex}` : null,
+        )
+        .filter(Boolean) as string[],
+      attempts: 1,
+      mistakes: isCorrect ? 0 : 1,
+    };
+    try {
+      const response = await api.completeGame(blockId, dto);
+      setSubmitResult(response.completed);
+      if (response.balance) {
+        useGameStore.getState().setBalance(response.balance);
+      }
+    } catch {
+      setSubmitResult(false);
+    } finally {
+      setIsSubmitting(false);
     }
+  }, [isComplete, isSubmitting, placements, isCorrect, blockId]);
 
+  function handlePrimaryAction() {
+    if (checked) {
+      if (!isCorrect) {
+        handleSubmit();
+        return;
+      }
+      if (isCorrect && submitResult) {
+        onNext();
+        return;
+      }
+    }
     setChecked(true);
   }
 
@@ -180,13 +217,17 @@ export default function DragDropBlock({ payload, onNext }: Props) {
       {checked && (
         <div
           className={`mb-5 rounded-2xl px-4 py-3 text-center text-sm font-black ${
-            isCorrect
+            isCorrect && submitResult
+              ? 'bg-[#effcef] text-[#318b32]'
+              : isCorrect
               ? 'bg-[#effcef] text-[#318b32]'
               : 'bg-rose-50 text-rose-500'
           }`}
         >
-          {isCorrect
+          {submitResult
             ? 'عالی بود! همه گزینه‌ها درست هستند.'
+            : checked && !isCorrect
+            ? 'بعضی گزینه‌ها درست نیستند؛ در حال بررسی...'
             : 'بعضی گزینه‌ها درست نیستند؛ دوباره امتحان کن.'}
         </div>
       )}
@@ -195,10 +236,17 @@ export default function DragDropBlock({ payload, onNext }: Props) {
         <button
           type="button"
           onClick={handlePrimaryAction}
-          disabled={!isComplete}
+          disabled={!isComplete || isSubmitting}
           className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#58cc59] font-black text-white shadow-[0_6px_0_#3da83e] transition-all enabled:hover:bg-[#61d562] enabled:active:translate-y-1 enabled:active:shadow-[0_2px_0_#3da83e] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-[0_6px_0_#b8c0ca]"
         >
-          {checked && isCorrect ? 'ادامه درس' : 'بررسی پاسخ'}
+          {isSubmitting ? (
+            <>
+              <span className="animate-spin">⟳</span>
+              در حال بررسی
+            </>
+          ) : checked && isCorrect && submitResult
+          ? 'ادامه درس'
+          : 'بررسی پاسخ'}
           <ArrowLeft size={20} strokeWidth={3} />
         </button>
         <button

@@ -15,7 +15,8 @@ export type BlockType =
   | 'coin_hunt'
   | 'memory_financial'
   | 'decision_tree'
-  | 'basket_game';
+  | 'basket_game'
+  | 'auction';
 
 export interface DialogPayload {
   character: string;
@@ -128,6 +129,21 @@ export interface BasketGamePayload {
   };
 }
 
+export interface AuctionPayload {
+  items: Array<{
+    id: number;
+    name: string;
+    imageUrl: string;
+    basePrice: number;
+    priceRange: {
+      min: number;
+      max: number;
+    };
+  }>;
+  totalBudget: number;
+  minBidPerItem?: number;
+}
+
 export interface BasketGameCompletionRequest {
   gameType: 'basket_game';
   basketCoinsCollected: number;
@@ -144,7 +160,8 @@ export type LessonBlockPayload =
   | MediaPayload
   | DragDropPayload
   | DecisionTreePayload
-  | BasketGamePayload;
+  | BasketGamePayload
+  | AuctionPayload;
 
 export interface Lesson {
   id: number;

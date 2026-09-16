@@ -1,19 +1,23 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, Sparkles, ArrowLeft } from 'lucide-react';
+import { api, type CompleteGameDto } from '@/lib/api';
+import { useGameStore } from '@/store/gameStore';
 import type { DecisionTreePayload } from '@/types/lesson';
 
 type Props = {
+  blockId: number;
   payload: DecisionTreePayload;
-  onNext: (isCorrect: boolean) => void;
+  onNext: () => void;
 };
 
-export default function DecisionTreeBlock({ payload, onNext }: Props) {
+export default function DecisionTreeBlock({ blockId, payload, onNext }: Props) {
   const [orderedSteps, setOrderedSteps] = useState<string[]>([]);
-  const [isChecking, setIsChecking] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<'idle' | 'correct' | 'wrong'>('idle');
+  const [submitError, setSubmitError] = useState('');
 
   const allSteps = useMemo(() => payload.steps, [payload.steps]);
   const usedSteps = useMemo(() => orderedSteps, [orderedSteps]);
@@ -31,26 +35,37 @@ export default function DecisionTreeBlock({ payload, onNext }: Props) {
   }, [orderedSteps, correctOrder]);
 
   function handleAddStep(stepId: string) {
-    if (isChecking || orderedSteps.includes(stepId)) return;
+    if (orderedSteps.includes(stepId)) return;
     setOrderedSteps((prev) => [...prev, stepId]);
   }
 
   function handleRemoveStep(stepId: string) {
-    if (isChecking) return;
     setOrderedSteps((prev) => prev.filter((id) => id !== stepId));
   }
 
-  function handleCheck() {
-    if (!isComplete || isChecking) return;
-    setIsChecking(true);
-    setResult(isCorrectOrder ? 'correct' : 'wrong');
-  }
-
-  function handleReset() {
-    setOrderedSteps([]);
-    setIsChecking(false);
-    setResult('idle');
-  }
+  const handleCheck = useCallback(async () => {
+    if (!isComplete || isSubmitting) return;
+    setIsSubmitting(true);
+    setSubmitError('');
+    const dto: CompleteGameDto = {
+      gameType: 'decision_tree',
+      decisionTreeMatches: orderedSteps,
+      attempts: 1,
+      mistakes: 0,
+    };
+    try {
+      const response = await api.completeGame(blockId, dto);
+      if (response.balance) {
+        useGameStore.getState().setBalance(response.balance);
+      }
+      setResult(response.completed ? 'correct' : 'wrong');
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : 'ثبت نتیجه ناموفق بود.');
+      setResult('wrong');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [isComplete, isSubmitting, orderedSteps, blockId]);
 
   const stepsById = useMemo(() => {
     const map = new Map<string, typeof allSteps[0]>();
@@ -66,9 +81,6 @@ export default function DecisionTreeBlock({ payload, onNext }: Props) {
       <div className="relative z-10 flex h-full flex-col">
         <header className="mb-6 flex items-start justify-between">
           <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-600">
-
-            </div>
             <h2 className="text-2xl font-black text-slate-800">ترتیب درست رو بچین!</h2>
             <p className="mt-1 text-sm font-medium text-slate-500">
               ترتیب رو بدرستی بچین تا جایزه بگیری
@@ -135,7 +147,7 @@ export default function DecisionTreeBlock({ payload, onNext }: Props) {
                         <button
                           type="button"
                           onClick={() => handleRemoveStep(stepId)}
-                          disabled={isChecking}
+                          disabled={isSubmitting}
                           className="grid size-8 shrink-0 place-items-center rounded-lg bg-rose-50 text-rose-500 transition-all hover:bg-rose-100 disabled:opacity-50"
                         >
                           <X size={16} />
@@ -184,15 +196,22 @@ export default function DecisionTreeBlock({ payload, onNext }: Props) {
               <button
                 type="button"
                 onClick={handleCheck}
-                className="flex items-center gap-2 rounded-2xl bg-[#58cc59] px-6 py-3 text-sm font-black text-white shadow-[0_5px_0_#3da83e] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3da83e]"
+                disabled={isSubmitting}
+                className="flex items-center gap-2 rounded-2xl bg-[#58cc59] px-6 py-3 text-sm font-black text-white shadow-[0_5px_0_#3da83e] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3da83e] disabled:cursor-wait disabled:bg-slate-300 disabled:shadow-none"
               >
-                <Check size={18} />
-                بررسی ترتیب
+                {isSubmitting ? (
+                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, repeatType: 'loop' }}>
+                    <Check size={18} />
+                  </motion.div>
+                ) : (
+                  <Check size={18} />
+                )}
+                {isSubmitting ? 'در حال ثبت...' : 'بررسی ترتیب'}
               </button>
             ) : result === 'correct' ? (
               <button
                 type="button"
-                onClick={() => onNext(true)}
+                onClick={onNext}
                 className="flex items-center gap-2 rounded-2xl bg-[#58cc59] px-6 py-3 text-sm font-black text-white shadow-[0_5px_0_#3da83e] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3da83e]"
               >
                 <ArrowLeft size={18} />
@@ -201,7 +220,11 @@ export default function DecisionTreeBlock({ payload, onNext }: Props) {
             ) : (
               <button
                 type="button"
-                onClick={handleReset}
+                onClick={() => {
+                  setOrderedSteps([]);
+                  setResult('idle');
+                  setSubmitError('');
+                }}
                 className="flex items-center gap-2 rounded-2xl border-2 border-slate-200 bg-white px-6 py-3 text-sm font-black text-slate-600 shadow-[0_4px_0_#e2e8f0] transition-all hover:bg-slate-50 active:translate-y-1 active:shadow-none"
               >
                 <ArrowLeft size={18} />
@@ -223,6 +246,9 @@ export default function DecisionTreeBlock({ payload, onNext }: Props) {
             <p className="text-xs font-medium text-amber-600">
               مسیر را پاک کن و بلوک‌های تصمیم را دوباره به ترتیب درست بچین.
             </p>
+            {submitError && (
+              <p className="mt-2 text-xs font-bold text-rose-500">{submitError}</p>
+            )}
           </motion.div>
         )}
       </div>

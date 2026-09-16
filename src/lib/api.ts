@@ -4,8 +4,11 @@ import type {
   CreateCourseInput,
   CreateLessonBlockInput,
   CreateLessonInput,
+  UpdateCourseInput,
+  UpdateLessonInput,
+  UpdateLessonBlockInput,
 } from '@/types/admin';
-import type { BasketGameCompletionRequest, CourseDetail, LessonData } from '@/types/lesson';
+import type { BasketGameCompletionRequest, CourseDetail, LessonData, Lesson, LessonBlock } from '@/types/lesson';
 import { useAuthStore } from '@/store/authStore';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
@@ -191,12 +194,22 @@ export type UserProfile = {
   birthDate?: string;
   grade?: number;
   avatarId?: number;
+  role?: 'child' | 'admin';
+  xp?: number;
+  coins?: number;
+  gems?: number;
+  level?: number;
+  experience?: number;
+  streak?: number;
 };
 
 export type CompleteGameDto = BasketGameCompletionRequest | {
-  gameType: 'coin_hunt' | 'memory_financial';
+  gameType: 'coin_hunt' | 'memory_financial' | 'basket_game' | 'auction';
   collectedItemIds?: string[];
   matchedPairIds?: string[];
+  decisionTreeMatches?: string[];
+  wordSearchFoundWords?: string[];
+  auctionBidIds?: string[];
   attempts?: number;
   mistakes?: number;
   startedAt?: string;
@@ -214,6 +227,11 @@ export type GameResultResponse = {
   reward?: Record<string, unknown> | null;
   xp: number;
   coins?: number;
+  balance?: {
+    xp: number;
+    coins: number;
+    experience: number;
+  };
 };
 
 export const api = {
@@ -274,4 +292,36 @@ export const api = {
     post<CreateLessonBlockInput, unknown>('/lesson-blocks', payload),
   updateLessonBlock: (id: number, payload: Partial<CreateLessonBlockInput>) =>
     patch<Partial<CreateLessonBlockInput>, unknown>(`/lesson-blocks/${id}`, payload),
+
+  // Course CRUD
+  updateCourse: (id: number, payload: Partial<UpdateCourseInput>) =>
+    patch<Partial<UpdateCourseInput>, unknown>(`/courses/${id}`, payload),
+  deleteCourse: (id: number) =>
+    request<void>(`/courses/${id}`, { method: 'DELETE' }),
+
+  // Lesson CRUD
+  updateLesson: (id: number, payload: Partial<UpdateLessonInput>) =>
+    patch<Partial<UpdateLessonInput>, unknown>(`/lessons/${id}`, payload),
+  deleteLesson: (id: number) =>
+    request<void>(`/lessons/${id}`, { method: 'DELETE' }),
+
+  // Lesson Block CRUD
+  getLessonBlocks: async (lessonId: number) => ({
+    data: unwrapData<LessonBlock[]>(
+      await get<LessonBlock[] | { data: LessonBlock[] }>(
+        `/lesson-blocks?lessonId=${lessonId}`,
+      ),
+    ),
+  }),
+  deleteLessonBlock: (id: number) =>
+    request<void>(`/lesson-blocks/${id}`, { method: 'DELETE' }),
+
+  // Lesson detail with blocks
+  getLessonDetail: async (id: number) => ({
+    data: unwrapData<Lesson & { blocks: LessonBlock[] }>(
+      await get<Lesson & { blocks: LessonBlock[] } | { data: Lesson & { blocks: LessonBlock[] } }>(
+        `/lessons/${id}`,
+      ),
+    ),
+  }),
 };

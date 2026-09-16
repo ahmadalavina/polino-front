@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { UserProfile } from '@/lib/api';
+import { useGameStore } from './gameStore';
 
 interface AuthState {
   token: string | null;
@@ -13,6 +14,7 @@ interface AuthState {
   setProfile: (profile: UserProfile) => void;
   logout: () => void;
   hasCompletedProfile: (profile: unknown) => boolean;
+  syncGameBalance: (profile: UserProfile) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -36,6 +38,19 @@ export const useAuthStore = create<AuthState>()(
 
       setProfile: (profile) => {
         set({ profile });
+        get().syncGameBalance(profile);
+      },
+
+      syncGameBalance: (profile) => {
+        if (profile?.xp !== undefined && profile?.coins !== undefined) {
+          const gameStore = useGameStore.getState();
+          if (profile.xp > gameStore.xp || profile.coins > gameStore.coins) {
+            useGameStore.setState({
+              xp: profile.xp,
+              coins: profile.coins,
+            });
+          }
+        }
       },
 
       logout: () => {
@@ -43,6 +58,7 @@ export const useAuthStore = create<AuthState>()(
           localStorage.removeItem('token');
           localStorage.removeItem('refreshToken');
         }
+        useGameStore.getState().reset();
         set({ token: null, refreshToken: null, profile: null, isAuthenticated: false });
       },
 
@@ -66,7 +82,14 @@ export const useAuthStore = create<AuthState>()(
         profile: state.profile,
         isAuthenticated: state.isAuthenticated,
       }),
-      onRehydrateStorage: () => (state) => state?.setHydrated(true),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHydrated(true);
+          if (state.profile) {
+            state.syncGameBalance(state.profile);
+          }
+        }
+      },
     },
   ),
 );

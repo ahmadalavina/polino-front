@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Coins, RotateCcw, Sparkles, Trophy, X } from 'lucide-react';
 import { api, type CompleteGameDto, type GameResultResponse } from '@/lib/api';
+import { useGameStore } from '@/store/gameStore';
 
 type Props = { blockId: number; payload: Record<string, unknown>; onNext: () => void };
 
@@ -52,7 +53,7 @@ export function CoinHuntGame({ blockId, payload, onNext }: Props) {
   useEffect(() => {
     if (!items.length || !completed || result || submitting) return;
     const dto: CompleteGameDto = { gameType: 'coin_hunt', collectedItemIds: collected, attempts, mistakes: 0, startedAt: startedAt.current, completedAt: new Date().toISOString() };
-    setSubmitting(true); api.completeGame(blockId, dto).then(setResult).catch((e) => setError(e instanceof Error ? e.message : 'ثبت نتیجه ناموفق بود.')).finally(() => setSubmitting(false));
+    setSubmitting(true); api.completeGame(blockId, dto).then((res) => { setResult(res); if (res.balance) useGameStore.getState().setBalance(res.balance); }).catch((e) => setError(e instanceof Error ? e.message : 'ثبت نتیجه ناموفق بود.')).finally(() => setSubmitting(false));
   }, [attempts, blockId, collected, completed, items.length, result, submitting]);
 
   if (result) return <Result result={result} onNext={onNext} />;
@@ -73,7 +74,7 @@ export function MemoryFinancialGame({ blockId, payload, onNext }: Props) {
   const [flipped, setFlipped] = useState<string[]>([]); const [matched, setMatched] = useState<string[]>([]); const [attempts, setAttempts] = useState(0); const [result, setResult] = useState<GameResultResponse | null>(null); const [error, setError] = useState(''); const startedAt = useRef(new Date().toISOString()); const lock = flipped.length === 2;
   useEffect(() => { api.getGameResult(blockId).then(setResult).catch(() => undefined); }, [blockId]);
   useEffect(() => { if (flipped.length !== 2) return; const [first, second] = flipped.map((id) => cards.find((card) => card.id === id)!); const timer = window.setTimeout(() => { setMatched((current) => first.pairId === second.pairId ? [...current, first.pairId] : current); setFlipped([]); }, 800); return () => window.clearTimeout(timer); }, [cards, flipped]);
-  useEffect(() => { if (!raw.length || matched.length !== raw.length || result) return; const dto: CompleteGameDto = { gameType: 'memory_financial', matchedPairIds: matched, attempts, mistakes: Math.max(0, attempts - matched.length), startedAt: startedAt.current, completedAt: new Date().toISOString() }; api.completeGame(blockId, dto).then(setResult).catch((e) => setError(e instanceof Error ? e.message : 'ثبت نتیجه ناموفق بود.')); }, [attempts, blockId, matched, raw.length, result]);
+  useEffect(() => { if (!raw.length || matched.length !== raw.length || result) return; const dto: CompleteGameDto = { gameType: 'memory_financial', matchedPairIds: matched, attempts, mistakes: Math.max(0, attempts - matched.length), startedAt: startedAt.current, completedAt: new Date().toISOString() }; api.completeGame(blockId, dto).then((res) => { setResult(res); if (res.balance) useGameStore.getState().setBalance(res.balance); }).catch((e) => setError(e instanceof Error ? e.message : 'ثبت نتیجه ناموفق بود.')); }, [attempts, blockId, matched, raw.length, result]);
   if (result) return <Result result={result} onNext={onNext} />;
   if (cards.length < 2) return <div className="p-8 text-center font-bold text-rose-500">کارت‌های بازی کامل نیستند.</div>;
   return <div className="relative overflow-hidden p-5 sm:p-8"><SparkleField /><div className="relative z-10"><div className="mb-5 flex items-start justify-between gap-3"><div><div className="mb-2 inline-flex items-center gap-2 rounded-full bg-violet-50 px-3 py-1 text-xs font-black text-violet-600"><Sparkles size={15} /> تمرین حافظه</div><h2 className="text-2xl font-black text-slate-800">{text(payload.title, 'حافظه مالی')}</h2><p className="mt-1 text-sm font-bold leading-6 text-slate-500">{text(payload.introduction, 'کارت‌های مرتبط را پیدا کن و جفت‌ها را کامل کن!')}</p></div><motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 1.8, repeat: Infinity }} className="grid size-14 shrink-0 place-items-center rounded-2xl bg-violet-100 text-3xl shadow-[0_5px_0_#b9a7ff]">🧠</motion.div></div>

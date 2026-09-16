@@ -22,6 +22,7 @@ import type {
   StoryPayload,
   DecisionTreePayload,
   BasketGamePayload,
+  AuctionPayload,
 } from '@/types/lesson';
 import { useGameStore } from '@/store/gameStore';
 import AnimationBlock from './AnimationBlock';
@@ -54,6 +55,7 @@ const blockLabels: Partial<Record<LessonBlock['type'], string>> = {
   drag_drop: 'بازی جورچین',
   decision_tree: 'درخت تصمیم',
   basket_game: 'بازی سبد',
+  auction: 'بازی مزایده',
 };
 
 export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
@@ -150,8 +152,9 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
         return (
           <QuizBlock
             key={block.id}
+            blockId={block.id}
             payload={block.payload as QuizPayload}
-            onNext={(isCorrect) => handleActivityNext(block.id, isCorrect)}
+            onNext={handleNext}
           />
         );
       case 'story':
@@ -190,8 +193,9 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
         return (
           <DragDropBlock
             key={block.id}
+            blockId={block.id}
             payload={block.payload as DragDropPayload}
-            onNext={(isCorrect) => handleActivityNext(block.id, isCorrect)}
+            onNext={handleNext}
           />
         );
       case 'coin_hunt':
@@ -216,8 +220,9 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
         return (
           <DecisionTreeBlock
             key={block.id}
+            blockId={block.id}
             payload={block.payload as DecisionTreePayload}
-            onNext={(isCorrect) => handleActivityNext(block.id, isCorrect)}
+            onNext={handleNext}
           />
         );
       case 'basket_game':
@@ -226,6 +231,15 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
             key={block.id}
             blockId={block.id}
             payload={block.payload as BasketGamePayload}
+            onNext={handleNext}
+          />
+        );
+      case 'auction':
+        return (
+          <AuctionBlock
+            key={block.id}
+            blockId={block.id}
+            payload={block.payload as AuctionPayload}
             onNext={handleNext}
           />
         );

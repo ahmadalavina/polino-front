@@ -11,6 +11,7 @@ import {
   tryBeginBasketSubmission,
 } from '@/features/basket-game/basketGame';
 import type { BasketGamePayload } from '@/types/lesson';
+import { useGameStore } from '@/store/gameStore';
 
 type GameState = 'ready' | 'playing' | 'paused' | 'submitting' | 'finished' | 'error';
 type FallingItem = { id: number; type: 'coin' | 'bomb'; x: number; y: number };
@@ -75,6 +76,9 @@ export default function BasketGame({
       const response = await api.completeGame(blockId, body);
       if (!mountedRef.current) return;
       setResult(response);
+      if (response.balance) {
+        useGameStore.getState().setBalance(response.balance);
+      }
       setGameState('finished');
     } catch (requestError) {
       if (!mountedRef.current) return;

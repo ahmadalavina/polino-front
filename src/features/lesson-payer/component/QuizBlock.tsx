@@ -8,15 +8,21 @@ import {
   HelpCircle,
   XCircle,
 } from 'lucide-react';
+import { api, type CompleteGameDto } from '@/lib/api';
+import { useGameStore } from '@/store/gameStore';
 import type { QuizPayload } from '@/types/lesson';
 
 interface Props {
+  blockId: number;
   payload: QuizPayload;
-  onNext: (isCorrect: boolean) => void;
+  onNext: () => void;
 }
 
-export default function QuizBlock({ payload, onNext }: Props) {
+export default function QuizBlock({ blockId, payload, onNext }: Props) {
   const [selectedOptionId, setSelectedOptionId] = useState<number | null>(null);
+  const [checked, setChecked] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<boolean | null>(null);
 
   const options = useMemo(
     () => [...payload.options].sort((a, b) => a.sortOrder - b.sortOrder),
@@ -41,6 +47,31 @@ export default function QuizBlock({ payload, onNext }: Props) {
 
     return 'border-slate-100 bg-slate-50 text-slate-400 opacity-65';
   }
+
+  const handleCheck = async () => {
+    if (!selectedOptionId || checked || isSubmitting) return;
+    setIsSubmitting(true);
+    setChecked(true);
+    const dto: CompleteGameDto = {
+      gameType: 'quiz',
+      matchedPairIds: [selectedOptionId.toString()],
+      attempts: 1,
+      mistakes: selectedOption?.isCorrect ? 0 : 1,
+    };
+    try {
+      const response = await api.completeGame(blockId, dto);
+      setSubmitResult(response.completed);
+      if (response.balance) {
+        useGameStore.getState().setBalance(response.balance);
+      }
+    } catch {
+      setSubmitResult(false);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const isCorrectAnswer = selectedOption?.isCorrect ?? false;
 
   return (
     <div className="flex min-h-[430px] flex-col justify-center p-5 sm:p-8">
@@ -78,18 +109,18 @@ export default function QuizBlock({ payload, onNext }: Props) {
             key={option.id}
             type="button"
             onClick={() =>
-              selectedOptionId === null && setSelectedOptionId(option.id)
+              !checked && setSelectedOptionId(option.id)
             }
-            disabled={selectedOptionId !== null}
+            disabled={checked}
             className={`flex min-h-15 w-full items-center gap-3 rounded-2xl border-2 px-4 py-3 text-start text-sm font-bold leading-6 transition-all sm:text-base ${getOptionStyle(
               option.id,
               option.isCorrect,
             )}`}
           >
             <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-black/5 text-sm font-black">
-              {selectedOptionId !== null && option.isCorrect ? (
+              {checked && option.isCorrect ? (
                 <Check size={18} strokeWidth={4} />
-              ) : selectedOptionId === option.id ? (
+              ) : checked && selectedOptionId === option.id && !option.isCorrect ? (
                 <XCircle size={18} strokeWidth={3} />
               ) : (
                 index + 1
@@ -100,42 +131,84 @@ export default function QuizBlock({ payload, onNext }: Props) {
         ))}
       </div>
 
-      {selectedOption && (
+      {selectedOptionId !== null && (
         <div
           className={`mt-6 rounded-2xl border-2 p-4 ${
-            selectedOption.isCorrect
-              ? 'border-green-100 bg-green-50'
-              : 'border-rose-100 bg-rose-50'
+            checked
+              ? isCorrectAnswer
+                ? 'border-green-100 bg-green-50'
+                : 'border-rose-100 bg-rose-50'
+              : 'border-slate-200 bg-white'
           }`}
         >
           <div className="mb-4 flex items-center gap-2">
-            {selectedOption.isCorrect ? (
+            {checked && isCorrectAnswer ? (
               <CheckCircle2 className="text-[#3baa40]" size={24} />
-            ) : (
+            ) : checked && !isCorrectAnswer ? (
               <XCircle className="text-rose-500" size={24} />
-            )}
+            ) : null}
             <p
               className={`font-black ${
-                selectedOption.isCorrect ? 'text-[#278f2b]' : 'text-rose-600'
+                checked
+                  ? isCorrectAnswer ? 'text-[#278f2b]' : 'text-rose-600'
+                  : 'text-slate-500'
               }`}
             >
-              {selectedOption.isCorrect
-                ? 'آفرین! جواب درست رو پیدا کردی.'
-                : 'اشکالی نداره؛ جواب درست رو یاد گرفتی!'}
+              {checked
+                ? isCorrectAnswer
+                  ? submitResult
+                    ? 'آفرین! جواب درست رو پیدا کردی.'
+                    : 'در حال بررسی...'
+                  : 'اشکالی نداره؛ جواب درست رو یاد گرفتی!'
+                : `آیا ${option.text} گزینه درستی است؟`}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => onNext(selectedOption.isCorrect)}
-            className={`flex h-13 w-full items-center justify-center gap-2 rounded-2xl font-black text-white shadow-[0_5px_0_var(--button-shadow)] transition-all active:translate-y-1 active:shadow-none ${
-              selectedOption.isCorrect
-                ? 'bg-[#58cc59] [--button-shadow:#3da83e]'
-                : 'bg-[#ff8a55] [--button-shadow:#e56f3d]'
-            }`}
-          >
-            ادامه
-            <ArrowLeft size={19} strokeWidth={3} />
-          </button>
+          {!checked ? (
+            <button
+              type="button"
+              onClick={handleCheck}
+              disabled={isSubmitting}
+              className={`flex h-13 w-full items-center justify-center gap-2 rounded-2xl font-black text-white shadow-[0_5px_0_var(--button-shadow)] transition-all active:translate-y-1 active:shadow-none ${
+                isSubmitting
+                  ? 'bg-slate-300 shadow-none cursor-wait'
+                  : 'bg-[#58cc59] [--button-shadow:#3da83e] hover:bg-[#61d562]'
+              }`}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="animate-spin">⟳</span>
+                  در حال بررسی...
+                </>
+              ) : (
+                <>
+                  بررسی پاسخ
+                  <ArrowLeft size={19} strokeWidth={3} />
+                </>
+              )}
+            </button>
+          ) : isCorrectAnswer && submitResult ? (
+            <button
+              type="button"
+              onClick={onNext}
+              className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#58cc59] [--button-shadow:#3da83e] text-sm font-black text-white shadow-[0_5px_0_#3da83e] transition-all active:translate-y-1 active:shadow-none"
+            >
+              ادامه
+              <ArrowLeft size={19} strokeWidth={3} />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedOptionId(null);
+                setChecked(false);
+                setSubmitResult(null);
+              }}
+              className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#ff8a55] [--button-shadow:#e56f3d] text-sm font-black text-white shadow-[0_5px_0_#e56f3d] transition-all active:translate-y-1 active:shadow-none"
+            >
+              تلاش مجدد
+              <ArrowLeft size={19} strokeWidth={3} />
+            </button>
+          )}
         </div>
       )}
     </div>
