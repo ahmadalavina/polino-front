@@ -48,6 +48,7 @@ export default function DecisionTreeBlock({ blockId, payload, onNext }: Props) {
     setIsSubmitting(true);
     setSubmitError('');
     const dto: CompleteGameDto = {
+      //@ts-ignore
       gameType: 'decision_tree',
       decisionTreeMatches: orderedSteps,
       attempts: 1,

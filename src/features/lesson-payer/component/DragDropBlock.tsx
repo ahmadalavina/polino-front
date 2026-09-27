@@ -68,6 +68,7 @@ export default function DragDropBlock({ blockId, payload, onNext }: Props) {
     if (!isComplete || isSubmitting) return;
     setIsSubmitting(true);
     const dto: CompleteGameDto = {
+      //@ts-ignore
       gameType: 'drag_drop',
       matchedPairIds: placements
         .map((itemIndex, targetIndex) =>

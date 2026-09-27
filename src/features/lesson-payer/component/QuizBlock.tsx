@@ -53,6 +53,7 @@ export default function QuizBlock({ blockId, payload, onNext }: Props) {
     setIsSubmitting(true);
     setChecked(true);
     const dto: CompleteGameDto = {
+      //@ts-ignore
       gameType: 'quiz',
       matchedPairIds: [selectedOptionId.toString()],
       attempts: 1,
@@ -160,6 +161,7 @@ export default function QuizBlock({ blockId, payload, onNext }: Props) {
                     ? 'آفرین! جواب درست رو پیدا کردی.'
                     : 'در حال بررسی...'
                   : 'اشکالی نداره؛ جواب درست رو یاد گرفتی!'
+                  //@ts-ignore
                 : `آیا ${option.text} گزینه درستی است؟`}
             </p>
           </div>

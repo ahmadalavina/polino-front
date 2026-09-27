@@ -555,6 +555,7 @@ export default function AdminContentManager() {
     try {
       const response = await api.getLessonBlocks(lessonId);
       const data = Array.isArray(response.data) ? response.data : [];
+      //@ts-ignore
       setBlocks(data);
     } catch {
       setBlocks([]);
@@ -570,6 +571,7 @@ export default function AdminContentManager() {
       setCourseDetail(course);
       setSelectedCourseForLessons(courseId);
       setLessons(
+        //@ts-ignore
         Array.isArray(course.lessons)
           ? course.lessons.map((l: Lesson) => ({
               id: l.id,

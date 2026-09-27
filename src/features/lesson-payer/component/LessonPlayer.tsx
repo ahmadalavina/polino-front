@@ -37,6 +37,7 @@ import RewardBlock from './RewardBlock';
 import StoryBlock from './StoryBlock';
 import VideoBlock from './VideoBlock';
 import { CoinHuntGame, MemoryFinancialGame } from './GameBlocks';
+import AuctionBlock from './AuctionBlock';
 
 interface Props {
   lesson: LessonData;
@@ -237,6 +238,7 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
       case 'auction':
         return (
           <AuctionBlock
+
             key={block.id}
             blockId={block.id}
             payload={block.payload as AuctionPayload}
