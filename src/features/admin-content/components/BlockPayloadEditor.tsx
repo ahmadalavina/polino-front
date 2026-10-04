@@ -23,7 +23,8 @@ import {
   Grid3x3,
   type LucideIcon,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { BlockType } from "@/types/lesson";
 
 type Props = {
@@ -125,6 +126,13 @@ const emojiChoices: { group: string; emojis: string[] }[] = [
   { group: "طبیعت", emojis: ["⚽", "🏀", "🎈", "🎨", "🎵", "🌻", "🌸", "🌈", "☀️", "🌙"] },
 ];
 
+type DropdownPosition = {
+  left: number;
+  top: number | null;
+  bottom: number | null;
+  width: number;
+};
+
 function EmojiPicker({
   label,
   value,
@@ -137,10 +145,61 @@ function EmojiPicker({
   hint?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [position, setPosition] = useState<DropdownPosition | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function updatePosition() {
+      const trigger = triggerRef.current;
+      if (!trigger) return;
+      const rect = trigger.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openUp = spaceBelow < 320 && rect.top > spaceBelow;
+      setPosition({
+        left: rect.left,
+        width: rect.width,
+        top: openUp ? null : rect.bottom + 8,
+        bottom: openUp ? window.innerHeight - rect.top + 8 : null,
+      });
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target as Node;
+      if (triggerRef.current?.contains(target)) return;
+      if (panelRef.current?.contains(target)) return;
+      setOpen(false);
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("pointerdown", handlePointerDown, true);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("pointerdown", handlePointerDown, true);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
   return (
-    <div className="relative block">
+    <div className="block">
       <FieldLabel>{label}</FieldLabel>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((current) => !current)}
         className={`${fieldClass} flex items-center justify-between gap-2 text-start`}
@@ -155,16 +214,21 @@ function EmojiPicker({
           {hint}
         </span>
       )}
-      {open && (
-        <>
-          <button
-            type="button"
-            aria-label="بستن انتخابگر ایموجی"
-            tabIndex={-1}
-            onClick={() => setOpen(false)}
-            className="fixed inset-0 z-30 cursor-default"
-          />
-          <div className="absolute z-40 mt-2 max-h-72 w-full min-w-[260px] overflow-y-auto rounded-2xl border-2 border-slate-100 bg-white p-3 shadow-[0_12px_40px_rgba(38,61,89,0.18)]">
+      {mounted &&
+        open &&
+        position &&
+        createPortal(
+          <div
+            ref={panelRef}
+            style={{
+              position: "fixed",
+              left: position.left,
+              width: Math.max(position.width, 280),
+              top: position.top ?? undefined,
+              bottom: position.bottom ?? undefined,
+            }}
+            className="z-50 max-h-[min(20rem,60vh)] overflow-y-auto rounded-2xl border-2 border-slate-100 bg-white p-3 shadow-[0_12px_40px_rgba(38,61,89,0.18)]"
+          >
             <label className="mb-3 block">
               <span className="mb-1.5 block text-[11px] font-black text-slate-400">
                 ایموجی دلخواه
@@ -201,9 +265,9 @@ function EmojiPicker({
                 </div>
               </div>
             ))}
-          </div>
-        </>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

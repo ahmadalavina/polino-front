@@ -150,7 +150,7 @@ Payload:
 }
 ```
 
-Validation requires positive duration (integer), spawn/falling/player values greater than zero, bomb chance in `[0,1]`, positive integer coins per point, and a non-negative integer bomb penalty. `collectible` is optional (`{ type: 'emoji' | 'image', value: string }`, non-empty `value`); the renderer falls back to `{ type: 'emoji', value: '⭐' }` via `resolveBasketCollectible` when it is missing or blank, so legacy blocks keep the star coin. When `type` is `image`, `value` is an image URL rendered instead of the emoji. The admin emoji branch uses the shared `EmojiPicker` (`BlockPayloadEditor.tsx`) — a grouped emoji dropdown plus a free-text field for custom emojis — instead of a plain text input.
+Validation requires positive duration (integer), spawn/falling/player values greater than zero, bomb chance in `[0,1]`, positive integer coins per point, and a non-negative integer bomb penalty. `collectible` is optional (`{ type: 'emoji' | 'image', value: string }`, non-empty `value`); the renderer falls back to `{ type: 'emoji', value: '⭐' }` via `resolveBasketCollectible` when it is missing or blank, so legacy blocks keep the star coin. When `type` is `image`, `value` is an image URL rendered instead of the emoji. The admin emoji branch uses the shared `EmojiPicker` (`BlockPayloadEditor.tsx`) — a grouped emoji dropdown plus a free-text field for custom emojis — instead of a plain text input. The picker panel renders through `createPortal` with `position: fixed` and flips upward when space below is tight, because the admin editor and its ancestors (`AdminContentManager.tsx` section/main) use `overflow-hidden` and would otherwise clip the dropdown.
 
 Gameplay rules:
 
