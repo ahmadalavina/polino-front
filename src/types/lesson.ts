@@ -72,10 +72,21 @@ export interface CoinHuntPayload {
   items?: Array<Record<string, unknown>>;
 }
 
+export interface MemoryFinancialCardSide {
+  type: string;
+}
+
+export interface MemoryFinancialPair {
+  id?: string;
+  first: MemoryFinancialCardSide;
+  second: MemoryFinancialCardSide;
+}
+
 export interface MemoryFinancialPayload {
   introduction?: string;
   title?: string;
-  pairs?: Array<Record<string, unknown>>;
+  maxAttempts?: number;
+  pairs?: MemoryFinancialPair[];
 }
 
 export interface LessonBlock {
@@ -159,6 +170,8 @@ export type LessonBlockPayload =
   | RewardPayload
   | MediaPayload
   | DragDropPayload
+  | CoinHuntPayload
+  | MemoryFinancialPayload
   | DecisionTreePayload
   | BasketGamePayload
   | AuctionPayload;

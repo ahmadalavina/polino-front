@@ -5,8 +5,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Check, Coins, RotateCcw, Sparkles, Trophy, X } from 'lucide-react';
 import { api, type CompleteGameDto, type GameResultResponse } from '@/lib/api';
 import { useGameStore } from '@/store/gameStore';
+import type { MemoryFinancialPayload } from '@/types/lesson';
 
 type Props = { blockId: number; payload: Record<string, unknown>; onNext: () => void };
+type MemoryFinancialProps = { blockId: number; payload: MemoryFinancialPayload; onNext: () => void };
 
 function text(value: unknown, fallback: string) {
   return typeof value === 'string' && value.trim() ? value : fallback;
@@ -77,10 +79,10 @@ export function CoinHuntGame({ blockId, payload, onNext }: Props) {
     </div></div>;
 }
 
-export function MemoryFinancialGame({ blockId, payload, onNext }: Props) {
+export function MemoryFinancialGame({ blockId, payload, onNext }: MemoryFinancialProps) {
   const raw = Array.isArray(payload.pairs) ? payload.pairs : [];
   const maxAttempts = Math.max(0, Number(payload.maxAttempts ?? 0) || 0);
-  const buildCards = () => raw.flatMap((pair, index) => { const value = pair as Record<string, unknown>; const id = text(value.id ?? value.pairId, `pair-${index}`); const first = value.first as Record<string, unknown> | undefined; const second = value.second as Record<string, unknown> | undefined; return [{ id: `${id}-a`, pairId: id, label: text(first?.type, 'کارت اول') }, { id: `${id}-b`, pairId: id, label: text(second?.type, 'کارت دوم') }]; });
+  const buildCards = () => raw.flatMap((pair, index) => { const id = text(pair.id, `pair-${index}`); return [{ id: `${id}-a`, pairId: id, label: text(pair.first?.type, 'کارت اول') }, { id: `${id}-b`, pairId: id, label: text(pair.second?.type, 'کارت دوم') }]; });
   const [cards, setCards] = useState(() => shuffleCards(buildCards()));
   const [flipped, setFlipped] = useState<string[]>([]); const [matched, setMatched] = useState<string[]>([]); const [attempts, setAttempts] = useState(0); const [result, setResult] = useState<GameResultResponse | null>(null); const [error, setError] = useState(''); const startedAt = useRef(new Date().toISOString()); const lock = flipped.length === 2; const outOfAttempts = maxAttempts > 0 && attempts >= maxAttempts && matched.length < raw.length;
   useEffect(() => { api.getGameResult(blockId).then(setResult).catch(() => undefined); }, [blockId]);

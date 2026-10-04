@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { basketGamePayloadSchema } from '@/features/basket-game/basketGame';
+import { memoryFinancialPayloadSchema } from '@/features/memory-financial-game/memoryFinancialGame';
 
 const optionalText = z
   .string()
@@ -96,5 +97,6 @@ export const lessonBlockUpdateSchema = z.object({
 
 export function validateBlockPayload(type: string, payload: unknown) {
   if (type === 'basket_game') return basketGamePayloadSchema.safeParse(payload);
+  if (type === 'memory_financial') return memoryFinancialPayloadSchema.safeParse(payload);
   return z.record(z.string(), z.unknown()).safeParse(payload);
 }

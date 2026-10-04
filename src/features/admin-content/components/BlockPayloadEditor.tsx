@@ -18,6 +18,8 @@ import {
   ArrowUp,
   ArrowDown,
   ShoppingBasket,
+  Brain,
+  Coins,
   type LucideIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -47,6 +49,8 @@ const blockMeta: Partial<Record<BlockType, BlockMeta>> = {
   drag_drop: { label: "کشیدن و رها کردن", icon: GripVertical, color: "#06b6d4" },
   decision_tree: { label: "درخت تصمیم", icon: GitBranch, color: "#f59e0b" },
   basket_game: { label: "بازی سبد", icon: ShoppingBasket, color: "#f59e0b" },
+  coin_hunt: { label: "شکار سکه", icon: Coins, color: "#f59e0b" },
+  memory_financial: { label: "حافظه مالی", icon: Brain, color: "#7c5cff" },
 };
 
 function safeParse(json: string): Record<string, unknown> {
@@ -1053,7 +1057,23 @@ function GamePreview({ payload, type }: { payload: Record<string, unknown>; type
     return <div className="grid grid-cols-3 gap-2 p-4">{items.map((item, i) => <div key={i} className="rounded-xl bg-amber-50 p-3 text-center text-2xl">🪙<span className="block text-xs font-black">{String(item.value ?? 0)}</span></div>)}</div>;
   }
   const pairs = Array.isArray(payload.pairs) ? payload.pairs as Record<string, unknown>[] : [];
-  return <div className="grid grid-cols-2 gap-2 p-4">{pairs.flatMap((pair, i) => [String(pair.cardA ?? 'کارت A'), String(pair.cardB ?? 'کارت B')]).map((label, i) => <div key={i} className="rounded-xl bg-violet-50 p-3 text-center text-xs font-black text-violet-700">{label}</div>)}</div>;
+  if (!pairs.length) {
+    return <p className="p-6 text-center text-xs font-bold text-slate-400">هنوز جفتی اضافه نشده است.</p>;
+  }
+  const sideLabel = (side: unknown, fallback: string) => {
+    const value = (side ?? {}) as Record<string, unknown>;
+    return typeof value.type === 'string' && value.type.trim() ? value.type : fallback;
+  };
+  return (
+    <div className="space-y-2 p-4">
+      {pairs.map((pair, i) => (
+        <div key={i} className="grid grid-cols-2 gap-2">
+          <div className="rounded-xl bg-violet-50 p-3 text-center text-xs font-black text-violet-700">{sideLabel(pair.first, 'کارت اول')}</div>
+          <div className="rounded-xl bg-violet-50 p-3 text-center text-xs font-black text-violet-700">{sideLabel(pair.second, 'کارت دوم')}</div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function ImagePreview({ payload }: { payload: Record<string, unknown> }) {

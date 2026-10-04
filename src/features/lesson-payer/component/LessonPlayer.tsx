@@ -22,6 +22,7 @@ import type {
   StoryPayload,
   DecisionTreePayload,
   BasketGamePayload,
+  MemoryFinancialPayload,
   AuctionPayload,
 } from '@/types/lesson';
 import { useGameStore } from '@/store/gameStore';
@@ -213,7 +214,7 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
           <MemoryFinancialGame
             key={block.id}
             blockId={block.id}
-            payload={block.payload as unknown as Record<string, unknown>}
+            payload={block.payload as MemoryFinancialPayload}
             onNext={handleNext}
           />
         );

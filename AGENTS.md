@@ -100,7 +100,8 @@ The block payload **visual editor is now the default in production**: `src/featu
 There is no `card`/`flip`/`guess`/`flashcard` type; the card game is **`memory_financial`** (financial memory, pair matching).
 
 - Renderer: `MemoryFinancialGame` in `src/features/lesson-payer/component/GameBlocks.tsx`.
-- Reference implementation to follow for a "full" game: **`basket_game`** — `src/features/basket-game/basketGame.ts` (typed payload + Zod `basketGamePayloadSchema` + `parseBasketGamePayload` + completion builder + submit guard) and `tests/basket-game.test.ts`. It is the only block with real payload validation and tests.
+- Validation: `src/features/memory-financial-game/memoryFinancialGame.ts` (`memoryFinancialPayloadSchema`, `parseMemoryFinancialPayload`, `memoryFinancialDefaults`) and `tests/memory-financial-game.test.ts`.
+- Reference implementation for a "full" game: **`basket_game`** — `src/features/basket-game/basketGame.ts` (typed payload + Zod schema + parse helper + completion builder + submit guard) and `tests/basket-game.test.ts`.
 
 **Gameplay (pair-matching memory):**
 
@@ -115,12 +116,15 @@ There is no `card`/`flip`/`guess`/`flashcard` type; the card game is **`memory_f
   ```
   `first.type` / `second.type` is the visible card label. The legacy `memory_financial_legacy` shape used `cardA`/`cardB` strings and is **incompatible** with the renderer (silently falls back to «کارت اول/دوم»).
 
-Known incomplete points in `memory_financial` (fix target for "تکمیل اجرا"):
+Resolved points:
 
-1. `MemoryFinancialPayload` is declared in `types/lesson.ts` but **missing from the `LessonBlockPayload` union**, so `LessonPlayer` casts `as unknown as Record<string, unknown>`.
-2. **No Zod validation** for the card payload — `validateBlockPayload` (`schemas.ts`) only validates `basket_game`; everything else is `z.record(z.string(), z.unknown())`.
-3. Admin **live preview is wrong**: `GamePreview` (`BlockPayloadEditor.tsx`) reads obsolete `pair.cardA`/`pair.cardB` instead of `first.type`/`second.type`, so it always shows «کارت A/کارت B».
-4. `maxAttempts` is written by the admin form but **never read by the play renderer** — no attempt limit is enforced.
-5. No `blockMeta` entry for `memory_financial`/`coin_hunt` (`BlockPayloadEditor.tsx`), so the editor header shows the raw type string instead of a Persian label.
-6. Cards render **text only** — no image/front/back model; the `rotateY` flip is cosmetic (both sides show `card.label`).
-7. Auto-submit can race the initial `getGameResult` fetch (`GameBlocks.tsx`).
+1. `MemoryFinancialPayload` (with `MemoryFinancialPair`/`MemoryFinancialCardSide`) is in the `LessonBlockPayload` union; `LessonPlayer` casts to `MemoryFinancialPayload` instead of an unsafe `Record<string, unknown>`.
+2. Zod validation exists: `validateBlockPayload` (`schemas.ts`) routes `memory_financial` to `memoryFinancialPayloadSchema`. The legacy `cardA`/`cardB` shape is now rejected at save time.
+3. Admin live preview (`GamePreview`) reads `first.type`/`second.type` and shows each pair.
+4. `maxAttempts` is read by the renderer, counted per opened pair, and enforced with an out-of-attempts state.
+5. `blockMeta` has `memory_financial`/`coin_hunt` entries with Persian labels.
+
+Known incomplete points in `memory_financial` (remaining, fix target for "تکمیل اجرا"):
+
+1. Cards render **text only** — no image/front/back model; the `rotateY` flip is cosmetic (both sides show `card.label`).
+2. Auto-submit can race the initial `getGameResult` fetch (`GameBlocks.tsx`).
