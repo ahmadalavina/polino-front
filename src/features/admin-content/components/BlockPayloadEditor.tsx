@@ -632,6 +632,13 @@ function BasketGameForm({
 }) {
   const difficulty = (payload.difficulty ?? {}) as Record<string, unknown>;
   const scoring = (payload.scoring ?? {}) as Record<string, unknown>;
+  const collectible = (payload.collectible ?? {}) as Record<string, unknown>;
+  const collectibleType =
+    collectible.type === "image" ? "image" : "emoji";
+  const collectibleValue =
+    typeof collectible.value === "string" && collectible.value !== ""
+      ? collectible.value
+      : "⭐";
 
   function updateDifficulty(field: string, value: number) {
     onChange({ ...payload, difficulty: { ...difficulty, [field]: value } });
@@ -639,6 +646,23 @@ function BasketGameForm({
 
   function updateScoring(field: string, value: number) {
     onChange({ ...payload, scoring: { ...scoring, [field]: value } });
+  }
+
+  function updateCollectibleType(type: "emoji" | "image") {
+    onChange({
+      ...payload,
+      collectible: {
+        type,
+        value: String(collectible.value ?? ""),
+      },
+    });
+  }
+
+  function updateCollectibleValue(value: string) {
+    onChange({
+      ...payload,
+      collectible: { type: collectibleType, value },
+    });
   }
 
   function ConfigField({
@@ -701,6 +725,43 @@ function BasketGameForm({
         <div className="grid gap-3 sm:grid-cols-2">
           <ConfigField label="تعداد سکه برای هر امتیاز" hint="پس از جمع‌کردن این تعداد سکه، یک امتیاز ثبت می‌شود." value={Number(scoring.coinsPerPoint ?? 3)} onValueChange={(value) => updateScoring('coinsPerPoint', value)} min={1} />
           <ConfigField label="جریمه زمانی هر بمب (ثانیه)" hint="تعداد ثانیه‌ای که با گرفتن هر بمب از زمان کم می‌شود." value={Number(scoring.bombTimePenaltySeconds ?? 5)} onValueChange={(value) => updateScoring('bombTimePenaltySeconds', value)} min={0} />
+        </div>
+      </Section>
+      <Section title="آیتم جمع‌کردنی">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block">
+            <FieldLabel>نوع آیتم</FieldLabel>
+            <select
+              value={collectibleType}
+              onChange={(event) =>
+                updateCollectibleType(event.target.value === "image" ? "image" : "emoji")
+              }
+              className={fieldClass}
+            >
+              <option value="emoji">ایموجی</option>
+              <option value="image">تصویر</option>
+            </select>
+          </label>
+          <TextInput
+            label={collectibleType === "image" ? "نشانی تصویر" : "ایموجی"}
+            value={collectibleValue}
+            onChange={updateCollectibleValue}
+            placeholder={collectibleType === "image" ? "https://..." : "⭐"}
+            dir={collectibleType === "image" ? "ltr" : undefined}
+          />
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl bg-amber-50 p-3">
+          <span className="grid size-10 place-items-center text-3xl">
+            {collectibleType === "image" && collectible.value ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={String(collectible.value)} alt="" className="size-10 object-contain" />
+            ) : (
+              collectibleValue
+            )}
+          </span>
+          <span className="text-xs font-bold leading-5 text-amber-700">
+            این آیتم به‌جای سکه‌های پیش‌فرض از بالا می‌افتد.
+          </span>
         </div>
       </Section>
     </div>
@@ -1433,16 +1494,26 @@ function DragDropPreview({ payload }: { payload: Record<string, unknown> }) {
 
 function BasketGamePreview({ payload }: { payload: Record<string, unknown> }) {
   const scoring = (payload.scoring ?? {}) as Record<string, unknown>;
+  const collectible = (payload.collectible ?? {}) as Record<string, unknown>;
+  const collectibleType = collectible.type === "image" ? "image" : "emoji";
+  const collectibleValue = String(collectible.value || "⭐");
   return (
     <div className="p-4">
       <div className="relative h-52 overflow-hidden rounded-2xl bg-gradient-to-b from-sky-100 to-emerald-50">
-        <span className="absolute start-[18%] top-7 text-3xl">🪙</span>
+        <span className="absolute start-[18%] top-7 grid size-8 place-items-center text-3xl">
+          {collectibleType === "image" && collectible.value ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={collectibleValue} alt="" className="size-8 object-contain" />
+          ) : (
+            collectibleValue
+          )}
+        </span>
         <span className="absolute end-[20%] top-14 text-3xl">💣</span>
         <span className="absolute bottom-3 start-1/2 -translate-x-1/2 text-5xl">🧺</span>
       </div>
       <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs font-black">
         <span className="rounded-xl bg-sky-50 p-2 text-sky-700">⏱ {String(payload.durationSeconds ?? 60)}</span>
-        <span className="rounded-xl bg-amber-50 p-2 text-amber-700">🪙 ۰</span>
+        <span className="rounded-xl bg-amber-50 p-2 text-amber-700">{collectibleValue} ۰</span>
         <span className="rounded-xl bg-violet-50 p-2 text-violet-700">هر {String(scoring.coinsPerPoint ?? 3)} سکه</span>
       </div>
     </div>

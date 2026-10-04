@@ -169,6 +169,11 @@ export interface DecisionTreePayload {
   };
 }
 
+export interface BasketGameCollectible {
+  type: 'emoji' | 'image';
+  value: string;
+}
+
 export interface BasketGamePayload {
   durationSeconds: number;
   difficulty: {
@@ -181,6 +186,7 @@ export interface BasketGamePayload {
     coinsPerPoint: number;
     bombTimePenaltySeconds: number;
   };
+  collectible?: BasketGameCollectible;
 }
 
 export interface AuctionPayload {

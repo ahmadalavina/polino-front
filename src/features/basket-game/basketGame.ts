@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { BasketGamePayload, BasketGameCompletionRequest } from '../../types/lesson.ts';
+import type { BasketGameCollectible, BasketGamePayload, BasketGameCompletionRequest } from '../../types/lesson.ts';
 
 export const basketGameDefaults: BasketGamePayload = {
   durationSeconds: 60,
@@ -13,7 +13,16 @@ export const basketGameDefaults: BasketGamePayload = {
     coinsPerPoint: 3,
     bombTimePenaltySeconds: 5,
   },
+  collectible: {
+    type: 'emoji',
+    value: '⭐',
+  },
 };
+
+export const basketGameCollectibleSchema = z.object({
+  type: z.enum(['emoji', 'image']),
+  value: z.string().trim().min(1, 'مقدار آیتم جمع‌کردنی نمی‌تواند خالی باشد.'),
+});
 
 export const basketGamePayloadSchema = z.object({
   durationSeconds: z.number().int().positive('مدت بازی باید یک عدد صحیح بزرگ‌تر از صفر باشد.'),
@@ -27,10 +36,20 @@ export const basketGamePayloadSchema = z.object({
     coinsPerPoint: z.number().int().positive('تعداد سکه برای امتیاز باید یک عدد صحیح مثبت باشد.'),
     bombTimePenaltySeconds: z.number().int().nonnegative('جریمه زمانی نمی‌تواند منفی باشد.'),
   }),
+  collectible: basketGameCollectibleSchema.optional(),
 });
+
+export const basketGameDefaultCollectible = basketGameDefaults.collectible!;
 
 export function parseBasketGamePayload(value: unknown) {
   return basketGamePayloadSchema.safeParse(value);
+}
+
+export function resolveBasketCollectible(
+  collectible: BasketGamePayload['collectible'],
+): BasketGameCollectible {
+  if (collectible && collectible.value.trim()) return collectible;
+  return basketGameDefaultCollectible;
 }
 
 export function getBasketLocalScore(coinsCollected: number, coinsPerPoint: number) {

@@ -145,14 +145,16 @@ Payload:
   "scoring": {
     "coinsPerPoint": 3,
     "bombTimePenaltySeconds": 5
-  }
+  },
+  "collectible": { "type": "emoji", "value": "⭐" }
 }
 ```
 
-Validation requires positive duration (integer), spawn/falling/player values greater than zero, bomb chance in `[0,1]`, positive integer coins per point, and a non-negative integer bomb penalty.
+Validation requires positive duration (integer), spawn/falling/player values greater than zero, bomb chance in `[0,1]`, positive integer coins per point, and a non-negative integer bomb penalty. `collectible` is optional (`{ type: 'emoji' | 'image', value: string }`, non-empty `value`); the renderer falls back to `{ type: 'emoji', value: '⭐' }` via `resolveBasketCollectible` when it is missing or blank, so legacy blocks keep the star coin. When `type` is `image`, `value` is an image URL rendered instead of the emoji.
 
 Gameplay rules:
 
+- The caught item is the `collectible` (default ⭐); bombs are still 💣. The counters/labels say "آیتم" rather than "سکه" now that the collectible is configurable.
 - Local score is `floor(coinsCollected / coinsPerPoint)`; the frontend displays it but never submits a final score.
 - Remaining time is `max(0, duration - realElapsedTime - accumulatedBombPenalty)`.
 - Real elapsed time excludes bomb penalties. Completion occurs when real elapsed time plus penalties reaches duration.

@@ -8,9 +8,10 @@ import {
   cancelBasketAnimationFrame,
   getBasketLocalScore,
   parseBasketGamePayload,
+  resolveBasketCollectible,
   tryBeginBasketSubmission,
 } from '@/features/basket-game/basketGame';
-import type { BasketGamePayload } from '@/types/lesson';
+import type { BasketGameCollectible, BasketGamePayload } from '@/types/lesson';
 import { useGameStore } from '@/store/gameStore';
 
 type GameState = 'ready' | 'playing' | 'paused' | 'submitting' | 'finished' | 'error';
@@ -33,6 +34,10 @@ export default function BasketGame({
 }) {
   const parsedPayload = useMemo(() => parseBasketGamePayload(payload), [payload]);
   const config = parsedPayload.success ? parsedPayload.data : null;
+  const collectible = useMemo(
+    () => resolveBasketCollectible(payload.collectible),
+    [payload.collectible],
+  );
   const areaRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<number | null>(null);
   const lastFrameRef = useRef(0);
@@ -247,7 +252,7 @@ export default function BasketGame({
     <div className="p-4 sm:p-6" dir="rtl" data-testid="basket-game">
       <div className="mb-4 grid grid-cols-3 gap-2 text-center text-xs font-black sm:text-sm">
         <div className="rounded-2xl bg-sky-50 p-3 text-sky-700">زمان باقی‌مانده<br /><span className="text-lg">{remainingSeconds}</span></div>
-        <div className="rounded-2xl bg-amber-50 p-3 text-amber-700">سکه‌ها<br /><span className="text-lg">{coinsCollected}</span></div>
+        <div className="rounded-2xl bg-amber-50 p-3 text-amber-700">آیتم‌ها<br /><span className="text-lg">{coinsCollected}</span></div>
         <div className="rounded-2xl bg-violet-50 p-3 text-violet-700">امتیاز<br /><span className="text-lg">{localScore}</span></div>
       </div>
 
@@ -257,14 +262,14 @@ export default function BasketGame({
         onPointerDown={handlePointerDown}
         onPointerMove={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) moveFromPointer(event.clientX); }}
       >
-        <div className="absolute inset-x-0 top-4 text-center text-sm font-black text-sky-700">سکه‌ها را بگیر و از بمب‌ها دوری کن!</div>
+        <div className="absolute inset-x-0 top-4 text-center text-sm font-black text-sky-700">آیتم‌ها را بگیر و از بمب‌ها دوری کن!</div>
         {items.map((item) => (
           <div
             key={item.id}
             className="absolute grid size-[42px] place-items-center text-4xl drop-shadow"
             style={{ left: 0, top: 0, transform: `translate3d(${item.x}px, ${item.y}px, 0)` }}
           >
-            {item.type === 'coin' ? '⭐️' : '💣'}
+            {item.type === 'coin' ? <CollectibleFace collectible={collectible} /> : '💣'}
           </div>
         ))}
         <div
@@ -295,6 +300,21 @@ export default function BasketGame({
       </div>
     </div>
   );
+}
+
+function CollectibleFace({ collectible }: { collectible: BasketGameCollectible }) {
+  if (collectible.type === 'image') {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={collectible.value}
+        alt=""
+        className="size-[42px] object-contain"
+        draggable={false}
+      />
+    );
+  }
+  return <span>{collectible.value}</span>;
 }
 
 function Overlay({ title, text, action, onAction, loading, success }: { title: string; text: string; action?: string; onAction?: () => void; loading?: boolean; success?: boolean }) {

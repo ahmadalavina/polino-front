@@ -9,6 +9,7 @@ import {
   getBasketRemainingSeconds,
   isBasketTimelineComplete,
   parseBasketGamePayload,
+  resolveBasketCollectible,
   tryBeginBasketSubmission,
 } from '../src/features/basket-game/basketGame.ts';
 
@@ -17,6 +18,7 @@ test('admin defaults construct the exact nested basket payload', () => {
     durationSeconds: 60,
     difficulty: { spawnIntervalMs: 800, fallingSpeed: 180, playerSpeed: 300, bombChance: 0.25 },
     scoring: { coinsPerPoint: 3, bombTimePenaltySeconds: 5 },
+    collectible: { type: 'emoji', value: '⭐' },
   });
   assert.equal(parseBasketGamePayload(basketGameDefaults).success, true);
 });
@@ -25,6 +27,23 @@ test('admin validation rejects invalid basket values', () => {
   assert.equal(parseBasketGamePayload({ ...basketGameDefaults, durationSeconds: 0 }).success, false);
   assert.equal(parseBasketGamePayload({ ...basketGameDefaults, difficulty: { ...basketGameDefaults.difficulty, bombChance: 1.1 } }).success, false);
   assert.equal(parseBasketGamePayload({ ...basketGameDefaults, scoring: { ...basketGameDefaults.scoring, coinsPerPoint: 1.5 } }).success, false);
+});
+
+test('collectible accepts a custom emoji and an image url and is optional', () => {
+  assert.equal(parseBasketGamePayload({ ...basketGameDefaults, collectible: { type: 'emoji', value: '💎' } }).success, true);
+  assert.equal(parseBasketGamePayload({ ...basketGameDefaults, collectible: { type: 'image', value: 'https://cdn.test/coin.png' } }).success, true);
+  const withoutCollectible = { ...basketGameDefaults } as Record<string, unknown>;
+  delete withoutCollectible.collectible;
+  assert.equal(parseBasketGamePayload(withoutCollectible).success, true);
+});
+
+test('collectible validation rejects an empty value', () => {
+  assert.equal(parseBasketGamePayload({ ...basketGameDefaults, collectible: { type: 'emoji', value: '   ' } }).success, false);
+});
+
+test('resolveBasketCollectible falls back to the default when absent', () => {
+  assert.deepEqual(resolveBasketCollectible(undefined), { type: 'emoji', value: '⭐' });
+  assert.deepEqual(resolveBasketCollectible({ type: 'emoji', value: '💎' }), { type: 'emoji', value: '💎' });
 });
 
 test('three default coins produce one local point', () => {
@@ -67,4 +86,10 @@ test('lesson renderer registers basket_game with BasketGame', async () => {
   const source = await readFile(new URL('../src/features/lesson-payer/component/LessonPlayer.tsx', import.meta.url), 'utf8');
   assert.match(source, /case 'basket_game':/);
   assert.match(source, /<BasketGame/);
+});
+
+test('play renderer resolves and renders the configured collectible', async () => {
+  const source = await readFile(new URL('../src/features/lesson-payer/component/BasketGame.tsx', import.meta.url), 'utf8');
+  assert.match(source, /resolveBasketCollectible/);
+  assert.match(source, /<CollectibleFace collectible=\{collectible\} \/>/);
 });
