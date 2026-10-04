@@ -54,3 +54,19 @@ This document provides context, technical specifications, and development guidel
 - **API Documentation:** Full Swagger (OpenAPI) docs are in `swagger.json` at the project root. Always check it for endpoint paths, request/response schemas, and parameters before implementing any API call.
 - **Base URL:** Read from `NEXT_PUBLIC_API_BASE_URL` in `.env`. Never hardcode it.
 - **Auth:** set mock JWT in the `Authorization: Bearer <token>` header on all authenticated requests.
+
+### Parent IDs on Update (Content Hierarchy)
+
+The content hierarchy is **Course → Lesson → LessonBlock**. When updating a child entity, the request body must always include its parent identifier; never strip it because it is "unchanged".
+
+- `PATCH /lessons/{id}` must send `courseId`.
+- `PATCH /lesson-blocks/{id}` must send `lessonId`.
+- `PATCH /courses/{id}` has no parent.
+
+Response shapes do not always use the flat parent key:
+
+- `GET /lessons` returns `LessonSummaryResponseDto`, which may expose the parent as either `courseId` or a nested `course` object. Normalize `courseId = courseId ?? course?.id` when loading references, and resolve it the same way in edit handlers.
+- `GET /lesson-blocks` returns `LessonBlockResponseDto` with **no flat `lessonId`**; the parent only exists as the nested `lesson` object (`block.lesson.id` / `block.lesson.courseId`). Read the parent from `block.lessonId ?? block.lesson?.id` when editing a block.
+- Because `GET /lesson-blocks` nests the parent, do not assume `AdminLessonBlockOption.lessonId` is directly populated from the API response; keep the optional `lesson` fallback in the type.
+
+Edit flows must fail loudly when a required parent ID is missing instead of silently omitting it from the PATCH body. `AdminContentManager` validates `courseId`/`lessonId` before submitting lesson and block edits.

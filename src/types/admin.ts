@@ -16,6 +16,7 @@ export interface AdminLessonOption {
   icon?: string;
   order: number;
   courseId?: number;
+  course?: { id: number };
   rewardXp: number;
   rewardCoins: number;
   isPublished: boolean;
@@ -28,6 +29,7 @@ export interface AdminLessonBlockOption {
   type: BlockType;
   payload: Record<string, unknown>;
   lessonId: number;
+  lesson?: { id: number; courseId?: number | null };
 }
 
 export interface CreateCourseInput {

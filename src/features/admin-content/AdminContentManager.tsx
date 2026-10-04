@@ -518,9 +518,12 @@ export default function AdminContentManager() {
       const nextCourses = Array.isArray(courseResponse.data)
         ? courseResponse.data
         : [];
-      const nextLessons = Array.isArray(lessonResponse.data)
-        ? lessonResponse.data
-        : [];
+      const nextLessons = (
+        Array.isArray(lessonResponse.data) ? lessonResponse.data : []
+      ).map((lesson) => ({
+        ...lesson,
+        courseId: lesson.courseId ?? lesson.course?.id,
+      }));
 
       setCourses(nextCourses);
       setLessons(nextLessons);
@@ -692,6 +695,10 @@ export default function AdminContentManager() {
     setLessonStatus({ type: 'idle' });
 
     if (editingLessonId) {
+      if (!lessonForm.courseId) {
+        setLessonErrors({ courseId: 'برای ویرایش، دوره والد باید مشخص باشد.' });
+        return;
+      }
       const parsed = lessonUpdateSchema.safeParse(lessonForm);
       if (!parsed.success) {
         setLessonErrors(getFieldErrors(parsed.error.issues));
@@ -707,7 +714,7 @@ export default function AdminContentManager() {
         updatePayload.order = parseInt(lessonForm.order) || undefined;
         updatePayload.rewardXp = parseInt(lessonForm.rewardXp) || undefined;
         updatePayload.rewardCoins = parseInt(lessonForm.rewardCoins) || undefined;
-        updatePayload.courseId = parseInt(lessonForm.courseId) || undefined;
+        updatePayload.courseId = parseInt(lessonForm.courseId);
         updatePayload.isPublished = lessonForm.isPublished;
 
         await api.updateLesson(editingLessonId, updatePayload);
@@ -801,12 +808,16 @@ export default function AdminContentManager() {
     }
 
     if (editingBlockId) {
+      if (!blockForm.lessonId) {
+        setBlockErrors({ lessonId: 'برای ویرایش، درس والد باید مشخص باشد.' });
+        return;
+      }
       const parsed = lessonBlockUpdateSchema.safeParse({
         sortOrder: parseInt(blockForm.sortOrder) || undefined,
         pageNumber: parseInt(blockForm.pageNumber) || undefined,
         type: blockForm.type,
         payload,
-        lessonId: parseInt(blockForm.lessonId) || undefined,
+        lessonId: parseInt(blockForm.lessonId),
       });
       if (!parsed.success) {
         setBlockErrors(getFieldErrors(parsed.error.issues));
@@ -819,7 +830,7 @@ export default function AdminContentManager() {
         if (blockForm.pageNumber) updatePayload.pageNumber = parseInt(blockForm.pageNumber);
         updatePayload.type = blockForm.type;
         updatePayload.payload = payload as Record<string, unknown>;
-        if (blockForm.lessonId) updatePayload.lessonId = parseInt(blockForm.lessonId);
+        updatePayload.lessonId = parseInt(blockForm.lessonId);
 
         await api.updateLessonBlock(editingBlockId, updatePayload);
         setBlockStatus({
@@ -922,7 +933,9 @@ export default function AdminContentManager() {
   function editLesson(lesson: AdminLessonOption) {
     setEditingLessonId(lesson.id);
     setLessonForm({
-      courseId: String(lesson.courseId || courses[0]?.id || ''),
+      courseId: String(
+        lesson.courseId ?? lesson.course?.id ?? courses[0]?.id ?? '',
+      ),
       title: lesson.title || '',
       description: lesson.description || '',
       icon: lesson.icon || '',
@@ -938,12 +951,18 @@ export default function AdminContentManager() {
   }
 
   async function editBlock(block: AdminLessonBlockOption) {
+    const lessonId = block.lessonId ?? block.lesson?.id;
+    const parentLesson = lessons.find((lesson) => lesson.id === lessonId);
+    const courseId =
+      parentLesson?.courseId ??
+      parentLesson?.course?.id ??
+      block.lesson?.courseId ??
+      courses[0]?.id;
+
     setEditingBlockId(block.id);
     setBlockForm({
-      courseId: String(
-        lessons.find((l) => l.id === block.lessonId)?.courseId || courses[0]?.id || ''
-      ),
-      lessonId: String(block.lessonId),
+      courseId: String(courseId ?? ''),
+      lessonId: String(lessonId ?? ''),
       sortOrder: String(block.sortOrder || 1),
       pageNumber: String(block.pageNumber || 1),
       type: block.type,
