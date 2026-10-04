@@ -117,6 +117,97 @@ function TextInput({
   );
 }
 
+const emojiChoices: { group: string; emojis: string[] }[] = [
+  { group: "سکه و جایزه", emojis: ["⭐", "🌟", "✨", "💰", "🪙", "💎", "🏆", "🎁", "🎉", "👑"] },
+  { group: "میوه‌ها", emojis: ["🍎", "🍊", "🍋", "🍇", "🍓", "🍒", "🍉", "🍌", "🥕", "🌽"] },
+  { group: "خوراکی", emojis: ["🍪", "🍬", "🍭", "🍫", "🧁", "🍩", "🍕", "🍔", "🥪", "🍦"] },
+  { group: "حیوانات", emojis: ["🐶", "🐱", "🐭", "🐰", "🦊", "🐻", "🐼", "🦁", "🐸", "🐵"] },
+  { group: "طبیعت", emojis: ["⚽", "🏀", "🎈", "🎨", "🎵", "🌻", "🌸", "🌈", "☀️", "🌙"] },
+];
+
+function EmojiPicker({
+  label,
+  value,
+  onChange,
+  hint,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  hint?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative block">
+      <FieldLabel>{label}</FieldLabel>
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        className={`${fieldClass} flex items-center justify-between gap-2 text-start`}
+      >
+        <span className="text-2xl leading-none">{value || "⭐"}</span>
+        <span className="text-xs font-black text-slate-400">
+          {open ? "بستن" : "انتخاب ایموجی"}
+        </span>
+      </button>
+      {hint && (
+        <span className="mt-1.5 block text-xs font-medium leading-5 text-slate-400">
+          {hint}
+        </span>
+      )}
+      {open && (
+        <>
+          <button
+            type="button"
+            aria-label="بستن انتخابگر ایموجی"
+            tabIndex={-1}
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-30 cursor-default"
+          />
+          <div className="absolute z-40 mt-2 max-h-72 w-full min-w-[260px] overflow-y-auto rounded-2xl border-2 border-slate-100 bg-white p-3 shadow-[0_12px_40px_rgba(38,61,89,0.18)]">
+            <label className="mb-3 block">
+              <span className="mb-1.5 block text-[11px] font-black text-slate-400">
+                ایموجی دلخواه
+              </span>
+              <input
+                type="text"
+                value={value}
+                onChange={(event) => onChange(event.target.value)}
+                placeholder="ایموجی را اینجا بنویس یا بچسبان"
+                className={fieldClass}
+              />
+            </label>
+            {emojiChoices.map((section) => (
+              <div key={section.group} className="mb-3 last:mb-0">
+                <p className="mb-1.5 text-[11px] font-black text-slate-400">
+                  {section.group}
+                </p>
+                <div className="grid grid-cols-8 gap-1">
+                  {section.emojis.map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => {
+                        onChange(emoji);
+                        setOpen(false);
+                      }}
+                      className={`grid size-8 place-items-center rounded-lg text-xl transition-colors hover:bg-amber-50 ${
+                        value === emoji ? "bg-amber-100 ring-2 ring-amber-300" : ""
+                      }`}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function NumberInput({
   label,
   value,
@@ -742,13 +833,22 @@ function BasketGameForm({
               <option value="image">تصویر</option>
             </select>
           </label>
-          <TextInput
-            label={collectibleType === "image" ? "نشانی تصویر" : "ایموجی"}
-            value={collectibleValue}
-            onChange={updateCollectibleValue}
-            placeholder={collectibleType === "image" ? "https://..." : "⭐"}
-            dir={collectibleType === "image" ? "ltr" : undefined}
-          />
+          {collectibleType === "image" ? (
+            <TextInput
+              label="نشانی تصویر"
+              value={collectibleValue}
+              onChange={updateCollectibleValue}
+              placeholder="https://..."
+              dir="ltr"
+            />
+          ) : (
+            <EmojiPicker
+              label="ایموجی"
+              value={collectibleValue}
+              onChange={updateCollectibleValue}
+              hint="از فهرست انتخاب کن یا کد ایموجی را وارد کن."
+            />
+          )}
         </div>
         <div className="flex items-center gap-3 rounded-2xl bg-amber-50 p-3">
           <span className="grid size-10 place-items-center text-3xl">
