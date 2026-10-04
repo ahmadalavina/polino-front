@@ -70,3 +70,57 @@ Response shapes do not always use the flat parent key:
 - Because `GET /lesson-blocks` nests the parent, do not assume `AdminLessonBlockOption.lessonId` is directly populated from the API response; keep the optional `lesson` fallback in the type.
 
 Edit flows must fail loudly when a required parent ID is missing instead of silently omitting it from the PATCH body. `AdminContentManager` validates `courseId`/`lessonId` before submitting lesson and block edits.
+
+---
+
+## 5. Play / Lesson Block System
+
+The child "play" experience has **no `/play` route**. It lives at `/lesson/[lessonId]`:
+
+- `src/app/lesson/[lessonId]/page.tsx` loads `api.getLessonPlay(id)` and renders `<LessonPlayer>`.
+- `src/features/lesson-payer/component/LessonPlayer.tsx` is the dispatcher. Note the directory is misspelled **`lesson-payer`** (not `lesson-player`).
+- `renderBlock()` switches on `block.type`; blocks are grouped into pages by `pageNumber` and sorted by `sortOrder`. All blocks sharing a page render at once.
+- Game components submit via `api.completeGame(blockId, dto)` (`POST /game/blocks/{blockId}/complete`) and read results via `api.getGameResult` (`GET /game/blocks/{blockId}/result`). A `GET /game/lessons/{id}/play` returns blocks with `{ id, type, payload, pageNumber?, sortOrder? }`.
+
+### Block type coverage gaps
+
+`BlockType` (`src/types/lesson.ts`) has 16 values. Coverage is inconsistent:
+
+- **No play case (falls to the generic default placeholder):** `drop_down`, `question_block`, `film_and_image`. They are selectable and savable in admin but do nothing in play.
+- **Play case exists but not creatable in admin:** `auction` (missing from admin `blockTypeLabels`, `blockPresets`, and the Zod `type` enums in `schemas.ts`).
+- **Stale backend contract:** swagger `CompleteGameDto.gameType` only lists `coin_hunt | memory_financial`; the frontend also sends `quiz`, `drag_drop`, `decision_tree`, `basket_game`, `auction` (hence `//@ts-ignore` / casts in `QuizBlock.tsx`, `DragDropBlock.tsx`, `DecisionTreeBlock.tsx`). swagger `LessonBlockType` also omits `decision_tree`, `basket_game`, `auction`.
+- `src/features/admin-content/components/BlockTypeSelector.tsx` appears to be dead code (admin uses its own inline list in `AdminContentManager.tsx`).
+
+### Two payload conventions coexist (admin writes `first`/`second`; legacy presets use `cardA`/`cardB`)
+
+The block payload **visual editor is now the default in production**: `src/features/admin-content/AdminContentManager.tsx` imports `BlockPayloadEditor` and renders it. The raw-JSON textarea + `blockPresets` fallback (including `memory_financial_legacy`, `coin_hunt_legacy`) is legacy/fallback code. Only edit a payload's documented shape, and prefer the visual editor's fields.
+
+### The card guessing game = `memory_financial` («حافظه مالی»)
+
+There is no `card`/`flip`/`guess`/`flashcard` type; the card game is **`memory_financial`** (financial memory, pair matching).
+
+- Renderer: `MemoryFinancialGame` in `src/features/lesson-payer/component/GameBlocks.tsx`.
+- Reference implementation to follow for a "full" game: **`basket_game`** — `src/features/basket-game/basketGame.ts` (typed payload + Zod `basketGamePayloadSchema` + `parseBasketGamePayload` + completion builder + submit guard) and `tests/basket-game.test.ts`. It is the only block with real payload validation and tests.
+
+**Gameplay (pair-matching memory):**
+
+1. `payload.pairs` is flattened into two cards per pair: `first` → `<pairId>-a`, `second` → `<pairId>-b`; the visible face text is `first.type` / `second.type`.
+2. Cards start face-down (`✦`) and flip via `rotateY` on click. Two open cards with the same `pairId` stay matched (✅, green); otherwise they flip back after 800 ms.
+3. The game ends when every pair is matched; it then submits `{ gameType: 'memory_financial', matchedPairIds, attempts, mistakes, startedAt, completedAt }` to `POST /game/blocks/{blockId}/complete`. `mistakes` is approximated as `attempts - matched`.
+4. **Card order is shuffled once at game start** (Fisher–Yates in `shuffleCards`) and held in `cards` state — it must NOT reshuffle during play, otherwise the `flipped`/`matched` logic breaks. The «شروع دوباره» button performs one fresh shuffle (new game) and resets `startedAt`.
+- Payload written by `MemoryFinancialForm` (`BlockPayloadEditor.tsx`) / preset:
+  ```jsonc
+  { "title": "...", "introduction": "...", "maxAttempts": 0,
+    "pairs": [ { "id": "saving", "first": { "type": "پس‌انداز" }, "second": { "type": "هدف" } } ] }
+  ```
+  `first.type` / `second.type` is the visible card label. The legacy `memory_financial_legacy` shape used `cardA`/`cardB` strings and is **incompatible** with the renderer (silently falls back to «کارت اول/دوم»).
+
+Known incomplete points in `memory_financial` (fix target for "تکمیل اجرا"):
+
+1. `MemoryFinancialPayload` is declared in `types/lesson.ts` but **missing from the `LessonBlockPayload` union**, so `LessonPlayer` casts `as unknown as Record<string, unknown>`.
+2. **No Zod validation** for the card payload — `validateBlockPayload` (`schemas.ts`) only validates `basket_game`; everything else is `z.record(z.string(), z.unknown())`.
+3. Admin **live preview is wrong**: `GamePreview` (`BlockPayloadEditor.tsx`) reads obsolete `pair.cardA`/`pair.cardB` instead of `first.type`/`second.type`, so it always shows «کارت A/کارت B».
+4. `maxAttempts` is written by the admin form but **never read by the play renderer** — no attempt limit is enforced.
+5. No `blockMeta` entry for `memory_financial`/`coin_hunt` (`BlockPayloadEditor.tsx`), so the editor header shows the raw type string instead of a Persian label.
+6. Cards render **text only** — no image/front/back model; the `rotateY` flip is cosmetic (both sides show `card.label`).
+7. Auto-submit can race the initial `getGameResult` fetch (`GameBlocks.tsx`).
