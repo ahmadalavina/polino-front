@@ -20,6 +20,7 @@ import {
   ShoppingBasket,
   Brain,
   Coins,
+  Grid3x3,
   type LucideIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -51,6 +52,7 @@ const blockMeta: Partial<Record<BlockType, BlockMeta>> = {
   basket_game: { label: "بازی سبد", icon: ShoppingBasket, color: "#f59e0b" },
   coin_hunt: { label: "شکار سکه", icon: Coins, color: "#f59e0b" },
   memory_financial: { label: "حافظه مالی", icon: Brain, color: "#7c5cff" },
+  word_search: { label: "جدول کلمات", icon: Grid3x3, color: "#16b8a6" },
 };
 
 function safeParse(json: string): Record<string, unknown> {
@@ -780,6 +782,193 @@ function MemoryFinancialForm({ payload, onChange }: { payload: Record<string, un
   </Section>;
 }
 
+function rowToText(row: unknown): string {
+  if (Array.isArray(row)) return row.map(String).join(" ");
+  if (typeof row === "string") return row;
+  return "";
+}
+
+function textToRow(value: string): string[] {
+  return Array.from(value.replace(/\s+/g, ""));
+}
+
+function WordSearchForm({ payload, onChange }: { payload: Record<string, unknown>; onChange: (p: Record<string, unknown>) => void }) {
+  const grid = Array.isArray(payload.grid) ? payload.grid : [];
+  const words = Array.isArray(payload.words) ? payload.words : [];
+  const scoring = (payload.scoring ?? {}) as Record<string, unknown>;
+
+  const commit = (patch: Record<string, unknown>) => onChange({ ...payload, ...patch });
+
+  const updateRow = (index: number, value: string) =>
+    commit({ grid: grid.map((row, i) => (i === index ? textToRow(value) : row)) });
+
+  const addRow = () => commit({ grid: [...grid, []] });
+
+  const removeRow = (index: number) =>
+    commit({ grid: grid.filter((_, i) => i !== index) });
+
+  const updateWord = (index: number, patch: Record<string, unknown>) =>
+    commit({
+      words: words.map((entry, i) => {
+        if (i !== index) return entry;
+        const current = typeof entry === "string" ? { word: entry } : (entry as Record<string, unknown>);
+        return { ...current, ...patch };
+      }),
+    });
+
+  const addWord = () => commit({ words: [...words, { word: "" }] });
+
+  const removeWord = (index: number) =>
+    commit({ words: words.filter((_, i) => i !== index) });
+
+  return (
+    <div className="space-y-5">
+      <Section title="جدول حروف">
+        <p className="text-xs font-bold leading-6 text-slate-400">
+          هر ردیف را به‌صورت حروف جدا یا چسبیده بنویسید؛ همه ردیف‌ها باید هم‌طول باشند.
+        </p>
+        <div className="flex items-center justify-between">
+          <FieldLabel>ردیف‌ها</FieldLabel>
+          <button type="button" onClick={addRow} className="text-xs font-black text-[#7c5cff]">
+            <Plus size={14} className="inline" /> افزودن ردیف
+          </button>
+        </div>
+        {grid.map((row, index) => (
+          <div key={index} className="flex items-center gap-2">
+            <span className="w-6 text-center text-xs font-black text-slate-300">{index + 1}</span>
+            <input
+              type="text"
+              dir="rtl"
+              value={rowToText(row)}
+              onChange={(e) => updateRow(index, e.target.value)}
+              placeholder="مثلاً: ب ا ن ک خ"
+              className={`${fieldClass} flex-1 font-mono`}
+            />
+            <button
+              type="button"
+              aria-label={`حذف ردیف ${index + 1}`}
+              onClick={() => removeRow(index)}
+              className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-red-100 bg-white text-red-300 hover:border-red-300 hover:text-red-500"
+            >
+              <Trash2 size={17} />
+            </button>
+          </div>
+        ))}
+      </Section>
+
+      <Section title="کلمات">
+        <div className="flex items-center justify-between">
+          <FieldLabel>کلمه‌ها</FieldLabel>
+          <button type="button" onClick={addWord} className="text-xs font-black text-[#7c5cff]">
+            <Plus size={14} className="inline" /> افزودن کلمه
+          </button>
+        </div>
+        <p className="text-xs font-bold leading-6 text-slate-400">
+          مختصات اختیاری است؛ اگر خالی بماند سرور خودش کلمه را در جدول پیدا می‌کند.
+        </p>
+        {words.map((entry, index) => {
+          const config = typeof entry === "string" ? { word: entry } : (entry as Record<string, unknown>);
+          const start = (config.start ?? {}) as Record<string, unknown>;
+          return (
+            <div key={index} className="grid gap-2 rounded-xl border-2 border-slate-100 p-3 sm:grid-cols-2">
+              <TextInput
+                label={`کلمه ${index + 1}`}
+                value={String(config.word ?? "")}
+                onChange={(value) => updateWord(index, { word: value })}
+                dir="rtl"
+              />
+              <label className="block">
+                <FieldLabel>جهت (اختیاری)</FieldLabel>
+                <select
+                  value={String(config.direction ?? "")}
+                  onChange={(e) => updateWord(index, { direction: e.target.value || undefined })}
+                  className={fieldClass}
+                >
+                  <option value="">خودکار</option>
+                  <option value="horizontal">افقی</option>
+                  <option value="vertical">عمودی</option>
+                  <option value="diagonal_down">قطری رو به پایین</option>
+                  <option value="diagonal_up">قطری رو به بالا</option>
+                </select>
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <NumberInput
+                  label="سطر شروع (اختیاری)"
+                  value={Number(start.row ?? 0)}
+                  onChange={(value) => updateWord(index, { start: { row: value, col: Number(start.col ?? 0) } })}
+                  min={0}
+                />
+                <NumberInput
+                  label="ستون شروع (اختیاری)"
+                  value={Number(start.col ?? 0)}
+                  onChange={(value) => updateWord(index, { start: { row: Number(start.row ?? 0), col: value } })}
+                  min={0}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => removeWord(index)}
+                className="self-end text-start text-xs font-black text-rose-500"
+              >
+                <Trash2 size={15} className="inline" /> حذف کلمه
+              </button>
+            </div>
+          );
+        })}
+      </Section>
+
+      <Section title="تنظیمات امتیاز و جهت‌ها">
+        <label className="flex items-center gap-2 text-xs font-bold text-slate-500">
+          <input
+            type="checkbox"
+            checked={payload.allowReverse !== false}
+            onChange={(e) => commit({ allowReverse: e.target.checked })}
+          />
+          خواندن کلمه به‌صورت معکوس مجاز است
+        </label>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <NumberInput
+            label="امتیاز هر کلمه"
+            value={Number(scoring.perWord ?? 10)}
+            onChange={(value) => commit({ scoring: { ...scoring, perWord: value } })}
+            min={1}
+          />
+          <NumberInput
+            label="سقف امتیاز (اختیاری)"
+            value={Number(scoring.maxScore ?? 0)}
+            onChange={(value) => commit({ scoring: { ...scoring, maxScore: value || undefined } })}
+            min={0}
+          />
+        </div>
+      </Section>
+    </div>
+  );
+}
+
+function WordSearchPreview({ payload }: { payload: Record<string, unknown> }) {
+  const grid = Array.isArray(payload.grid) ? payload.grid.map(rowToText) : [];
+  const words = Array.isArray(payload.words) ? payload.words : [];
+  return (
+    <div className="space-y-3 p-4">
+      <div className="inline-flex flex-col gap-0.5 rounded-xl bg-teal-50 p-2 font-mono text-sm font-black text-teal-700">
+        {grid.map((row, i) => (
+          <span key={i} className="tracking-[0.4em]">
+            {row.replace(/\s+/g, "")}
+          </span>
+        ))}
+        {grid.length === 0 && <span className="text-xs text-slate-400">جدولی تنظیم نشده است.</span>}
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {words.map((entry, i) => (
+          <span key={i} className="rounded-full bg-teal-50 px-3 py-1 text-xs font-black text-teal-700">
+            {typeof entry === "string" ? entry : String((entry as Record<string, unknown>).word ?? "")}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 type DecisionStep = {
   id: string;
   question: string;
@@ -1290,6 +1479,7 @@ function LivePreview({
         {(blockType === "coin_hunt" || blockType === "memory_financial") && <GamePreview payload={payload} type={blockType} />}
         {blockType === "decision_tree" && <DecisionTreePreview payload={payload} />}
         {blockType === "basket_game" && <BasketGamePreview payload={payload} />}
+        {blockType === "word_search" && <WordSearchPreview payload={payload} />}
       </div>
     </div>
   );
@@ -1440,6 +1630,9 @@ export default function BlockPayloadEditor({
               )}
               {blockType === "basket_game" && (
                 <BasketGameForm payload={payload} onChange={handleChange} />
+              )}
+              {blockType === "word_search" && (
+                <WordSearchForm payload={payload} onChange={handleChange} />
               )}
             </div>
           )}

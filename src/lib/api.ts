@@ -8,7 +8,15 @@ import type {
   UpdateLessonInput,
   UpdateLessonBlockInput,
 } from '@/types/admin';
-import type { BasketGameCompletionRequest, CourseDetail, LessonData, Lesson, LessonBlock } from '@/types/lesson';
+import type {
+  BasketGameCompletionRequest,
+  CourseDetail,
+  LessonData,
+  Lesson,
+  LessonBlock,
+  WordSearchCompletionRequest,
+  WordSearchSelection,
+} from '@/types/lesson';
 import { useAuthStore } from '@/store/authStore';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
@@ -203,17 +211,28 @@ export type UserProfile = {
   streak?: number;
 };
 
-export type CompleteGameDto = BasketGameCompletionRequest | {
-  gameType: 'coin_hunt' | 'memory_financial' | 'basket_game' | 'auction';
-  collectedItemIds?: string[];
-  matchedPairIds?: string[];
-  decisionTreeMatches?: string[];
-  wordSearchFoundWords?: string[];
-  auctionBidIds?: string[];
-  attempts?: number;
-  mistakes?: number;
-  startedAt?: string;
-  completedAt?: string;
+export type CompleteGameDto =
+  | BasketGameCompletionRequest
+  | WordSearchCompletionRequest
+  | {
+      gameType: 'coin_hunt' | 'memory_financial' | 'basket_game' | 'auction';
+      collectedItemIds?: string[];
+      matchedPairIds?: string[];
+      decisionTreeMatches?: string[];
+      wordSearchFoundWords?: string[];
+      wordSearchSelections?: WordSearchSelection[];
+      auctionBidIds?: string[];
+      attempts?: number;
+      mistakes?: number;
+      startedAt?: string;
+      completedAt?: string;
+    };
+
+export type GameReward = {
+  lessonId?: number;
+  xp?: number;
+  coins?: number;
+  claimEndpoint?: string;
 };
 
 export type GameResultResponse = {
@@ -224,7 +243,7 @@ export type GameResultResponse = {
   attempts: number;
   mistakes: number;
   result: Record<string, unknown>;
-  reward?: Record<string, unknown> | null;
+  reward?: GameReward | null;
   xp: number;
   coins?: number;
   balance?: {
@@ -232,6 +251,15 @@ export type GameResultResponse = {
     coins: number;
     experience: number;
   };
+};
+
+export type RewardResponse = {
+  id: number;
+  lessonId: number;
+  lessonTitle?: string;
+  xp: number;
+  coins: number;
+  createdAt: string;
 };
 
 export const api = {
@@ -258,6 +286,13 @@ export const api = {
     ),
   getGameResult: (blockId: number) =>
     get<GameResultResponse>(`/game/blocks/${blockId}/result`),
+  claimLessonReward: async (lessonId: number) =>
+    unwrapData<RewardResponse>(
+      await post<Record<string, never>, RewardResponse | { data: RewardResponse }>(
+        `/rewards/lessons/${lessonId}/claim`,
+        {},
+      ),
+    ),
   getLessonPlay: async (id: number) => ({
     data: unwrapData<LessonData>(
       await get<LessonData | { data: LessonData }>(

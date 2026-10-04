@@ -51,6 +51,7 @@ import {
   lessonBlockUpdateSchema,
 } from './schemas';
 import { basketGameDefaults } from '@/features/basket-game/basketGame';
+import { wordSearchDefaults } from '@/features/word-search-game/wordSearchGame';
 import BlockPayloadEditor from './components/BlockPayloadEditor';
 
 type AdminSection = 'course' | 'lesson' | 'block';
@@ -156,6 +157,7 @@ Object.assign(blockTypeLabels, {
   memory_financial: 'حافظه مالی',
   decision_tree: 'درخت تصمیم',
   basket_game: 'بازی سبد',
+  word_search: 'جدول کلمات',
 });
 
 Object.assign(blockPresets, {
@@ -206,6 +208,7 @@ Object.assign(blockPresets, {
     scoring: { correct: 10, wrong: -5, maxScore: 30 },
   },
   basket_game: basketGameDefaults,
+  word_search: wordSearchDefaults,
 });
 
 const initialCourseForm = {

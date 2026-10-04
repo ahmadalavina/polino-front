@@ -16,6 +16,7 @@ export type BlockType =
   | 'memory_financial'
   | 'decision_tree'
   | 'basket_game'
+  | 'word_search'
   | 'auction';
 
 export interface DialogPayload {
@@ -87,6 +88,48 @@ export interface MemoryFinancialPayload {
   title?: string;
   maxAttempts?: number;
   pairs?: MemoryFinancialPair[];
+}
+
+export type WordSearchDirection =
+  | 'horizontal'
+  | 'vertical'
+  | 'diagonal_down'
+  | 'diagonal_up';
+
+export interface WordSearchCell {
+  row: number;
+  col: number;
+}
+
+export interface WordSearchWordConfig {
+  word: string;
+  start?: WordSearchCell;
+  direction?: WordSearchDirection;
+}
+
+export interface WordSearchScoring {
+  perWord?: number;
+  maxScore?: number;
+}
+
+export interface WordSearchPayload {
+  grid?: string[][];
+  words?: Array<string | WordSearchWordConfig>;
+  allowReverse?: boolean;
+  scoring?: WordSearchScoring;
+}
+
+export interface WordSearchSelection {
+  word: string;
+  start: WordSearchCell;
+  end: WordSearchCell;
+}
+
+export interface WordSearchCompletionRequest {
+  gameType: 'word_search';
+  wordSearchSelections: WordSearchSelection[];
+  startedAt?: string;
+  completedAt?: string;
 }
 
 export interface LessonBlock {
@@ -174,6 +217,7 @@ export type LessonBlockPayload =
   | MemoryFinancialPayload
   | DecisionTreePayload
   | BasketGamePayload
+  | WordSearchPayload
   | AuctionPayload;
 
 export interface Lesson {

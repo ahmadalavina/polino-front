@@ -14,6 +14,7 @@ export const blockTypeLabels: Partial<Record<string, string>> = {
   memory_financial: 'حافظه مالی',
   decision_tree: 'درخت تصمیم',
   basket_game: 'بازی سبد',
+  word_search: 'جدول کلمات',
 };
 
 export const blockPresets: Record<string, unknown> = {
@@ -108,5 +109,15 @@ export const blockPresets: Record<string, unknown> = {
       coinsPerPoint: 3,
       bombTimePenaltySeconds: 5,
     },
+  },
+  word_search: {
+    grid: [
+      ['ب', 'ا', 'ن', 'ک', 'خ'],
+      ['د', 'ر', 'م', 'ب', 'ا'],
+      ['س', 'ه', 'م', 'ج', 'ه'],
+    ],
+    words: [{ word: 'بانک', start: { row: 0, col: 0 }, direction: 'horizontal' }],
+    allowReverse: true,
+    scoring: { perWord: 10 },
   },
 };

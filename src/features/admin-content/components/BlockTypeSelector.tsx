@@ -16,6 +16,7 @@ export const blockTypeLabels: Record<string, string> = {
   memory_financial: 'حافظه مالی',
   decision_tree: 'درخت تصمیم',
   basket_game: 'بازی سبد',
+  word_search: 'جدول کلمات',
 };
 
 export function BlockTypeSelector({

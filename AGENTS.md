@@ -84,7 +84,7 @@ The child "play" experience has **no `/play` route**. It lives at `/lesson/[less
 
 ### Block type coverage gaps
 
-`BlockType` (`src/types/lesson.ts`) has 16 values. Coverage is inconsistent:
+`BlockType` (`src/types/lesson.ts`) now has 17 values. Coverage is inconsistent:
 
 - **No play case (falls to the generic default placeholder):** `drop_down`, `question_block`, `film_and_image`. They are selectable and savable in admin but do nothing in play.
 - **Play case exists but not creatable in admin:** `auction` (missing from admin `blockTypeLabels`, `blockPresets`, and the Zod `type` enums in `schemas.ts`).
@@ -128,3 +128,26 @@ Known incomplete points in `memory_financial` (remaining, fix target for "تکم
 
 1. Cards render **text only** — no image/front/back model; the `rotateY` flip is cosmetic (both sides show `card.label`).
 2. Auto-submit can race the initial `getGameResult` fetch (`GameBlocks.tsx`).
+
+### Word search = `word_search` («جدول کلمات»)
+
+- Renderer: `WordSearchBlock` in `src/features/lesson-payer/component/WordSearchBlock.tsx`; dispatched by `LessonPlayer`.
+- Logic/validation: `src/features/word-search-game/wordSearchGame.ts` (`wordSearchPayloadSchema`, `parseWordSearchPayload`, `normalizeGrid`, `readWordSearchLine`, `createWordSearchSelection`, `createWordSearchCompletionRequest`, `wordSearchDefaults`) and `tests/word-search-game.test.ts`.
+- Cell coordinates are **0-based** `{ row, col }`. Player selects `start`/`end`; the frontend never sends a direction.
+
+**Two different payload shapes (important):**
+
+- **Admin (write, `POST`/`PATCH /lesson-blocks`)** accepts `grid` as `string[][]` **or** `string[]` rows and `words` as `string[]` or `{ word, start?, direction? }[]`. `start`/`direction` are optional; if omitted the server finds the word. Server stores the canonical form (`grid: string[]`, each word with definitive `start`+`direction`).
+- **Play (`GET /game/lessons/{id}/play`)** returns `payload.grid` as a `string[][]` character matrix and `payload.words` as a **plain `string[]`** — deliberately without `start`/`direction`. The renderer must not depend on answers.
+- `allowReverse` defaults to `true`; `scoring.perWord` defaults to `10`, `scoring.maxScore` optional.
+
+**Completion contract:**
+
+- Submit via `wordSearchSelections: [{ word, start:{row,col}, end:{row,col} }]` (`createWordSearchCompletionRequest`). Order of `start`/`end` does not matter.
+- `wordSearchFoundWords: string[]` still exists in `CompleteGameDto` for backward compatibility but is **untrusted/cheatable** — never use it. If `wordSearchSelections` is non-empty the server ignores the legacy field.
+- `gameType` must equal `block.type` (`'word_search'`).
+- Server validates each selection: line must be straight (Δrow==0, Δcol==0, or |Δrow|==|Δcol|), both endpoints in bounds, path characters must equal an allowed word (or its reverse when `allowReverse`), and normalized (spaces/ZWNJ stripped) to `selection.word`. `score = foundCount × perWord`, capped by `maxScore`; `completed = foundCount == totalWords && totalWords > 0`.
+- Response `result` includes per-selection `matched` + `cells`, `foundWords`, `totalWords`, `foundCount`, `missedCount`. Re-completing overwrites the previous record.
+- Reward eligibility is announced in the response (`reward.claimEndpoint`, e.g. `/rewards/lessons/{lessonId}/claim`); actual granting is a separate `POST /rewards/lessons/{lessonId}/claim` call. No frontend claim wiring exists yet.
+
+**Compatibility:** legacy `word_search` blocks stored with the old shape (`grid: string[]` + `words[].cells`) are normalized on read, but `cells` is ignored, so the server may lack answer coordinates until the admin re-saves (PATCH) the block. Existing word-search blocks should be re-saved once. Normalize word comparisons with `normalizeWordSearchWord` (strips whitespace and `\u200c`).

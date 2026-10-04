@@ -27,11 +27,13 @@ Important directories:
 - `src/features/admin-content`: course, lesson, and lesson-block authoring UI and validation.
 - `src/features/lesson-payer`: lesson playback components. The directory name is intentionally/mistakenly spelled `payer`; use the existing path unless performing an explicitly requested migration.
 - `src/features/basket-game`: framework-independent basket-game validation and calculation helpers.
+- `src/features/memory-financial-game`: card pair-matching payload schema and defaults.
+- `src/features/word-search-game`: word-search payload schema, grid/line helpers, and completion builder.
 - `src/features/lesson-tree`: course lesson-map presentation.
 - `src/lib/api.ts`: centralized HTTP client and typed API facade.
 - `src/store`: persisted authentication state and local game/reward state.
 - `src/types`: shared API, admin, and lesson domain types.
-- `tests`: focused Node test files; currently basket-game logic is tested with `node:test`.
+- `tests`: focused Node test files; basket-game, memory-financial, and word-search logic are tested with `node:test`.
 
 ## Routes and Main Workflows
 
@@ -171,6 +173,26 @@ Gameplay rules:
 - In RTL containers, pixel-positioned game objects need an explicit physical origin (`left: 0`, plus `top` or `bottom`) before `translate3d`; omitting it can place the basket, coins, and bombs outside the right edge.
 - Overlay actions must not let the game-area pointer handler capture their pointer events; pointer capture should occur only while actively playing.
 
+## Word Search Contract and Mechanics
+
+Reusable logic lives in `src/features/word-search-game/wordSearchGame.ts` (schema, parsing, line reading, completion builder, submit guard); keep pure helpers there, not in the renderer.
+
+```json
+{
+  "grid": [["ب","ا","ن","ک"], ["د","ر","م","ب"]],
+  "words": [{ "word": "بانک", "start": { "row": 0, "col": 0 }, "direction": "horizontal" }],
+  "allowReverse": true,
+  "scoring": { "perWord": 10, "maxScore": 100 }
+}
+```
+
+- Cell coordinates are 0-based. The admin shape and the play shape differ: admin accepts `grid` as `string[]` or `string[][]` and `words` as `string[]` or `{ word, start?, direction? }[]`; the server stores `grid: string[]` with definitive `start`+`direction`. Play returns `grid: string[][]` and `words: string[]` without answers, so the renderer never depends on coordinates.
+- `readWordSearchLine` only accepts straight lines (Δrow==0, Δcol==0, or |Δrow|==|Δcol|) with both endpoints in bounds.
+- Completion submits `{ gameType: 'word_search', wordSearchSelections: [{ word, start, end }], startedAt, completedAt }`. The legacy `wordSearchFoundWords` field is cheatable and must not be used when selections are available.
+- Server owns scoring (`foundCount × perWord`, capped by `maxScore`) and `completed` (`foundCount == totalWords`). Word comparison strips spaces and ZWNJ (`normalizeWordSearchWord`).
+- Reward eligibility is only announced (`reward.claimEndpoint`); claiming is a separate `POST /rewards/lessons/{lessonId}/claim` call that is not yet wired in the frontend.
+- Legacy blocks stored with `grid: string[]` + `words[].cells` are normalized on read but `cells` is discarded; re-save the block via PATCH so the server recomputes answer coordinates.
+
 ## State and Reward Caveats
 
 `gameStore` holds local `coins`, `xp`, and `hearts` and exposes mutation methods. These values are frontend session state and are separate from authoritative backend game completion responses. Avoid silently conflating the two reward sources. The store currently contains historical TypeScript suppressions in spend methods; do not copy that pattern into new code.
@@ -180,7 +202,7 @@ Gameplay rules:
 - Do not automatically run linting or formatting; `AGENTS.md` explicitly leaves those to IDE/pre-commit/build tooling unless the user requests them.
 - Type checking: `node_modules/.bin/tsc.cmd --noEmit` in PowerShell.
 - Production build: use `npm.cmd run build` because PowerShell execution policy may block `npm.ps1`.
-- Basket-focused tests: `node --experimental-strip-types --test tests/basket-game.test.ts`.
+- Game tests: `node --experimental-strip-types --test tests/basket-game.test.ts tests/memory-financial-game.test.ts tests/word-search-game.test.ts`.
 - Test interactive logic through extracted pure helpers where practical, plus a focused renderer/contract check.
 - Git commands may report unsafe repository ownership in this environment. Do not change global Git configuration merely to inspect status; preserve unrelated user changes and use direct file inspection when necessary.
 

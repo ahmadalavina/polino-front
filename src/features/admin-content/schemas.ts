@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { basketGamePayloadSchema } from '@/features/basket-game/basketGame';
 import { memoryFinancialPayloadSchema } from '@/features/memory-financial-game/memoryFinancialGame';
+import { wordSearchPayloadSchema } from '@/features/word-search-game/wordSearchGame';
 
 const optionalText = z
   .string()
@@ -66,6 +67,7 @@ export const lessonBlockSchema = z.object({
     'memory_financial',
     'decision_tree',
     'basket_game',
+    'word_search',
   ]),
   payload: z.record(z.string(), z.unknown()),
   lessonId: z.coerce.number().int().positive('یک درس انتخاب کنید.'),
@@ -90,6 +92,7 @@ export const lessonBlockUpdateSchema = z.object({
     'memory_financial',
     'decision_tree',
     'basket_game',
+    'word_search',
   ]).optional(),
   payload: z.record(z.string(), z.unknown()).optional(),
   lessonId: z.coerce.number().int().positive('یک درس انتخاب کنید.').optional(),
@@ -98,5 +101,6 @@ export const lessonBlockUpdateSchema = z.object({
 export function validateBlockPayload(type: string, payload: unknown) {
   if (type === 'basket_game') return basketGamePayloadSchema.safeParse(payload);
   if (type === 'memory_financial') return memoryFinancialPayloadSchema.safeParse(payload);
+  if (type === 'word_search') return wordSearchPayloadSchema.safeParse(payload);
   return z.record(z.string(), z.unknown()).safeParse(payload);
 }

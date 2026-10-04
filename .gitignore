@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# npm registry auth
+.npmrc
+
 # debug
 npm-debug.log*
 yarn-debug.log*

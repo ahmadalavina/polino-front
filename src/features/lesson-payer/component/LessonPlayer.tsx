@@ -23,6 +23,7 @@ import type {
   DecisionTreePayload,
   BasketGamePayload,
   MemoryFinancialPayload,
+  WordSearchPayload,
   AuctionPayload,
 } from '@/types/lesson';
 import { useGameStore } from '@/store/gameStore';
@@ -38,6 +39,7 @@ import RewardBlock from './RewardBlock';
 import StoryBlock from './StoryBlock';
 import VideoBlock from './VideoBlock';
 import { CoinHuntGame, MemoryFinancialGame } from './GameBlocks';
+import WordSearchBlock from './WordSearchBlock';
 import AuctionBlock from './AuctionBlock';
 
 interface Props {
@@ -233,6 +235,15 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
             key={block.id}
             blockId={block.id}
             payload={block.payload as BasketGamePayload}
+            onNext={handleNext}
+          />
+        );
+      case 'word_search':
+        return (
+          <WordSearchBlock
+            key={block.id}
+            blockId={block.id}
+            payload={block.payload as WordSearchPayload}
             onNext={handleNext}
           />
         );
