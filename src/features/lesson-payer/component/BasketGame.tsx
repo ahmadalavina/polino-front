@@ -245,24 +245,24 @@ export default function BasketGame({
   }
 
   if (!config) {
-    return <div className="p-8 text-center font-bold text-rose-600">تنظیمات بازی سبد ناقص یا نامعتبر است.</div>;
+    return <div className="p-8 text-center font-bold text-danger-soft-foreground">تنظیمات بازی سبد ناقص یا نامعتبر است.</div>;
   }
 
   return (
     <div className="p-4 sm:p-6" dir="rtl" data-testid="basket-game">
       <div className="mb-4 grid grid-cols-3 gap-2 text-center text-xs font-black sm:text-sm">
-        <div className="rounded-2xl bg-sky-50 p-3 text-sky-700">زمان باقی‌مانده<br /><span className="text-lg">{remainingSeconds}</span></div>
-        <div className="rounded-2xl bg-amber-50 p-3 text-amber-700">آیتم‌ها<br /><span className="text-lg">{coinsCollected}</span></div>
-        <div className="rounded-2xl bg-violet-50 p-3 text-violet-700">امتیاز<br /><span className="text-lg">{localScore}</span></div>
+        <div className="rounded-2xl bg-cyan-soft p-3 text-cyan-soft-foreground">زمان باقی‌مانده<br /><span className="text-lg">{remainingSeconds}</span></div>
+        <div className="rounded-2xl bg-warning-soft p-3 text-warning-soft-foreground">آیتم‌ها<br /><span className="text-lg">{coinsCollected}</span></div>
+        <div className="rounded-2xl bg-brand-soft p-3 text-brand-soft-foreground">امتیاز<br /><span className="text-lg">{localScore}</span></div>
       </div>
 
       <div
         ref={areaRef}
-        className={`relative h-[430px] touch-none overflow-hidden rounded-[28px] border-2 border-sky-100 bg-gradient-to-b from-sky-200 via-sky-50 to-emerald-100 ${effect?.kind === 'bomb' ? 'animate-pulse ring-4 ring-rose-300' : ''}`}
+        className={`relative h-[430px] touch-none overflow-hidden rounded-[28px] border-2 border-cyan-soft bg-gradient-to-b from-cyan-soft via-cyan-soft to-success-soft ${effect?.kind === 'bomb' ? 'animate-pulse ring-4 ring-danger' : ''}`}
         onPointerDown={handlePointerDown}
         onPointerMove={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) moveFromPointer(event.clientX); }}
       >
-        <div className="absolute inset-x-0 top-4 text-center text-sm font-black text-sky-700">آیتم‌ها را بگیر و از بمب‌ها دوری کن!</div>
+        <div className="absolute inset-x-0 top-4 text-center text-sm font-black text-cyan-soft-foreground">آیتم‌ها را بگیر و از بمب‌ها دوری کن!</div>
         {items.map((item) => (
           <div
             key={item.id}
@@ -280,7 +280,7 @@ export default function BasketGame({
         </div>
 
         {effect && (
-          <div key={effect.id} className={`absolute inset-x-4 top-16 rounded-2xl p-3 text-center text-sm font-black shadow-lg ${effect.kind === 'coin' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+          <div key={effect.id} className={`absolute inset-x-4 top-16 rounded-2xl p-3 text-center text-sm font-black shadow-lg ${effect.kind === 'coin' ? 'bg-warning-soft text-warning-soft-foreground' : 'bg-danger-soft text-danger-soft-foreground'}`}>
             {effect.kind === 'coin' ? 'آفرین! یک سکه گرفتی ✨' : `بمب خوردی! ${config.scoring.bombTimePenaltySeconds} ثانیه از زمان کم شد.`}
           </div>
         )}
@@ -293,9 +293,9 @@ export default function BasketGame({
       </div>
 
       <div className="mt-4 flex items-center justify-between gap-3">
-        <span className="text-xs font-bold text-slate-400">بمب‌های برخوردکرده: {bombsHit}</span>
+        <span className="text-xs font-bold text-subtle">بمب‌های برخوردکرده: {bombsHit}</span>
         {gameState === 'playing' && (
-          <button type="button" onClick={() => setGameState('paused')} className="flex items-center gap-2 rounded-xl border-2 border-slate-200 px-4 py-2 text-xs font-black text-slate-600"><Pause size={16} /> توقف</button>
+          <button type="button" onClick={() => setGameState('paused')} className="flex items-center gap-2 rounded-xl border-2 border-border px-4 py-2 text-xs font-black text-muted"><Pause size={16} /> توقف</button>
         )}
       </div>
     </div>
@@ -319,12 +319,12 @@ function CollectibleFace({ collectible }: { collectible: BasketGameCollectible }
 
 function Overlay({ title, text, action, onAction, loading, success }: { title: string; text: string; action?: string; onAction?: () => void; loading?: boolean; success?: boolean }) {
   return (
-    <div className="absolute inset-0 z-20 grid place-items-center bg-slate-900/35 p-5 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-[26px] bg-white p-6 text-center shadow-2xl">
-        {loading ? <LoaderCircle className="mx-auto mb-3 animate-spin text-violet-500" size={42} /> : success ? <CheckCircle2 className="mx-auto mb-3 text-emerald-500" size={46} /> : <AlertTriangle className="mx-auto mb-3 text-amber-500" size={42} />}
-        <h2 className="text-xl font-black text-slate-800">{title}</h2>
-        <p className="mt-2 text-sm font-bold leading-7 text-slate-500">{text}</p>
-        {action && onAction && <button type="button" onPointerDown={(event) => event.stopPropagation()} onClick={onAction} className="mx-auto mt-5 flex items-center gap-2 rounded-2xl bg-[#58cc59] px-6 py-3 text-sm font-black text-white shadow-[0_5px_0_#3da83e]"><Play size={17} />{action}</button>}
+    <div className="absolute inset-0 z-20 grid place-items-center bg-overlay p-5 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-[26px] bg-surface p-6 text-center shadow-2xl">
+        {loading ? <LoaderCircle className="mx-auto mb-3 animate-spin text-brand" size={42} /> : success ? <CheckCircle2 className="mx-auto mb-3 text-success" size={46} /> : <AlertTriangle className="mx-auto mb-3 text-warning-strong" size={42} />}
+        <h2 className="text-xl font-black text-foreground">{title}</h2>
+        <p className="mt-2 text-sm font-bold leading-7 text-muted">{text}</p>
+        {action && onAction && <button type="button" onPointerDown={(event) => event.stopPropagation()} onClick={onAction} className="mx-auto mt-5 flex items-center gap-2 rounded-2xl bg-success px-6 py-3 text-sm font-black text-success-foreground shadow-[0_5px_0_var(--success-strong)]"><Play size={17} />{action}</button>}
       </div>
     </div>
   );

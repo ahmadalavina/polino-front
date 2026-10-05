@@ -38,22 +38,23 @@ type BlockMeta = {
   label: string;
   icon: LucideIcon;
   color: string;
+  foreground: string;
 };
 
 const blockMeta: Partial<Record<BlockType, BlockMeta>> = {
-  dialog: { label: "گفت‌وگو", icon: MessageCircle, color: "#7c5cff" },
-  image: { label: "تصویر", icon: ImageIcon, color: "#16b8a6" },
-  quiz: { label: "آزمون", icon: HelpCircle, color: "#ff8a55" },
-  story: { label: "داستان", icon: BookOpen, color: "#f59e0b" },
-  reward: { label: "جایزه", icon: Star, color: "#ec4899" },
-  animation: { label: "انیمیشن", icon: Eye, color: "#8b5cf6" },
-  video: { label: "ویدیو", icon: Eye, color: "#ef4444" },
-  drag_drop: { label: "کشیدن و رها کردن", icon: GripVertical, color: "#06b6d4" },
-  decision_tree: { label: "درخت تصمیم", icon: GitBranch, color: "#f59e0b" },
-  basket_game: { label: "بازی سبد", icon: ShoppingBasket, color: "#f59e0b" },
-  coin_hunt: { label: "شکار سکه", icon: Coins, color: "#f59e0b" },
-  memory_financial: { label: "حافظه مالی", icon: Brain, color: "#7c5cff" },
-  word_search: { label: "جدول کلمات", icon: Grid3x3, color: "#16b8a6" },
+  dialog: { label: "گفت‌وگو", icon: MessageCircle, color: "var(--brand)", foreground: "var(--brand-foreground)" },
+  image: { label: "تصویر", icon: ImageIcon, color: "var(--info)", foreground: "var(--info-foreground)" },
+  quiz: { label: "آزمون", icon: HelpCircle, color: "var(--accent)", foreground: "var(--accent-foreground)" },
+  story: { label: "داستان", icon: BookOpen, color: "var(--warning)", foreground: "var(--warning-foreground)" },
+  reward: { label: "جایزه", icon: Star, color: "var(--pink)", foreground: "var(--pink-foreground)" },
+  animation: { label: "انیمیشن", icon: Eye, color: "var(--brand)", foreground: "var(--brand-foreground)" },
+  video: { label: "ویدیو", icon: Eye, color: "var(--danger)", foreground: "var(--danger-foreground)" },
+  drag_drop: { label: "کشیدن و رها کردن", icon: GripVertical, color: "var(--cyan)", foreground: "var(--cyan-foreground)" },
+  decision_tree: { label: "درخت تصمیم", icon: GitBranch, color: "var(--warning)", foreground: "var(--warning-foreground)" },
+  basket_game: { label: "بازی سبد", icon: ShoppingBasket, color: "var(--warning)", foreground: "var(--warning-foreground)" },
+  coin_hunt: { label: "شکار سکه", icon: Coins, color: "var(--warning)", foreground: "var(--warning-foreground)" },
+  memory_financial: { label: "حافظه مالی", icon: Brain, color: "var(--brand)", foreground: "var(--brand-foreground)" },
+  word_search: { label: "جدول کلمات", icon: Grid3x3, color: "var(--info)", foreground: "var(--info-foreground)" },
 };
 
 function safeParse(json: string): Record<string, unknown> {
@@ -77,14 +78,14 @@ function isValidPayload(json: string) {
 }
 
 const fieldClass =
-  "h-12 w-full rounded-xl border-2 border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-800 outline-none transition-all placeholder:font-medium placeholder:text-slate-400 focus:border-[#7c5cff] focus:bg-white focus:shadow-[0_0_0_3px_rgba(124,92,255,0.08)]";
+  "h-12 w-full rounded-xl border-2 border-border bg-surface-muted px-4 text-sm font-bold text-foreground outline-none transition-all placeholder:font-medium placeholder:text-subtle focus:border-brand focus:bg-surface focus:shadow-[0_0_0_3px_rgba(124,92,255,0.08)]";
 
 const textareaClass =
-  "w-full resize-y rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 outline-none transition-all placeholder:font-medium placeholder:text-slate-400 focus:border-[#7c5cff] focus:bg-white focus:shadow-[0_0_0_3px_rgba(124,92,255,0.08)]";
+  "w-full resize-y rounded-xl border-2 border-border bg-surface-muted px-4 py-3 text-sm font-bold text-foreground outline-none transition-all placeholder:font-medium placeholder:text-subtle focus:border-brand focus:bg-surface focus:shadow-[0_0_0_3px_rgba(124,92,255,0.08)]";
 
 function FieldLabel({ children }: { children: string }) {
   return (
-    <span className="mb-1.5 block text-xs font-black text-slate-500">
+    <span className="mb-1.5 block text-xs font-black text-muted">
       {children}
     </span>
   );
@@ -205,12 +206,12 @@ function EmojiPicker({
         className={`${fieldClass} flex items-center justify-between gap-2 text-start`}
       >
         <span className="text-2xl leading-none">{value || "⭐"}</span>
-        <span className="text-xs font-black text-slate-400">
+        <span className="text-xs font-black text-subtle">
           {open ? "بستن" : "انتخاب ایموجی"}
         </span>
       </button>
       {hint && (
-        <span className="mt-1.5 block text-xs font-medium leading-5 text-slate-400">
+        <span className="mt-1.5 block text-xs font-medium leading-5 text-subtle">
           {hint}
         </span>
       )}
@@ -227,10 +228,10 @@ function EmojiPicker({
               top: position.top ?? undefined,
               bottom: position.bottom ?? undefined,
             }}
-            className="z-50 max-h-[min(20rem,60vh)] overflow-y-auto rounded-2xl border-2 border-slate-100 bg-white p-3 shadow-[0_12px_40px_rgba(38,61,89,0.18)]"
+            className="z-50 max-h-[min(20rem,60vh)] overflow-y-auto rounded-2xl border-2 border-border bg-surface p-3 shadow-[0_12px_40px_rgba(38,61,89,0.18)]"
           >
             <label className="mb-3 block">
-              <span className="mb-1.5 block text-[11px] font-black text-slate-400">
+              <span className="mb-1.5 block text-[11px] font-black text-subtle">
                 ایموجی دلخواه
               </span>
               <input
@@ -243,7 +244,7 @@ function EmojiPicker({
             </label>
             {emojiChoices.map((section) => (
               <div key={section.group} className="mb-3 last:mb-0">
-                <p className="mb-1.5 text-[11px] font-black text-slate-400">
+                <p className="mb-1.5 text-[11px] font-black text-subtle">
                   {section.group}
                 </p>
                 <div className="grid grid-cols-8 gap-1">
@@ -255,8 +256,8 @@ function EmojiPicker({
                         onChange(emoji);
                         setOpen(false);
                       }}
-                      className={`grid size-8 place-items-center rounded-lg text-xl transition-colors hover:bg-amber-50 ${
-                        value === emoji ? "bg-amber-100 ring-2 ring-amber-300" : ""
+                      className={`grid size-8 place-items-center rounded-lg text-xl transition-colors hover:bg-warning-soft ${
+                        value === emoji ? "bg-warning-soft ring-2 ring-warning" : ""
                       }`}
                     >
                       {emoji}
@@ -306,8 +307,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-b-2 border-slate-100 pb-5 last:border-b-0 last:pb-0">
-      <p className="mb-4 text-xs font-black text-slate-500">{title}</p>
+    <section className="border-b-2 border-border pb-5 last:border-b-0 last:pb-0">
+      <p className="mb-4 text-xs font-black text-muted">{title}</p>
       <div className="flex flex-col gap-3">{children}</div>
     </section>
   );
@@ -332,7 +333,7 @@ function OptionRow({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="w-6 text-center text-xs font-black text-slate-300">
+      <span className="w-6 text-center text-xs font-black text-subtle">
         {index + 1}
       </span>
       <input
@@ -340,10 +341,10 @@ function OptionRow({
         value={text}
         onChange={(e) => onChangeText(e.target.value)}
         placeholder="متن گزینه"
-        className={`flex-1 h-11 rounded-xl border-2 px-3 text-sm font-bold outline-none transition-all placeholder:font-medium placeholder:text-slate-400 ${
+        className={`flex-1 h-11 rounded-xl border-2 px-3 text-sm font-bold outline-none transition-all placeholder:font-medium placeholder:text-subtle ${
           isCorrect
-            ? "border-emerald-300 bg-emerald-50 focus:border-emerald-400 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)]"
-            : "border-slate-200 bg-slate-50 focus:border-[#7c5cff] focus:bg-white focus:shadow-[0_0_0_3px_rgba(124,92,255,0.08)]"
+            ? "border-success bg-success-soft focus:border-success focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)]"
+            : "border-border bg-surface-muted focus:border-brand focus:bg-surface focus:shadow-[0_0_0_3px_rgba(124,92,255,0.08)]"
         }`}
       />
       <button
@@ -352,8 +353,8 @@ function OptionRow({
         title={isCorrect ? "حذف پاسخ صحیح" : "تنظیم به\u200Cعنوان پاسخ صحیح"}
         className={`grid size-11 shrink-0 place-items-center rounded-xl border-2 transition-all ${
           isCorrect
-            ? "border-emerald-400 bg-emerald-500 text-white shadow-[0_3px_0_#059669]"
-            : "border-slate-200 bg-white text-slate-300 hover:border-emerald-300 hover:text-emerald-500"
+            ? "border-success bg-success text-success-foreground shadow-[0_3px_0_var(--success-strong)]"
+            : "border-border bg-surface text-subtle hover:border-success hover:text-success"
         }`}
       >
         <Check size={18} strokeWidth={3.5} />
@@ -363,7 +364,7 @@ function OptionRow({
           type="button"
           onClick={onRemove}
           title="حذف گزینه"
-          className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-red-100 bg-white text-red-300 transition-all hover:border-red-300 hover:text-red-500"
+          className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-danger-soft bg-surface text-danger transition-all hover:border-danger hover:text-danger"
         >
           <Trash2 size={17} />
         </button>
@@ -517,18 +518,18 @@ function QuizForm({
       />
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-black text-slate-500">گزینه‌ها</span>
+          <span className="text-xs font-black text-muted">گزینه‌ها</span>
           <button
             type="button"
             onClick={addOption}
-            className="flex items-center gap-1 rounded-xl border-2 border-dashed border-slate-200 px-3 py-1.5 text-xs font-black text-slate-400 transition-all hover:border-[#7c5cff] hover:text-[#7c5cff]"
+            className="flex items-center gap-1 rounded-xl border-2 border-dashed border-border px-3 py-1.5 text-xs font-black text-subtle transition-all hover:border-brand hover:text-brand"
           >
             <Plus size={14} />
             افزودن گزینه
           </button>
         </div>
         {options.length === 0 && (
-          <p className="py-4 text-center text-xs font-medium text-slate-400">
+          <p className="py-4 text-center text-xs font-medium text-subtle">
             هنوز گزینه‌ای اضافه نشده است.
           </p>
         )}
@@ -705,13 +706,13 @@ function DragDropForm({
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-black text-slate-500">
+          <span className="text-xs font-black text-muted">
             گزینه‌های قابل کشیدن
           </span>
           <button
             type="button"
             onClick={addItem}
-            className="flex items-center gap-1 rounded-xl border-2 border-dashed border-slate-200 px-3 py-1.5 text-xs font-black text-slate-400 transition-all hover:border-[#06b6d4] hover:text-[#06b6d4]"
+            className="flex items-center gap-1 rounded-xl border-2 border-dashed border-border px-3 py-1.5 text-xs font-black text-subtle transition-all hover:border-cyan hover:text-cyan"
           >
             <Plus size={14} />
             افزودن گزینه
@@ -719,18 +720,18 @@ function DragDropForm({
         </div>
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-2">
-            <GripVertical size={16} className="text-slate-300" />
+            <GripVertical size={16} className="text-subtle" />
             <input
               type="text"
               value={item}
               onChange={(e) => updateItem(i, e.target.value)}
               placeholder={`گزینه ${i + 1}`}
-              className="flex-1 h-11 rounded-xl border-2 border-slate-200 bg-slate-50 px-3 text-sm font-bold outline-none transition-all focus:border-[#06b6d4] focus:bg-white"
+              className="flex-1 h-11 rounded-xl border-2 border-border bg-surface-muted px-3 text-sm font-bold outline-none transition-all focus:border-cyan focus:bg-surface"
             />
             <button
               type="button"
               onClick={() => removeItem(i)}
-              className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-red-100 bg-white text-red-300 transition-all hover:border-red-300 hover:text-red-500"
+              className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-danger-soft bg-surface text-danger transition-all hover:border-danger hover:text-danger"
             >
               <Trash2 size={17} />
             </button>
@@ -740,13 +741,13 @@ function DragDropForm({
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-black text-slate-500">
+          <span className="text-xs font-black text-muted">
             اهداف (مقصدها)
           </span>
           <button
             type="button"
             onClick={addTarget}
-            className="flex items-center gap-1 rounded-xl border-2 border-dashed border-slate-200 px-3 py-1.5 text-xs font-black text-slate-400 transition-all hover:border-[#06b6d4] hover:text-[#06b6d4]"
+            className="flex items-center gap-1 rounded-xl border-2 border-dashed border-border px-3 py-1.5 text-xs font-black text-subtle transition-all hover:border-cyan hover:text-cyan"
           >
             <Plus size={14} />
             افزودن هدف
@@ -754,7 +755,7 @@ function DragDropForm({
         </div>
         {targets.map((target, i) => (
           <div key={i} className="flex items-center gap-2">
-            <span className="w-6 text-center text-xs font-black text-slate-300">
+            <span className="w-6 text-center text-xs font-black text-subtle">
               {i + 1}
             </span>
             <input
@@ -762,12 +763,12 @@ function DragDropForm({
               value={target}
               onChange={(e) => updateTarget(i, e.target.value)}
               placeholder={`هدف ${i + 1}`}
-              className="flex-1 h-11 rounded-xl border-2 border-slate-200 bg-slate-50 px-3 text-sm font-bold outline-none transition-all focus:border-[#06b6d4] focus:bg-white"
+              className="flex-1 h-11 rounded-xl border-2 border-border bg-surface-muted px-3 text-sm font-bold outline-none transition-all focus:border-cyan focus:bg-surface"
             />
             <button
               type="button"
               onClick={() => removeTarget(i)}
-              className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-red-100 bg-white text-red-300 transition-all hover:border-red-300 hover:text-red-500"
+              className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-danger-soft bg-surface text-danger transition-all hover:border-danger hover:text-danger"
             >
               <Trash2 size={17} />
             </button>
@@ -850,7 +851,7 @@ function BasketGameForm({
           className={fieldClass}
           dir="ltr"
         />
-        <span className="mt-1.5 block text-xs font-medium leading-5 text-slate-400">
+        <span className="mt-1.5 block text-xs font-medium leading-5 text-subtle">
           {hint}
         </span>
       </label>
@@ -914,7 +915,7 @@ function BasketGameForm({
             />
           )}
         </div>
-        <div className="flex items-center gap-3 rounded-2xl bg-amber-50 p-3">
+        <div className="flex items-center gap-3 rounded-2xl bg-warning-soft p-3">
           <span className="grid size-10 place-items-center text-3xl">
             {collectibleType === "image" && collectible.value ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -923,7 +924,7 @@ function BasketGameForm({
               collectibleValue
             )}
           </span>
-          <span className="text-xs font-bold leading-5 text-amber-700">
+          <span className="text-xs font-bold leading-5 text-warning-soft-foreground">
             این آیتم به‌جای سکه‌های پیش‌فرض از بالا می‌افتد.
           </span>
         </div>
@@ -949,7 +950,7 @@ function DialogPreview({ payload }: { payload: Record<string, unknown> }) {
 
   return (
     <div className="flex flex-col items-center p-4">
-      <div className="relative mb-4 grid size-20 shrink-0 place-items-center overflow-hidden rounded-[24px] bg-gradient-to-br from-[#ffd94a] to-[#ffaf36] text-5xl shadow-[0_5px_0_#e99320]">
+      <div className="relative mb-4 grid size-20 shrink-0 place-items-center overflow-hidden rounded-[24px] bg-gradient-to-br from-warning to-accent text-5xl shadow-[0_5px_0_var(--warning-strong)]">
         {hasAvatarUrl ? (
           <img
             src={String(payload.avatarUrl)}
@@ -959,13 +960,13 @@ function DialogPreview({ payload }: { payload: Record<string, unknown> }) {
         ) : (
           avatar
         )}
-        <span className="absolute bottom-1.5 end-1.5 grid size-5 place-items-center rounded-full bg-white text-[#7c5cff] shadow">
+        <span className="absolute bottom-1.5 end-1.5 grid size-5 place-items-center rounded-full bg-surface text-brand shadow">
           <MessageCircle size={11} className="fill-current" />
         </span>
       </div>
-      <div className="relative w-full rounded-2xl border-2 border-[#ffe2a6] bg-[#fffaf0] p-3 shadow-[0_3px_0_#f4d48f]">
-        <span className="absolute -top-2 start-10 size-4 rotate-45 border-s-2 border-t-2 border-[#ffe2a6] bg-[#fffaf0]" />
-        <p className="text-sm font-bold leading-7 text-slate-700">{text}</p>
+      <div className="relative w-full rounded-2xl border-2 border-warning-soft bg-warning-soft p-3 shadow-[0_3px_0_var(--warning-soft)]">
+        <span className="absolute -top-2 start-10 size-4 rotate-45 border-s-2 border-t-2 border-warning-soft bg-warning-soft" />
+        <p className="text-sm font-bold leading-7 text-foreground">{text}</p>
       </div>
     </div>
   );
@@ -988,8 +989,8 @@ function CoinHuntForm({ payload, onChange }: { payload: Record<string, unknown>;
       <NumberInput label="امتیاز صحیح" value={Number(scoring.correct ?? 10)} onChange={(v) => onChange({ ...payload, scoring: { ...scoring, correct: v } })} />
       <NumberInput label="امتیاز اشتباه" value={Number(scoring.wrong ?? -2)} onChange={(v) => onChange({ ...payload, scoring: { ...scoring, wrong: v } })} />
     </div>
-    <div className="space-y-3"><div className="flex items-center justify-between"><FieldLabel>آیتم‌ها</FieldLabel><button type="button" onClick={() => onChange({ ...payload, items: [...items, { id: `coin-${items.length + 1}`, value: 100, collectible: true }] })} className="text-xs font-black text-[#7c5cff]"><Plus size={14} className="inline" /> افزودن</button></div>
-      {items.map((item, index) => <div key={index} className="grid gap-2 rounded-xl border-2 border-slate-100 p-3 sm:grid-cols-[1fr_100px_auto]"><TextInput label="شناسه" value={String(item.id ?? '')} onChange={(v) => update(index, 'id', v)} dir="ltr" /><NumberInput label="ارزش" value={Number(item.value ?? 0)} onChange={(v) => update(index, 'value', v)} min={0} /><button type="button" aria-label="حذف آیتم" onClick={() => onChange({ ...payload, items: items.filter((_, i) => i !== index) })} className="self-end rounded-xl p-3 text-rose-500"><Trash2 size={17} /></button><label className="flex items-center gap-2 text-xs font-bold text-slate-500"><input type="checkbox" checked={item.collectible !== false} onChange={(e) => update(index, 'collectible', e.target.checked)} /> قابل جمع‌آوری</label></div>)}
+    <div className="space-y-3"><div className="flex items-center justify-between"><FieldLabel>آیتم‌ها</FieldLabel><button type="button" onClick={() => onChange({ ...payload, items: [...items, { id: `coin-${items.length + 1}`, value: 100, collectible: true }] })} className="text-xs font-black text-brand"><Plus size={14} className="inline" /> افزودن</button></div>
+      {items.map((item, index) => <div key={index} className="grid gap-2 rounded-xl border-2 border-border p-3 sm:grid-cols-[1fr_100px_auto]"><TextInput label="شناسه" value={String(item.id ?? '')} onChange={(v) => update(index, 'id', v)} dir="ltr" /><NumberInput label="ارزش" value={Number(item.value ?? 0)} onChange={(v) => update(index, 'value', v)} min={0} /><button type="button" aria-label="حذف آیتم" onClick={() => onChange({ ...payload, items: items.filter((_, i) => i !== index) })} className="self-end rounded-xl p-3 text-danger"><Trash2 size={17} /></button><label className="flex items-center gap-2 text-xs font-bold text-muted"><input type="checkbox" checked={item.collectible !== false} onChange={(e) => update(index, 'collectible', e.target.checked)} /> قابل جمع‌آوری</label></div>)}
     </div>
   </Section>;
 }
@@ -1001,8 +1002,8 @@ function MemoryFinancialForm({ payload, onChange }: { payload: Record<string, un
     <TextInput label="عنوان بازی" value={String(payload.title ?? '')} onChange={(v) => onChange({ ...payload, title: v })} />
     <label className="block"><FieldLabel>راهنما</FieldLabel><textarea rows={2} value={String(payload.introduction ?? '')} onChange={(e) => onChange({ ...payload, introduction: e.target.value })} className={textareaClass} /></label>
     <NumberInput label="حداکثر تلاش (اختیاری)" value={Number(payload.maxAttempts ?? 0)} onChange={(v) => onChange({ ...payload, maxAttempts: v || undefined })} min={1} />
-    <div className="space-y-3"><div className="flex items-center justify-between"><FieldLabel>جفت‌ها</FieldLabel><button type="button" onClick={() => onChange({ ...payload, pairs: [...pairs, { id: `pair-${pairs.length + 1}`, first: { type: '' }, second: { type: '' } }] })} className="text-xs font-black text-[#7c5cff]"><Plus size={14} className="inline" /> افزودن جفت</button></div>
-      {pairs.map((pair, index) => <div key={index} className="grid gap-2 rounded-xl border-2 border-slate-100 p-3 sm:grid-cols-2"><TextInput label={`جفت ${index + 1} - کارت اول`} value={String((pair.first as Record<string, unknown> | undefined)?.type ?? '')} onChange={(v) => update(index, 'first', v)} /><TextInput label="کارت دوم" value={String((pair.second as Record<string, unknown> | undefined)?.type ?? '')} onChange={(v) => update(index, 'second', v)} /><button type="button" onClick={() => onChange({ ...payload, pairs: pairs.filter((_, i) => i !== index) })} className="text-start text-xs font-black text-rose-500"><Trash2 size={15} className="inline" /> حذف جفت</button></div>)}
+    <div className="space-y-3"><div className="flex items-center justify-between"><FieldLabel>جفت‌ها</FieldLabel><button type="button" onClick={() => onChange({ ...payload, pairs: [...pairs, { id: `pair-${pairs.length + 1}`, first: { type: '' }, second: { type: '' } }] })} className="text-xs font-black text-brand"><Plus size={14} className="inline" /> افزودن جفت</button></div>
+      {pairs.map((pair, index) => <div key={index} className="grid gap-2 rounded-xl border-2 border-border p-3 sm:grid-cols-2"><TextInput label={`جفت ${index + 1} - کارت اول`} value={String((pair.first as Record<string, unknown> | undefined)?.type ?? '')} onChange={(v) => update(index, 'first', v)} /><TextInput label="کارت دوم" value={String((pair.second as Record<string, unknown> | undefined)?.type ?? '')} onChange={(v) => update(index, 'second', v)} /><button type="button" onClick={() => onChange({ ...payload, pairs: pairs.filter((_, i) => i !== index) })} className="text-start text-xs font-black text-danger"><Trash2 size={15} className="inline" /> حذف جفت</button></div>)}
     </div>
   </Section>;
 }
@@ -1049,18 +1050,18 @@ function WordSearchForm({ payload, onChange }: { payload: Record<string, unknown
   return (
     <div className="space-y-5">
       <Section title="جدول حروف">
-        <p className="text-xs font-bold leading-6 text-slate-400">
+        <p className="text-xs font-bold leading-6 text-subtle">
           هر ردیف را به‌صورت حروف جدا یا چسبیده بنویسید؛ همه ردیف‌ها باید هم‌طول باشند.
         </p>
         <div className="flex items-center justify-between">
           <FieldLabel>ردیف‌ها</FieldLabel>
-          <button type="button" onClick={addRow} className="text-xs font-black text-[#7c5cff]">
+          <button type="button" onClick={addRow} className="text-xs font-black text-brand">
             <Plus size={14} className="inline" /> افزودن ردیف
           </button>
         </div>
         {grid.map((row, index) => (
           <div key={index} className="flex items-center gap-2">
-            <span className="w-6 text-center text-xs font-black text-slate-300">{index + 1}</span>
+            <span className="w-6 text-center text-xs font-black text-subtle">{index + 1}</span>
             <input
               type="text"
               dir="rtl"
@@ -1073,7 +1074,7 @@ function WordSearchForm({ payload, onChange }: { payload: Record<string, unknown
               type="button"
               aria-label={`حذف ردیف ${index + 1}`}
               onClick={() => removeRow(index)}
-              className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-red-100 bg-white text-red-300 hover:border-red-300 hover:text-red-500"
+              className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-danger-soft bg-surface text-danger hover:border-danger hover:text-danger"
             >
               <Trash2 size={17} />
             </button>
@@ -1084,18 +1085,18 @@ function WordSearchForm({ payload, onChange }: { payload: Record<string, unknown
       <Section title="کلمات">
         <div className="flex items-center justify-between">
           <FieldLabel>کلمه‌ها</FieldLabel>
-          <button type="button" onClick={addWord} className="text-xs font-black text-[#7c5cff]">
+          <button type="button" onClick={addWord} className="text-xs font-black text-brand">
             <Plus size={14} className="inline" /> افزودن کلمه
           </button>
         </div>
-        <p className="text-xs font-bold leading-6 text-slate-400">
+        <p className="text-xs font-bold leading-6 text-subtle">
           مختصات اختیاری است؛ اگر خالی بماند سرور خودش کلمه را در جدول پیدا می‌کند.
         </p>
         {words.map((entry, index) => {
           const config = typeof entry === "string" ? { word: entry } : (entry as Record<string, unknown>);
           const start = (config.start ?? {}) as Record<string, unknown>;
           return (
-            <div key={index} className="grid gap-2 rounded-xl border-2 border-slate-100 p-3 sm:grid-cols-2">
+            <div key={index} className="grid gap-2 rounded-xl border-2 border-border p-3 sm:grid-cols-2">
               <TextInput
                 label={`کلمه ${index + 1}`}
                 value={String(config.word ?? "")}
@@ -1133,7 +1134,7 @@ function WordSearchForm({ payload, onChange }: { payload: Record<string, unknown
               <button
                 type="button"
                 onClick={() => removeWord(index)}
-                className="self-end text-start text-xs font-black text-rose-500"
+                className="self-end text-start text-xs font-black text-danger"
               >
                 <Trash2 size={15} className="inline" /> حذف کلمه
               </button>
@@ -1143,7 +1144,7 @@ function WordSearchForm({ payload, onChange }: { payload: Record<string, unknown
       </Section>
 
       <Section title="تنظیمات امتیاز و جهت‌ها">
-        <label className="flex items-center gap-2 text-xs font-bold text-slate-500">
+        <label className="flex items-center gap-2 text-xs font-bold text-muted">
           <input
             type="checkbox"
             checked={payload.allowReverse !== false}
@@ -1175,17 +1176,17 @@ function WordSearchPreview({ payload }: { payload: Record<string, unknown> }) {
   const words = Array.isArray(payload.words) ? payload.words : [];
   return (
     <div className="space-y-3 p-4">
-      <div className="inline-flex flex-col gap-0.5 rounded-xl bg-teal-50 p-2 font-mono text-sm font-black text-teal-700">
+      <div className="inline-flex flex-col gap-0.5 rounded-xl bg-info-soft p-2 font-mono text-sm font-black text-info-soft-foreground">
         {grid.map((row, i) => (
           <span key={i} className="tracking-[0.4em]">
             {row.replace(/\s+/g, "")}
           </span>
         ))}
-        {grid.length === 0 && <span className="text-xs text-slate-400">جدولی تنظیم نشده است.</span>}
+        {grid.length === 0 && <span className="text-xs text-subtle">جدولی تنظیم نشده است.</span>}
       </div>
       <div className="flex flex-wrap gap-1.5">
         {words.map((entry, i) => (
-          <span key={i} className="rounded-full bg-teal-50 px-3 py-1 text-xs font-black text-teal-700">
+          <span key={i} className="rounded-full bg-info-soft px-3 py-1 text-xs font-black text-info-soft-foreground">
             {typeof entry === "string" ? entry : String((entry as Record<string, unknown>).word ?? "")}
           </span>
         ))}
@@ -1288,13 +1289,13 @@ function DecisionTreeForm({
     <div className="space-y-5">
       <Section title="مرحله‌های تصمیم‌گیری">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-bold leading-6 text-slate-400">
+          <p className="text-xs font-bold leading-6 text-subtle">
             هر بلوک تصمیم یک شناسه یکتا و متن قابل نمایش برای بازیکن دارد.
           </p>
           <button
             type="button"
             onClick={addStep}
-            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-2 text-xs font-black text-amber-700 transition hover:bg-amber-100"
+            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-warning-soft px-3 py-2 text-xs font-black text-warning-soft-foreground transition hover:bg-warning-soft"
           >
             <Plus size={15} />
             افزودن مرحله
@@ -1302,29 +1303,29 @@ function DecisionTreeForm({
         </div>
 
         {steps.length === 0 && (
-          <div className="rounded-2xl border-2 border-dashed border-amber-200 bg-amber-50/50 p-6 text-center">
-            <GitBranch className="mx-auto mb-2 text-amber-400" size={30} />
-            <p className="text-sm font-black text-slate-600">هنوز مرحله‌ای ساخته نشده است.</p>
+          <div className="rounded-2xl border-2 border-dashed border-warning-soft bg-warning-soft/50 p-6 text-center">
+            <GitBranch className="mx-auto mb-2 text-warning-strong" size={30} />
+            <p className="text-sm font-black text-muted">هنوز مرحله‌ای ساخته نشده است.</p>
           </div>
         )}
 
         {steps.map((step, stepIndex) => (
           <div
             key={`${step.id}-${stepIndex}`}
-            className="rounded-2xl border-2 border-amber-100 bg-[#fffdf7] p-4"
+            className="rounded-2xl border-2 border-warning-soft bg-warning-soft p-4"
           >
             <div className="mb-4 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <span className="grid size-8 place-items-center rounded-xl bg-amber-500 text-sm font-black text-white">
+                <span className="grid size-8 place-items-center rounded-xl bg-warning-strong text-sm font-black text-warning-foreground">
                   {stepIndex + 1}
                 </span>
-                <p className="text-sm font-black text-slate-700">مرحله {stepIndex + 1}</p>
+                <p className="text-sm font-black text-foreground">مرحله {stepIndex + 1}</p>
               </div>
               <button
                 type="button"
                 onClick={() => removeStep(stepIndex)}
                 aria-label={`حذف مرحله ${stepIndex + 1}`}
-                className="grid size-9 place-items-center rounded-xl border-2 border-rose-100 bg-white text-rose-400 transition hover:border-rose-300 hover:text-rose-600"
+                className="grid size-9 place-items-center rounded-xl border-2 border-danger-soft bg-surface text-danger transition hover:border-danger hover:text-danger-soft-foreground"
               >
                 <Trash2 size={16} />
               </button>
@@ -1356,7 +1357,7 @@ function DecisionTreeForm({
       </Section>
 
       <Section title="ترتیب پاسخ صحیح">
-        <p className="text-xs font-bold leading-6 text-slate-400">
+        <p className="text-xs font-bold leading-6 text-subtle">
           مرحله‌ها را با فلش‌ها در ترتیب صحیح قرار دهید.
         </p>
         {correctOrder.map((id, index) => {
@@ -1364,12 +1365,12 @@ function DecisionTreeForm({
           return (
             <div
               key={`${id}-${index}`}
-              className="flex items-center gap-3 rounded-xl border-2 border-slate-100 bg-slate-50 p-3"
+              className="flex items-center gap-3 rounded-xl border-2 border-border bg-surface-muted p-3"
             >
-              <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-[#7c5cff] text-xs font-black text-white">
+              <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-brand text-xs font-black text-brand-foreground">
                 {index + 1}
               </span>
-              <span className="min-w-0 flex-1 whitespace-pre-wrap break-words text-sm font-bold leading-6 text-slate-700">
+              <span className="min-w-0 flex-1 whitespace-pre-wrap break-words text-sm font-bold leading-6 text-foreground">
                 {step?.question || id}
               </span>
               <div className="flex gap-1">
@@ -1378,7 +1379,7 @@ function DecisionTreeForm({
                   disabled={index === 0}
                   onClick={() => moveOrder(index, -1)}
                   aria-label="انتقال به بالا"
-                  className="grid size-8 place-items-center rounded-lg bg-white text-slate-500 disabled:opacity-30"
+                  className="grid size-8 place-items-center rounded-lg bg-surface text-muted disabled:opacity-30"
                 >
                   <ArrowUp size={15} />
                 </button>
@@ -1387,7 +1388,7 @@ function DecisionTreeForm({
                   disabled={index === correctOrder.length - 1}
                   onClick={() => moveOrder(index, 1)}
                   aria-label="انتقال به پایین"
-                  className="grid size-8 place-items-center rounded-lg bg-white text-slate-500 disabled:opacity-30"
+                  className="grid size-8 place-items-center rounded-lg bg-surface text-muted disabled:opacity-30"
                 >
                   <ArrowDown size={15} />
                 </button>
@@ -1427,7 +1428,7 @@ function DecisionTreePreview({ payload }: { payload: Record<string, unknown> }) 
 
   return (
     <div className="p-4">
-      <div className="mb-4 flex items-center gap-2 rounded-xl bg-amber-50 p-3 text-xs font-black text-amber-700">
+      <div className="mb-4 flex items-center gap-2 rounded-xl bg-warning-soft p-3 text-xs font-black text-warning-soft-foreground">
         <GitBranch size={17} />
         مسیر صحیح تصمیم‌گیری
       </div>
@@ -1436,28 +1437,28 @@ function DecisionTreePreview({ payload }: { payload: Record<string, unknown> }) 
           const step = steps.find((item) => String(item.id) === id);
           return (
             <div key={`${id}-${index}`}>
-              <div className="flex items-center gap-2 rounded-xl border-2 border-amber-100 bg-white p-3">
-                <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-amber-500 text-xs font-black text-white">
+              <div className="flex items-center gap-2 rounded-xl border-2 border-warning-soft bg-surface p-3">
+                <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-warning-strong text-xs font-black text-warning-foreground">
                   {index + 1}
                 </span>
-                <p className="text-xs font-bold leading-6 text-slate-600">
+                <p className="text-xs font-bold leading-6 text-muted">
                   {String(step?.question ?? id)}
                 </p>
               </div>
               {index < orderedIds.length - 1 && (
-                <ArrowDown className="mx-auto my-1 text-amber-300" size={16} />
+                <ArrowDown className="mx-auto my-1 text-warning" size={16} />
               )}
             </div>
           );
         })}
         {orderedIds.length === 0 && (
-          <p className="py-5 text-center text-xs font-bold text-slate-400">
+          <p className="py-5 text-center text-xs font-bold text-subtle">
             هنوز مسیری ساخته نشده است.
           </p>
         )}
       </div>
       {Boolean(lesson.lesson) && (
-        <p className="mt-4 rounded-xl bg-emerald-50 p-3 text-xs font-bold leading-6 text-emerald-700">
+        <p className="mt-4 rounded-xl bg-success-soft p-3 text-xs font-bold leading-6 text-success-soft-foreground">
           {String(lesson.lesson)}
         </p>
       )}
@@ -1468,11 +1469,11 @@ function DecisionTreePreview({ payload }: { payload: Record<string, unknown> }) 
 function GamePreview({ payload, type }: { payload: Record<string, unknown>; type: 'coin_hunt' | 'memory_financial' }) {
   if (type === 'coin_hunt') {
     const items = Array.isArray(payload.items) ? payload.items as Record<string, unknown>[] : [];
-    return <div className="grid grid-cols-3 gap-2 p-4">{items.map((item, i) => <div key={i} className="rounded-xl bg-amber-50 p-3 text-center text-2xl">🪙<span className="block text-xs font-black">{String(item.value ?? 0)}</span></div>)}</div>;
+    return <div className="grid grid-cols-3 gap-2 p-4">{items.map((item, i) => <div key={i} className="rounded-xl bg-warning-soft p-3 text-center text-2xl">🪙<span className="block text-xs font-black">{String(item.value ?? 0)}</span></div>)}</div>;
   }
   const pairs = Array.isArray(payload.pairs) ? payload.pairs as Record<string, unknown>[] : [];
   if (!pairs.length) {
-    return <p className="p-6 text-center text-xs font-bold text-slate-400">هنوز جفتی اضافه نشده است.</p>;
+    return <p className="p-6 text-center text-xs font-bold text-subtle">هنوز جفتی اضافه نشده است.</p>;
   }
   const sideLabel = (side: unknown, fallback: string) => {
     const value = (side ?? {}) as Record<string, unknown>;
@@ -1482,8 +1483,8 @@ function GamePreview({ payload, type }: { payload: Record<string, unknown>; type
     <div className="space-y-2 p-4">
       {pairs.map((pair, i) => (
         <div key={i} className="grid grid-cols-2 gap-2">
-          <div className="rounded-xl bg-violet-50 p-3 text-center text-xs font-black text-violet-700">{sideLabel(pair.first, 'کارت اول')}</div>
-          <div className="rounded-xl bg-violet-50 p-3 text-center text-xs font-black text-violet-700">{sideLabel(pair.second, 'کارت دوم')}</div>
+          <div className="rounded-xl bg-brand-soft p-3 text-center text-xs font-black text-brand-soft-foreground">{sideLabel(pair.first, 'کارت اول')}</div>
+          <div className="rounded-xl bg-brand-soft p-3 text-center text-xs font-black text-brand-soft-foreground">{sideLabel(pair.second, 'کارت دوم')}</div>
         </div>
       ))}
     </div>
@@ -1496,8 +1497,8 @@ function ImagePreview({ payload }: { payload: Record<string, unknown> }) {
 
   return (
     <div className="flex flex-col items-center p-4">
-      <div className="relative mb-3 flex h-40 w-full items-center justify-center overflow-hidden rounded-2xl border-3 border-[#d9d0ff] bg-[#f7f5ff]">
-        <ImageIcon className="text-[#7c5cff]/20" size={36} />
+      <div className="relative mb-3 flex h-40 w-full items-center justify-center overflow-hidden rounded-2xl border-3 border-brand-soft bg-brand-soft">
+        <ImageIcon className="text-brand/20" size={36} />
         {url && (
           <img
             src={url}
@@ -1510,8 +1511,8 @@ function ImagePreview({ payload }: { payload: Record<string, unknown> }) {
         )}
       </div>
       {caption && (
-        <div className="w-full rounded-xl bg-slate-50 px-4 py-2.5 text-center">
-          <p className="text-xs font-bold text-slate-500">{caption}</p>
+        <div className="w-full rounded-xl bg-surface-muted px-4 py-2.5 text-center">
+          <p className="text-xs font-bold text-muted">{caption}</p>
         </div>
       )}
     </div>
@@ -1528,22 +1529,22 @@ function QuizPreview({ payload }: { payload: Record<string, unknown> }) {
   return (
     <div className="p-4">
       <div className="mb-3 flex items-start gap-2">
-        <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-[#fff0e9] text-[#ff8a55]">
+        <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
           <HelpCircle size={17} />
         </div>
-        <p className="text-sm font-black text-slate-700 leading-7">{question}</p>
+        <p className="text-sm font-black text-foreground leading-7">{question}</p>
       </div>
       <div className="space-y-2">
         {options.length === 0 && (
-          <p className="py-3 text-center text-xs text-slate-400">بدون گزینه</p>
+          <p className="py-3 text-center text-xs text-subtle">بدون گزینه</p>
         )}
         {options.map((opt, i) => (
           <div
             key={i}
             className={`flex items-center gap-2 rounded-xl border-2 px-3 py-2.5 text-xs font-bold ${
               opt.isCorrect
-                ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                : "border-slate-100 bg-white text-slate-500"
+                ? "border-success bg-success-soft text-success-soft-foreground"
+                : "border-border bg-surface text-muted"
             }`}
           >
             <span className="grid size-5 place-items-center rounded-full border-2 border-current text-[10px] font-black">
@@ -1560,11 +1561,11 @@ function QuizPreview({ payload }: { payload: Record<string, unknown> }) {
 function StoryPreview({ payload }: { payload: Record<string, unknown> }) {
   return (
     <div className="p-4">
-      <div className="rounded-2xl border-2 border-amber-100 bg-[#fffdf5] p-4">
-        <p className="mb-1 text-sm font-black text-amber-600">
+      <div className="rounded-2xl border-2 border-warning-soft bg-warning-soft p-4">
+        <p className="mb-1 text-sm font-black text-warning-soft-foreground">
           {String(payload.title ?? "عنوان داستان...")}
         </p>
-        <p className="text-xs font-medium leading-7 text-slate-600">
+        <p className="text-xs font-medium leading-7 text-muted">
           {String(payload.text ?? "متن داستان...")}
         </p>
       </div>
@@ -1575,17 +1576,17 @@ function StoryPreview({ payload }: { payload: Record<string, unknown> }) {
 function RewardPreview({ payload }: { payload: Record<string, unknown> }) {
   return (
     <div className="flex flex-col items-center p-5">
-      <div className="mb-3 grid size-16 place-items-center rounded-[20px] bg-gradient-to-br from-amber-300 to-amber-500 text-white shadow-[0_5px_0_#d97706]">
+      <div className="mb-3 grid size-16 place-items-center rounded-[20px] bg-gradient-to-br from-warning to-accent-strong text-warning-foreground shadow-[0_5px_0_var(--warning-strong)]">
         <Star size={30} className="fill-white" />
       </div>
-      <p className="mb-3 text-sm font-black text-slate-700">
+      <p className="mb-3 text-sm font-black text-foreground">
         {String(payload.message ?? "پیام جایزه...")}
       </p>
       <div className="flex items-center gap-4">
-        <span className="rounded-full bg-[#f0e6ff] px-4 py-1.5 text-xs font-black text-[#7c5cff]">
+        <span className="rounded-full bg-brand-soft px-4 py-1.5 text-xs font-black text-brand">
           ✦ {String(payload.xp ?? 0)} XP
         </span>
-        <span className="rounded-full bg-[#fff7d6] px-4 py-1.5 text-xs font-black text-[#d99100]">
+        <span className="rounded-full bg-warning-soft px-4 py-1.5 text-xs font-black text-warning-strong">
           🪙 {String(payload.coins ?? 0)} سکه
         </span>
       </div>
@@ -1604,19 +1605,19 @@ function MediaPreview({
   const caption = String(payload.caption ?? "");
   return (
     <div className="flex flex-col items-center p-4">
-      <div className="relative mb-3 flex h-40 w-full items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50">
+      <div className="relative mb-3 flex h-40 w-full items-center justify-center rounded-2xl border-2 border-dashed border-border bg-surface-muted">
         <div className="text-center">
-          <Eye size={32} className="mx-auto text-slate-300" />
-          <p className="mt-1 text-xs font-bold text-slate-400">
+          <Eye size={32} className="mx-auto text-subtle" />
+          <p className="mt-1 text-xs font-bold text-subtle">
             پیش‌نمایش {label}
           </p>
-          <p className="mt-1 max-w-[200px] truncate text-[10px] text-slate-300" dir="ltr">
+          <p className="mt-1 max-w-[200px] truncate text-[10px] text-subtle" dir="ltr">
             {String(payload.url ?? "...")}
           </p>
         </div>
       </div>
       {caption && (
-        <p className="text-xs font-bold text-slate-500">
+        <p className="text-xs font-bold text-muted">
           {caption}
         </p>
       )}
@@ -1629,14 +1630,14 @@ function DragDropPreview({ payload }: { payload: Record<string, unknown> }) {
   const targets = (Array.isArray(payload.targets) ? payload.targets : []) as string[];
   return (
     <div className="p-4">
-      <p className="mb-3 text-xs font-bold text-slate-500">
+      <p className="mb-3 text-xs font-bold text-muted">
         {String(payload.instruction ?? "راهنما...")}
       </p>
       <div className="mb-3 flex flex-wrap gap-2">
         {(items.length > 0 ? items : ["گزینه ۱", "گزینه ۲"]).map((item, i) => (
           <span
             key={i}
-            className="cursor-grab rounded-xl border-2 border-cyan-200 bg-cyan-50 px-3 py-2 text-xs font-bold text-cyan-700 shadow-sm"
+            className="cursor-grab rounded-xl border-2 border-cyan-soft bg-cyan-soft px-3 py-2 text-xs font-bold text-cyan-soft-foreground shadow-sm"
           >
             {String(item)}
           </span>
@@ -1646,7 +1647,7 @@ function DragDropPreview({ payload }: { payload: Record<string, unknown> }) {
         {(targets.length > 0 ? targets : ["هدف ۱", "هدف ۲"]).map((target, i) => (
           <div
             key={i}
-            className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold text-slate-400"
+            className="rounded-xl border-2 border-dashed border-border bg-surface-muted px-4 py-3 text-xs font-bold text-subtle"
           >
             {String(target)}
           </div>
@@ -1663,7 +1664,7 @@ function BasketGamePreview({ payload }: { payload: Record<string, unknown> }) {
   const collectibleValue = String(collectible.value || "⭐");
   return (
     <div className="p-4">
-      <div className="relative h-52 overflow-hidden rounded-2xl bg-gradient-to-b from-sky-100 to-emerald-50">
+      <div className="relative h-52 overflow-hidden rounded-2xl bg-gradient-to-b from-cyan-soft to-success-soft">
         <span className="absolute start-[18%] top-7 grid size-8 place-items-center text-3xl">
           {collectibleType === "image" && collectible.value ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -1676,9 +1677,9 @@ function BasketGamePreview({ payload }: { payload: Record<string, unknown> }) {
         <span className="absolute bottom-3 start-1/2 -translate-x-1/2 text-5xl">🧺</span>
       </div>
       <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs font-black">
-        <span className="rounded-xl bg-sky-50 p-2 text-sky-700">⏱ {String(payload.durationSeconds ?? 60)}</span>
-        <span className="rounded-xl bg-amber-50 p-2 text-amber-700">{collectibleValue} ۰</span>
-        <span className="rounded-xl bg-violet-50 p-2 text-violet-700">هر {String(scoring.coinsPerPoint ?? 3)} سکه</span>
+        <span className="rounded-xl bg-cyan-soft p-2 text-cyan-soft-foreground">⏱ {String(payload.durationSeconds ?? 60)}</span>
+        <span className="rounded-xl bg-warning-soft p-2 text-warning-soft-foreground">{collectibleValue} ۰</span>
+        <span className="rounded-xl bg-brand-soft p-2 text-brand-soft-foreground">هر {String(scoring.coinsPerPoint ?? 3)} سکه</span>
       </div>
     </div>
   );
@@ -1691,13 +1692,13 @@ function LivePreview({
   blockType: BlockType;
   payload: Record<string, unknown>;
 }) {
-  const meta = blockMeta[blockType] ?? { label: blockType, icon: BookOpen, color: '#7c5cff' };
+  const meta = blockMeta[blockType] ?? { label: blockType, icon: BookOpen, color: 'var(--brand)', foreground: 'var(--brand-foreground)' };
 
   return (
-    <div className="overflow-hidden rounded-2xl border-2 border-slate-100 bg-white shadow-[0_12px_40px_rgba(38,61,89,0.08)]">
+    <div className="overflow-hidden rounded-2xl border-2 border-border bg-surface shadow-[0_12px_40px_rgba(38,61,89,0.08)]">
       <div
-        className="flex items-center gap-2 px-4 py-3 text-white"
-        style={{ backgroundColor: meta.color }}
+        className="flex items-center gap-2 px-4 py-3"
+        style={{ backgroundColor: meta.color, color: meta.foreground }}
       >
         <meta.icon size={17} />
         <span className="text-sm font-black">پیش‌نمایش {meta.label}</span>
@@ -1732,7 +1733,8 @@ export default function BlockPayloadEditor({
   const meta = blockMeta[blockType] ?? {
     label: blockType,
     icon: BookOpen,
-    color: '#7c5cff',
+    color: 'var(--brand)',
+    foreground: 'var(--brand-foreground)',
   };
   const payloadIsValid = isValidPayload(payloadJson);
 
@@ -1741,12 +1743,12 @@ export default function BlockPayloadEditor({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border-2 border-slate-100 bg-[#f8fafc]">
-      <div className="flex flex-col gap-4 border-b-2 border-slate-100 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+    <div className="overflow-hidden rounded-2xl border-2 border-border bg-surface-muted">
+      <div className="flex flex-col gap-4 border-b-2 border-border bg-surface p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
         <div className="flex items-center gap-3">
           <div
-            className="grid size-11 shrink-0 place-items-center rounded-xl text-white"
-            style={{ backgroundColor: meta.color }}
+            className="grid size-11 shrink-0 place-items-center rounded-xl"
+            style={{ backgroundColor: meta.color, color: meta.foreground }}
           >
             {(() => {
               const BlockIcon = meta.icon;
@@ -1754,21 +1756,21 @@ export default function BlockPayloadEditor({
             })()}
           </div>
           <div>
-            <p className="text-sm font-black text-slate-800">محتوای بلوک</p>
-            <p className="mt-1 text-xs font-bold text-slate-400">
+            <p className="text-sm font-black text-foreground">محتوای بلوک</p>
+            <p className="mt-1 text-xs font-bold text-subtle">
               تنظیمات {meta.label} را تکمیل کنید.
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 rounded-xl bg-slate-100 p-1" aria-label="حالت ویرایش">
+        <div className="grid grid-cols-2 rounded-xl bg-surface-muted p-1" aria-label="حالت ویرایش">
           <button
             type="button"
             onClick={() => payloadIsValid && setShowRawJson(false)}
             className={`flex h-9 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-black transition-all ${
               !showRawJson
-                ? "bg-white text-[#7c5cff] shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
+                ? "bg-surface text-brand shadow-sm"
+                : "text-muted hover:text-foreground"
             }`}
           >
             <FormInput size={15} />
@@ -1779,8 +1781,8 @@ export default function BlockPayloadEditor({
             onClick={() => setShowRawJson(true)}
             className={`flex h-9 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-black transition-all ${
               showRawJson
-                ? "bg-white text-[#7c5cff] shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
+                ? "bg-surface text-brand shadow-sm"
+                : "text-muted hover:text-foreground"
             }`}
           >
             <FileJson size={15} />
@@ -1790,23 +1792,23 @@ export default function BlockPayloadEditor({
       </div>
 
       {errors.payload && (
-        <div className="mx-4 mt-4 flex items-start gap-2 rounded-xl border-2 border-red-200 bg-red-50 px-4 py-3 text-xs font-bold leading-6 text-red-600 sm:mx-5">
+        <div className="mx-4 mt-4 flex items-start gap-2 rounded-xl border-2 border-danger-soft bg-danger-soft px-4 py-3 text-xs font-bold leading-6 text-danger-soft-foreground sm:mx-5">
           <AlertCircle className="mt-0.5 shrink-0" size={17} />
           {errors.payload}
         </div>
       )}
 
       <div className="grid gap-5 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="min-w-0 rounded-2xl bg-white p-4 sm:p-5">
+        <div className="min-w-0 rounded-2xl bg-surface p-4 sm:p-5">
           {showRawJson ? (
             <div className="space-y-3">
-              <div className={`flex items-center gap-2 text-xs font-bold ${payloadIsValid ? "text-emerald-600" : "text-red-500"}`}>
-                <span className={`size-2 rounded-full ${payloadIsValid ? "bg-emerald-500" : "bg-red-500"}`} />
+              <div className={`flex items-center gap-2 text-xs font-bold ${payloadIsValid ? "text-success-soft-foreground" : "text-danger"}`}>
+                <span className={`size-2 rounded-full ${payloadIsValid ? "bg-success" : "bg-danger"}`} />
                 {payloadIsValid ? "ساختار JSON معتبر است" : "ساختار JSON معتبر نیست؛ برای بازگشت به فرم آن را اصلاح کنید."}
               </div>
               <div className="relative">
                 <FileJson
-                  className="absolute end-4 top-4 text-[#7c5cff]"
+                  className="absolute end-4 top-4 text-brand"
                   size={20}
                 />
                 <textarea
@@ -1816,7 +1818,7 @@ export default function BlockPayloadEditor({
                   onChange={(e) => onPayloadChange(e.target.value)}
                   spellCheck={false}
                   aria-label="ویرایش کد JSON محتوای بلوک"
-                  className={`w-full resize-y rounded-xl border-2 bg-[#fafaff] px-4 py-4 pe-11 font-mono text-sm leading-7 text-slate-700 outline-none transition-all focus:bg-white focus:shadow-[0_0_0_4px_rgba(124,92,255,0.08)] ${payloadIsValid ? "border-slate-200 focus:border-[#7c5cff]" : "border-red-300 focus:border-red-400"}`}
+                  className={`w-full resize-y rounded-xl border-2 bg-brand-soft px-4 py-4 pe-11 font-mono text-sm leading-7 text-foreground outline-none transition-all focus:bg-surface focus:shadow-[0_0_0_4px_rgba(124,92,255,0.08)] ${payloadIsValid ? "border-border focus:border-brand" : "border-danger focus:border-danger"}`}
                 />
               </div>
             </div>

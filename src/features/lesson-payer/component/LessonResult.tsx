@@ -29,30 +29,30 @@ export default function LessonResultScreen({
 
   return (
     <main
-      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f5fbff] p-4 text-slate-800"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 text-foreground"
       dir="rtl"
     >
-      <div className="absolute -start-28 -top-28 size-72 rounded-full bg-[#fff2bd]" />
-      <div className="absolute -bottom-36 -end-24 size-80 rounded-full bg-[#ddf8ef]" />
-      <div className="absolute end-[10%] top-[18%] hidden size-5 rotate-45 rounded bg-[#7c5cff]/30 lg:block" />
+      <div className="absolute -start-28 -top-28 size-72 rounded-full bg-warning-soft" />
+      <div className="absolute -bottom-36 -end-24 size-80 rounded-full bg-info-soft" />
+      <div className="absolute end-[10%] top-[18%] hidden size-5 rotate-45 rounded bg-brand/30 lg:block" />
 
-      <section className="relative w-full max-w-lg rounded-[34px] border-2 border-white bg-white/95 p-6 text-center shadow-[0_24px_75px_rgba(42,60,90,0.14)] backdrop-blur sm:p-9">
-        <div className="mx-auto mb-5 grid size-28 place-items-center rounded-full bg-gradient-to-br from-[#ffe56b] to-[#ffb33f] shadow-[0_8px_0_#e89b2e]">
+      <section className="relative w-full max-w-lg rounded-[34px] border-2 border-border bg-surface/95 p-6 text-center shadow-[0_24px_75px_rgba(42,60,90,0.14)] backdrop-blur sm:p-9">
+        <div className="mx-auto mb-5 grid size-28 place-items-center rounded-full bg-gradient-to-br from-warning to-accent shadow-[0_8px_0_var(--warning-strong)]">
           <Trophy
             size={58}
-            className="text-white drop-shadow"
+            className="text-warning-foreground drop-shadow"
             strokeWidth={2.5}
           />
         </div>
 
-        <div className="mb-3 flex items-center justify-center gap-2 text-[#7c5cff]">
+        <div className="mb-3 flex items-center justify-center gap-2 text-brand">
           <Sparkles size={20} />
           <span className="text-sm font-black">درس کامل شد!</span>
         </div>
-        <h1 className="mb-2 text-2xl font-black text-slate-800 sm:text-3xl">
+        <h1 className="mb-2 text-2xl font-black text-foreground sm:text-3xl">
           آفرین قهرمان!
         </h1>
-        <p className="mx-auto mb-5 max-w-sm text-sm font-medium leading-7 text-slate-500">
+        <p className="mx-auto mb-5 max-w-sm text-sm font-medium leading-7 text-muted">
           درس «{lessonTitle}» رو با موفقیت تموم کردی.
         </p>
 
@@ -64,46 +64,46 @@ export default function LessonResultScreen({
               strokeWidth={2.5}
               className={
                 index < stars
-                  ? 'fill-amber-400 text-amber-400 drop-shadow'
-                  : 'fill-slate-100 text-slate-200'
+                  ? 'fill-warning-strong text-warning-strong drop-shadow'
+                  : 'fill-border text-faint'
               }
             />
           ))}
         </div>
 
         <div className="mb-7 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl bg-[#f1edff] p-4">
-            <Sparkles className="mx-auto mb-2 text-[#7c5cff]" size={24} />
-            <p className="text-xl font-black text-[#6748df]">
+          <div className="rounded-2xl bg-brand-soft p-4">
+            <Sparkles className="mx-auto mb-2 text-brand" size={24} />
+            <p className="text-xl font-black text-brand-soft-foreground">
               +{result.xpEarned}
             </p>
-            <p className="mt-1 text-xs font-bold text-slate-500">امتیاز</p>
+            <p className="mt-1 text-xs font-bold text-muted">امتیاز</p>
           </div>
-          <div className="rounded-2xl bg-[#fff7d6] p-4">
+          <div className="rounded-2xl bg-warning-soft p-4">
             <Coins
-              className="mx-auto mb-2 fill-current text-amber-400"
+              className="mx-auto mb-2 fill-current text-warning-strong"
               size={24}
             />
-            <p className="text-xl font-black text-[#c78300]">
+            <p className="text-xl font-black text-warning-soft-foreground">
               +{result.coinsEarned}
             </p>
-            <p className="mt-1 text-xs font-bold text-slate-500">سکه</p>
+            <p className="mt-1 text-xs font-bold text-muted">سکه</p>
           </div>
-          <div className="col-span-2 rounded-2xl bg-[#eafffb] p-4 sm:col-span-1">
-            <Target className="mx-auto mb-2 text-[#16a394]" size={24} />
-            <p className="text-xl font-black text-[#087d72]">
+          <div className="col-span-2 rounded-2xl bg-info-soft p-4 sm:col-span-1">
+            <Target className="mx-auto mb-2 text-info" size={24} />
+            <p className="text-xl font-black text-info-soft-foreground">
               {result.totalQuestions > 0
                 ? `${result.correctAnswers}/${result.totalQuestions}`
                 : '۱۰۰٪'}
             </p>
-            <p className="mt-1 text-xs font-bold text-slate-500">پاسخ درست</p>
+            <p className="mt-1 text-xs font-bold text-muted">پاسخ درست</p>
           </div>
         </div>
 
         <button
           type="button"
           onClick={onContinue}
-          className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#58cc59] text-base font-black text-white shadow-[0_6px_0_#3da83e] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3da83e]"
+          className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-success text-base font-black text-success-foreground shadow-[0_6px_0_var(--success-strong)] transition-all hover:bg-success-hover active:translate-y-1 active:shadow-[0_2px_0_var(--success-strong)]"
         >
           برگشت به مسیر یادگیری
           <ArrowLeft size={20} strokeWidth={3} />

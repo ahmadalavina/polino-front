@@ -15,11 +15,11 @@ export function ReferenceInfo({
   onRefresh: () => void;
 }) {
   return (
-    <section className="rounded-[24px] border-2 border-white bg-white/90 p-4 shadow-sm">
+    <section className="rounded-[24px] border-2 border-border bg-surface/90 p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Layers3 size={18} className="text-[#7c5cff]" />
-          <h2 className="text-sm font-black text-slate-700">
+          <Layers3 size={18} className="text-brand" />
+          <h2 className="text-sm font-black text-foreground">
             اطلاعات مرجع
           </h2>
         </div>
@@ -27,7 +27,7 @@ export function ReferenceInfo({
           type="button"
           onClick={() => onRefresh()}
           aria-label="به‌روزرسانی فهرست‌ها"
-          className="grid size-8 place-items-center rounded-xl bg-slate-100 text-slate-500"
+          className="grid size-8 place-items-center rounded-xl bg-surface-muted text-muted"
         >
           <RefreshCw
             size={16}
@@ -36,25 +36,25 @@ export function ReferenceInfo({
         </button>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <div className="rounded-2xl bg-[#f1edff] p-3 text-center">
-          <p className="text-xl font-black text-[#6748df]">
+        <div className="rounded-2xl bg-brand-soft p-3 text-center">
+          <p className="text-xl font-black text-brand-soft-foreground">
             {courses.length}
           </p>
-          <p className="mt-1 text-[11px] font-bold text-slate-500">
+          <p className="mt-1 text-[11px] font-bold text-muted">
             دوره
           </p>
         </div>
-        <div className="rounded-2xl bg-[#eafffb] p-3 text-center">
-          <p className="text-xl font-black text-[#087d72]">
+        <div className="rounded-2xl bg-info-soft p-3 text-center">
+          <p className="text-xl font-black text-info-soft-foreground">
             {lessons.length}
           </p>
-          <p className="mt-1 text-[11px] font-bold text-slate-500">
+          <p className="mt-1 text-[11px] font-bold text-muted">
             درس
           </p>
         </div>
       </div>
       {error && (
-        <p className="mt-3 text-xs font-bold leading-5 text-rose-500">
+        <p className="mt-3 text-xs font-bold leading-5 text-danger">
           {error}
         </p>
       )}

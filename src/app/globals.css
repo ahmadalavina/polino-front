@@ -25,6 +25,7 @@
   --subtle-foreground: #94a3b8;
   --faint-foreground: #cbd5e1;
   --overlay: rgba(15, 23, 42, 0.45);
+  --media-backdrop: #0b1120;
 
   /* Brand (purple) */
   --brand: #7c5cff;
@@ -108,6 +109,7 @@
   --subtle-foreground: #6b7a93;
   --faint-foreground: #46536b;
   --overlay: rgba(2, 6, 23, 0.65);
+  --media-backdrop: #05080f;
 
   --brand: #8b78ff;
   --brand-hover: #9c8bff;
@@ -179,6 +181,7 @@
   --color-subtle: var(--subtle-foreground);
   --color-faint: var(--faint-foreground);
   --color-overlay: var(--overlay);
+  --color-media-backdrop: var(--media-backdrop);
 
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
@@ -250,84 +253,3 @@ body {
   font-family: var(--font-iran-yekan-x), Arial, sans-serif;
 }
 
-/* ---------------------------------------------------------------------------
-   Dark-mode compatibility bridge (temporary).
-
-   The codebase still uses inline neutral utilities (bg-white, text-slate-*,
-   border-slate-*, near-white accent hexes). Rather than edit every file at once,
-   remap those specific utilities to the semantic tokens only under dark mode.
-   Migrate components to token utilities (bg-surface, text-foreground, ...) and
-   delete this block when it is empty.
---------------------------------------------------------------------------- */
-
-:root[data-theme="dark"],
-:root.dark {
-  /* Neutral surfaces */
-  & .bg-white { background-color: var(--surface); }
-  & .bg-white\/95 { background-color: color-mix(in srgb, var(--surface) 95%, transparent); }
-  & .bg-white\/90 { background-color: color-mix(in srgb, var(--surface) 90%, transparent); }
-  & .bg-white\/80 { background-color: color-mix(in srgb, var(--surface) 80%, transparent); }
-  & .bg-white\/70 { background-color: color-mix(in srgb, var(--surface) 70%, transparent); }
-  & .bg-slate-50 { background-color: var(--surface-muted); }
-  & .bg-slate-100 { background-color: var(--surface-muted); }
-  & .bg-slate-200 { background-color: var(--border); }
-  & .bg-slate-300 { background-color: var(--border-strong); }
-  & .bg-gray-50 { background-color: var(--surface-muted); }
-  & .bg-gray-300 { background-color: var(--border); }
-
-  /* Neutral text */
-  & .text-slate-800 { color: var(--foreground); }
-  & .text-slate-700 { color: var(--foreground); }
-  & .text-slate-600 { color: var(--muted-foreground); }
-  & .text-slate-500 { color: var(--muted-foreground); }
-  & .text-slate-400 { color: var(--subtle-foreground); }
-  & .text-slate-300 { color: var(--subtle-foreground); }
-  & .text-slate-200 { color: var(--faint-foreground); }
-  & .text-gray-700 { color: var(--muted-foreground); }
-
-  /* Neutral borders */
-  & .border-white { border-color: var(--border); }
-  & .border-white\/70 { border-color: var(--border); }
-  & .border-slate-100 { border-color: var(--border); }
-  & .border-slate-200 { border-color: var(--border); }
-  & .border-slate-300 { border-color: var(--border-strong); }
-  & .border-gray-300 { border-color: var(--border); }
-
-  /* Page shell */
-  & .bg-\[\#f5fbff\], & .bg-\[\#f6fbff\] { background-color: var(--background); }
-
-  /* Soft brand/accent tints that would otherwise glare on dark */
-  & .bg-\[\#f1edff\], & .bg-\[\#ece7ff\], & .bg-\[\#eee9ff\],
-  & .bg-\[\#f7f5ff\], & .bg-\[\#fafaff\], & .bg-\[\#f0e6ff\],
-  & .bg-\[\#ece8ff\], & .bg-\[\#eeeaff\] { background-color: var(--brand-soft); }
-
-  & .bg-\[\#eafffb\], & .bg-\[\#e7fbff\], & .bg-\[\#f3fdff\],
-  & .bg-\[\#ddf8ef\], & .bg-\[\#dff8ee\], & .bg-\[\#dff9f2\],
-  & .bg-\[\#effcf9\] { background-color: var(--info-soft); }
-
-  & .bg-\[\#fff7d6\], & .bg-\[\#fffaf0\], & .bg-\[\#fffdf5\],
-  & .bg-\[\#fffdf7\], & .bg-\[\#fff2d8\], & .bg-\[\#fff1dc\],
-  & .bg-\[\#fff2bd\] { background-color: var(--warning-soft); }
-
-  & .bg-\[\#edffed\], & .bg-\[\#effcef\], & .bg-\[\#e9fbe9\] {
-    background-color: var(--success-soft);
-  }
-
-  & .bg-\[\#fff0e9\], & .bg-\[\#ffe9df\], & .bg-\[\#fff4ee\] {
-    background-color: var(--accent-soft);
-  }
-
-  & .bg-\[\#fff0f7\] { background-color: var(--pink-soft); }
-
-  /* State variants on neutral utilities */
-  & .focus\:bg-white:focus { background-color: var(--surface); }
-  & .hover\:bg-slate-50:hover, & .hover\:bg-gray-50:hover { background-color: var(--surface-muted); }
-  & .hover\:bg-slate-200:hover { background-color: var(--border); }
-  & .hover\:bg-slate-300:hover { background-color: var(--border-strong); }
-  & .hover\:text-slate-700:hover { color: var(--foreground); }
-  & .hover\:border-slate-300:hover { border-color: var(--border-strong); }
-  & .disabled\:bg-slate-200:disabled, & .disabled\:bg-slate-300:disabled,
-  & .disabled\:bg-gray-300:disabled { background-color: var(--border); }
-  & .disabled\:text-slate-300:disabled, & .disabled\:text-slate-400:disabled { color: var(--subtle-foreground); }
-  & .disabled\:border-slate-200:disabled { border-color: var(--border); }
-}

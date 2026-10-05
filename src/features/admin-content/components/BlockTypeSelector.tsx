@@ -35,8 +35,8 @@ export function BlockTypeSelector({
           onClick={() => onChange(type as BlockType)}
           className={`rounded-2xl border-2 px-3 py-3 text-xs font-black transition-all ${
             selectedType === type
-              ? 'border-[#ff8a55] bg-[#fff0e9] text-[#d65f2f] shadow-[0_3px_0_#ff8a55]'
-              : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+              ? 'border-accent bg-accent-soft text-accent-soft-foreground shadow-[0_3px_0_var(--accent)]'
+              : 'border-border bg-surface text-muted hover:border-border-strong'
           }`}
         >
           {label}

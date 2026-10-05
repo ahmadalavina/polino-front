@@ -11,7 +11,7 @@ export function SubmitButton({
     <button
       type="submit"
       disabled={loading}
-      className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#58cc59] text-base font-black text-white shadow-[0_6px_0_#3da83e] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3da83e] disabled:cursor-wait disabled:bg-slate-300 disabled:shadow-[0_6px_0_#cbd5e1]"
+      className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-success text-base font-black text-success-foreground shadow-[0_6px_0_var(--success-strong)] transition-all hover:bg-success-hover active:translate-y-1 active:shadow-[0_2px_0_var(--success-strong)] disabled:cursor-wait disabled:bg-border-strong disabled:shadow-[0_6px_0_var(--border-strong)]"
     >
       {loading ? (
         <LoaderCircle className="animate-spin" size={21} />

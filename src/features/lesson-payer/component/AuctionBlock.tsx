@@ -26,28 +26,28 @@ function Result({ result, onNext }: { result: GameResultResponse; onNext: () => 
     <motion.div
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="relative overflow-hidden rounded-3xl border-2 border-white bg-gradient-to-br from-emerald-50 to-white p-6 shadow-[0_20px_65px_rgba(38,61,89,0.12)] sm:p-8"
+      className="relative overflow-hidden rounded-3xl border-2 border-border bg-gradient-to-br from-success-soft to-white p-6 shadow-[0_20px_65px_rgba(38,61,89,0.12)] sm:p-8"
     >
       <motion.div
         animate={{ rotate: [0, 8, -8, 0], scale: [1, 1.08, 1] }}
         transition={{ duration: 2, repeat: Infinity }}
-        className="mx-auto mb-5 grid size-24 place-items-center rounded-[30px] bg-gradient-to-br from-[#ffe56b] to-[#ffb23f] text-white shadow-[0_8px_0_#e89b2e]"
+        className="mx-auto mb-5 grid size-24 place-items-center rounded-[30px] bg-gradient-to-br from-warning to-accent text-warning-foreground shadow-[0_8px_0_var(--warning-strong)]"
       >
         <Coins size={48} />
       </motion.div>
-      <h2 className="mb-2 text-center text-2xl font-black text-slate-800">
+      <h2 className="mb-2 text-center text-2xl font-black text-foreground">
         {result.completed ? 'آفرین!' : 'تلاش خوبی بود!'}
       </h2>
-      <p className="mb-6 text-center text-sm font-bold text-slate-500">
+      <p className="mb-6 text-center text-sm font-bold text-muted">
         {result.completed
           ? 'تو تونستی بهتر از سیستم قیمت بذاری!'
           : 'دفعه بعد سعی کن کمتر پیشنهاد بدی!'}
       </p>
       {details && details.length > 0 && (
         <div className="mb-6 space-y-2">
-          <div className="mb-3 flex items-center justify-center gap-2 rounded-full bg-amber-50 px-4 py-2 text-sm font-black text-amber-600">
+          <div className="mb-3 flex items-center justify-center gap-2 rounded-full bg-warning-soft px-4 py-2 text-sm font-black text-warning-soft-foreground">
             <span>امتیاز: {result.score}</span>
-            <span className="text-amber-400">|</span>
+            <span className="text-warning-strong">|</span>
             <span>پیشنهاد: {formatNumber((result.result as Record<string, unknown>)?.totalBid as number ?? 0)} تومان</span>
           </div>
           {details.map((item, index) => (
@@ -58,23 +58,23 @@ function Result({ result, onNext }: { result: GameResultResponse; onNext: () => 
               transition={{ delay: index * 0.1 }}
               className={`flex items-center justify-between rounded-2xl border-2 p-3 ${
                 item.outcome === 'win'
-                  ? 'border-emerald-200 bg-emerald-50'
-                  : 'border-rose-200 bg-rose-50'
+                  ? 'border-success-soft bg-success-soft'
+                  : 'border-danger-soft bg-danger-soft'
               }`}
             >
-              <span className="font-black text-slate-700">{item.itemName}</span>
+              <span className="font-black text-foreground">{item.itemName}</span>
               <div className="flex items-center gap-2 text-xs font-bold">
-                <span className="text-slate-500">
+                <span className="text-muted">
                   پیشنهاد: {formatNumber(item.playerBid)}
                 </span>
-                <span className="text-slate-400">|</span>
-                <span className="text-slate-500">
+                <span className="text-subtle">|</span>
+                <span className="text-muted">
                   سیستم: {formatNumber(item.systemPrice)}
                 </span>
                 {item.outcome === 'win' ? (
-                  <span className="text-emerald-500">✅</span>
+                  <span className="text-success">✅</span>
                 ) : (
-                  <span className="text-rose-500">❌</span>
+                  <span className="text-danger">❌</span>
                 )}
               </div>
             </motion.div>
@@ -83,7 +83,7 @@ function Result({ result, onNext }: { result: GameResultResponse; onNext: () => 
       )}
       <button
         onClick={onNext}
-        className="h-14 w-full rounded-2xl bg-[#58cc59] font-black text-white shadow-[0_5px_0_#3da83e] transition-transform active:translate-y-1"
+        className="h-14 w-full rounded-2xl bg-success font-black text-success-foreground shadow-[0_5px_0_var(--success-strong)] transition-transform active:translate-y-1"
       >
         ادامه درس
       </button>
@@ -190,50 +190,50 @@ export default function AuctionBlock({ blockId, payload, onNext }: Props) {
 
   if (!items.length) {
     return (
-      <div className="p-8 text-center font-bold text-rose-500">
+      <div className="p-8 text-center font-bold text-danger">
         محتوای بازی کامل نیست.
       </div>
     );
   }
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border-2 border-white bg-white/95 p-6 shadow-[0_20px_65px_rgba(38,61,89,0.12)] sm:p-8">
+    <div className="relative overflow-hidden rounded-3xl border-2 border-border bg-surface/95 p-6 shadow-[0_20px_65px_rgba(38,61,89,0.12)] sm:p-8">
       {/* Header */}
       <div className="mb-6 flex items-start justify-between gap-3">
         <div>
-          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-orange-50 px-3 py-1 text-xs font-black text-orange-600">
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-black text-accent-soft-foreground">
             <span className="text-sm">🏷️</span>
             مزایده
           </div>
-          <h2 className="text-2xl font-black text-slate-800">بازی مزایده</h2>
-          <p className="mt-1 text-sm font-bold leading-6 text-slate-500">
+          <h2 className="text-2xl font-black text-foreground">بازی مزایده</h2>
+          <p className="mt-1 text-sm font-bold leading-6 text-muted">
             بودجه‌ات رو بین آیتم‌ها تقسیم کن و پیشنهاد بده. سعی کن کمتر از قیمت سیستم پیشنهاد بدی!
           </p>
         </div>
         <motion.div
           animate={{ rotate: [0, 10, -10, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="grid size-14 shrink-0 place-items-center rounded-2xl bg-orange-100 text-3xl shadow-[0_5px_0_#f2b84b]"
+          className="grid size-14 shrink-0 place-items-center rounded-2xl bg-accent-soft text-3xl shadow-[0_5px_0_var(--warning-strong)]"
         >
           🏷️
         </motion.div>
       </div>
 
       {/* Budget bar */}
-      <div className="mb-6 rounded-2xl bg-slate-50 p-3">
+      <div className="mb-6 rounded-2xl bg-surface-muted p-3">
         <div className="mb-2 flex items-center justify-between text-xs font-black">
-          <span className="text-orange-600">💰 بودجه باقی‌مانده</span>
-          <span className={remainingBudget < 0 ? 'text-rose-500' : 'text-emerald-500'}>
+          <span className="text-accent-soft-foreground">💰 بودجه باقی‌مانده</span>
+          <span className={remainingBudget < 0 ? 'text-danger' : 'text-success'}>
             {formatNumber(remainingBudget)} تومان
           </span>
         </div>
-        <div className="h-3 overflow-hidden rounded-full bg-slate-200">
+        <div className="h-3 overflow-hidden rounded-full bg-border">
           <motion.div
             animate={{ width: `${Math.min(100, (totalBid / totalBudget) * 100)}%` }}
             className={`h-full rounded-full transition-all ${
               remainingBudget < 0
-                ? 'bg-gradient-to-l from-rose-400 to-rose-300'
-                : 'bg-gradient-to-l from-orange-400 to-amber-300'
+                ? 'bg-gradient-to-l from-danger to-danger-hover'
+                : 'bg-gradient-to-l from-accent to-warning'
             }`}
           />
         </div>
@@ -247,10 +247,10 @@ export default function AuctionBlock({ blockId, payload, onNext }: Props) {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.06 }}
-            className="overflow-hidden rounded-2xl border-2 border-slate-100 bg-gradient-to-br from-slate-50 to-white shadow-[0_4px_0_#e2e8f0]"
+            className="overflow-hidden rounded-2xl border-2 border-border bg-gradient-to-br from-surface-muted to-white shadow-[0_4px_0_var(--border)]"
           >
             {item.imageUrl && (
-              <div className="aspect-square w-full overflow-hidden bg-slate-100">
+              <div className="aspect-square w-full overflow-hidden bg-surface-muted">
                 <img
                   src={item.imageUrl}
                   alt={item.name}
@@ -259,24 +259,24 @@ export default function AuctionBlock({ blockId, payload, onNext }: Props) {
               </div>
             )}
             <div className="p-3">
-              <h3 className="mb-2 text-sm font-black text-slate-700">{item.name}</h3>
+              <h3 className="mb-2 text-sm font-black text-foreground">{item.name}</h3>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-400">ارزش تقریبی:</span>
-                <span className="text-xs font-black text-slate-500">
+                <span className="text-xs font-bold text-subtle">ارزش تقریبی:</span>
+                <span className="text-xs font-black text-muted">
                   {formatNumber(item.basePrice)} تومان
                 </span>
               </div>
               <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-500">پیشنهاد تو:</span>
+                <span className="text-xs font-bold text-muted">پیشنهاد تو:</span>
                 <input
                   type="text"
                   inputMode="numeric"
                   value={bids[item.id] ?? 0}
                   onChange={(e) => updateBid(item.id, e.target.value)}
-                  className="w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-center text-sm font-black text-slate-700 outline-none transition-colors focus:border-orange-300"
+                  className="w-full rounded-xl border-2 border-border bg-surface px-3 py-2 text-center text-sm font-black text-foreground outline-none transition-colors focus:border-accent"
                   placeholder="مبلغ"
                 />
-                <span className="text-xs font-bold text-slate-400 shrink-0">تومان</span>
+                <span className="text-xs font-bold text-subtle shrink-0">تومان</span>
               </div>
             </div>
           </motion.div>
@@ -288,7 +288,7 @@ export default function AuctionBlock({ blockId, payload, onNext }: Props) {
         <button
           type="button"
           onClick={handleAutoFill}
-          className="text-sm font-black text-orange-500 underline-offset-4 hover:underline"
+          className="text-sm font-black text-accent underline-offset-4 hover:underline"
         >
           تقسیم خودکار بودجه
         </button>
@@ -296,7 +296,7 @@ export default function AuctionBlock({ blockId, payload, onNext }: Props) {
           type="button"
           onClick={handleSubmit}
           disabled={isSubmitting || remainingBudget < 0}
-          className="h-14 w-full flex-1 rounded-2xl bg-gradient-to-l from-[#ffb52e] to-[#ffe064] font-black text-slate-800 shadow-[0_5px_0_#e89b2e] transition-transform disabled:opacity-50 disabled:shadow-none active:translate-y-1"
+          className="h-14 w-full flex-1 rounded-2xl bg-gradient-to-l from-accent to-warning font-black text-foreground shadow-[0_5px_0_var(--warning-strong)] transition-transform disabled:opacity-50 disabled:shadow-none active:translate-y-1"
         >
           {isSubmitting ? 'در حال ثبت...' : 'ثبت پیشنهادها'}
         </button>
@@ -304,7 +304,7 @@ export default function AuctionBlock({ blockId, payload, onNext }: Props) {
 
       {/* Error */}
       {error && (
-        <div className="mt-4 flex items-center justify-between rounded-xl bg-rose-50 p-3 text-xs font-bold text-rose-600">
+        <div className="mt-4 flex items-center justify-between rounded-xl bg-danger-soft p-3 text-xs font-bold text-danger-soft-foreground">
           <span>{error}</span>
           <button onClick={() => setError('')} className="ml-2">
             <X size={16} />

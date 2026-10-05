@@ -44,7 +44,23 @@ This document provides context, technical specifications, and development guidel
 ```javascript
   const coins = useGameStore((state) => state.coins);
   
-### C. Tooling & Workspace Rules
+### C. Colors, Theme & Design Tokens
+
+**This project uses a single centralized color palette. Never hardcode a color.** Every color must come from the palette defined in `src/app/globals.css`; to introduce a new color, add/extend a token there and consume it (do not invent a one-off hex inline).
+
+- **Source of truth:** `src/app/globals.css`. Light values live on `:root`, dark values under `:root[data-theme="dark"], :root.dark`. `@theme inline` exposes them as Tailwind utilities.
+- **Use semantic Tailwind utilities, never inline hex or arbitrary color classes.** Forbidden patterns: `bg-[#7c5cff]`, `text-[#16a8a6]`, `border-[#...]`, `from-[#...]`, `shadow-[0_5px_0_#...]`, `[--button-shadow:#...]`, and `style={{ color: '#...' }}`.
+  - Surfaces/text: `bg-background`, `bg-surface`, `bg-surface-muted`, `border-border`, `border-border-strong`, `text-foreground`, `text-muted`, `text-subtle`, `text-faint`, `bg-overlay`.
+  - Role colors (each has variants): `brand` (purple), `accent` (orange), `success` (green), `info` (teal), `cyan`, `warning` (amber), `pink`, `danger`.
+    - Variants: base `bg-brand` / `text-brand`, plus `-hover`, `-strong`, `-soft`, `-soft-foreground`, `-foreground` (e.g. `bg-brand-soft`, `text-brand-soft-foreground`, `shadow-[0_5px_0_var(--brand-strong)]`, `bg-success-soft text-success-soft-foreground`).
+  - Elevation/radius: `shadow-card`, `shadow-soft`, `rounded-card`, `rounded-panel`, `rounded-chip`.
+  - Opacity modifiers are supported (`bg-accent/40`, `border-info/30`).
+- **Shadows/custom properties:** the 3D "pressed button" shadow uses the token variable, e.g. `bg-success shadow-[0_5px_0_var(--success-strong)]` and `bg-brand [--button-shadow:var(--brand-strong)]`. Do not inline a hex in `shadow-[...]` or `[--x:#...]`.
+- **Inline styles / config color maps:** reference the CSS variable, e.g. `style={{ backgroundColor: 'var(--info)' }}` and `color: 'var(--brand)'`, not a hex.
+- **Dark mode:** driven by `data-theme="dark"` / `.dark` on `<html>` (see `@custom-variant dark` and `src/store/themeStore.ts`). Prefer token utilities, which switch automatically; use a `dark:` variant only when a genuinely different treatment is needed.
+- **Migrating legacy colors:** a temporary dark-mode compatibility bridge at the end of `globals.css` remaps leftover neutral utilities (`bg-white`, `text-slate-*`, `border-slate-*`). Convert them to tokens and shrink that block; delete it when empty.
+
+### D. Tooling & Workspace Rules
 
 - No Automatic Linting/Formatting on Commands: Do NOT run npm run lint, eslint, or formatter commands automatically after generating code or running commands. Let the local IDE setup or the pre-commit/build pipelines handle formatting and linting. Keep command execution clean and lightweight.
 

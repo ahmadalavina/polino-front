@@ -260,19 +260,19 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
       default:
         return (
           <div className="flex min-h-[430px] flex-col items-center justify-center px-5 py-10 text-center">
-            <div className="mb-5 grid size-20 place-items-center rounded-[24px] bg-[#eee9ff] text-[#7c5cff]">
+            <div className="mb-5 grid size-20 place-items-center rounded-[24px] bg-brand-soft text-brand">
               <BookOpen size={38} />
             </div>
-            <h2 className="mb-2 text-xl font-black text-slate-800">
+            <h2 className="mb-2 text-xl font-black text-foreground">
               بخش بعدی آماده‌ست
             </h2>
-            <p className="mb-7 text-sm font-medium text-slate-500">
+            <p className="mb-7 text-sm font-medium text-muted">
               برای ادامه ماجراجویی روی دکمه بزن.
             </p>
             <button
               type="button"
               onClick={handleNext}
-              className="flex h-14 w-full max-w-xs items-center justify-center gap-2 rounded-2xl bg-[#58cc59] font-black text-white shadow-[0_6px_0_#3da83e] transition-all active:translate-y-1 active:shadow-[0_2px_0_#3da83e]"
+              className="flex h-14 w-full max-w-xs items-center justify-center gap-2 rounded-2xl bg-success font-black text-success-foreground shadow-[0_6px_0_var(--success-strong)] transition-all active:translate-y-1 active:shadow-[0_2px_0_var(--success-strong)]"
             >
               ادامه
               <ArrowLeft size={20} strokeWidth={3} />
@@ -306,23 +306,23 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
   if (blocks.length === 0) {
     return (
       <main
-        className="flex min-h-screen items-center justify-center bg-[#f5fbff] p-4"
+        className="flex min-h-screen items-center justify-center bg-background p-4"
         dir="rtl"
       >
-        <section className="w-full max-w-md rounded-[30px] border-2 border-white bg-white p-8 text-center shadow-[0_20px_65px_rgba(38,61,89,0.12)]">
-          <div className="mx-auto mb-5 grid size-20 place-items-center rounded-[24px] bg-[#fff7d6] text-[#d99a00]">
+        <section className="w-full max-w-md rounded-[30px] border-2 border-border bg-surface p-8 text-center shadow-[0_20px_65px_rgba(38,61,89,0.12)]">
+          <div className="mx-auto mb-5 grid size-20 place-items-center rounded-[24px] bg-warning-soft text-warning-strong">
             <BookOpen size={38} />
           </div>
-          <h1 className="mb-2 text-xl font-black text-slate-800">
+          <h1 className="mb-2 text-xl font-black text-foreground">
             محتوای درس آماده نیست
           </h1>
-          <p className="mb-6 text-sm font-medium text-slate-500">
+          <p className="mb-6 text-sm font-medium text-muted">
             به‌زودی این درس پر از داستان و بازی می‌شه.
           </p>
           <button
             type="button"
             onClick={onFinish}
-            className="h-13 w-full rounded-2xl bg-[#7c5cff] font-black text-white shadow-[0_5px_0_#6245dc] transition-all active:translate-y-1 active:shadow-none"
+            className="h-13 w-full rounded-2xl bg-brand font-black text-brand-foreground shadow-[0_5px_0_var(--brand-strong)] transition-all active:translate-y-1 active:shadow-none"
           >
             برگشت به مسیر
           </button>
@@ -337,72 +337,72 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden bg-[#f5fbff] text-slate-800"
+      className="relative min-h-screen overflow-hidden bg-background text-foreground"
       dir="rtl"
     >
-      <div className="pointer-events-none absolute -start-36 -top-36 size-96 rounded-full bg-[#ddf8ef]" />
-      <div className="pointer-events-none absolute -bottom-48 -end-32 size-[30rem] rounded-full bg-[#ece7ff]" />
-      <div className="pointer-events-none absolute end-[8%] top-[38%] hidden size-5 rotate-45 rounded bg-[#ff8a55]/35 lg:block" />
+      <div className="pointer-events-none absolute -start-36 -top-36 size-96 rounded-full bg-info-soft" />
+      <div className="pointer-events-none absolute -bottom-48 -end-32 size-[30rem] rounded-full bg-brand-soft" />
+      <div className="pointer-events-none absolute end-[8%] top-[38%] hidden size-5 rotate-45 rounded bg-accent/35 lg:block" />
 
       <header className="relative mx-auto flex w-full max-w-4xl items-center justify-between gap-3 px-4 py-5 sm:px-8">
         <button
           type="button"
           onClick={onExit}
           aria-label="خروج از درس"
-          className="grid size-11 shrink-0 place-items-center rounded-2xl border-2 border-slate-200 bg-white text-slate-500 shadow-[0_3px_0_#e2e8f0] transition-all hover:text-slate-700 active:translate-y-1 active:shadow-none"
+          className="grid size-11 shrink-0 place-items-center rounded-2xl border-2 border-border bg-surface text-muted shadow-[0_3px_0_var(--border)] transition-all hover:text-foreground active:translate-y-1 active:shadow-none"
         >
           <X size={21} strokeWidth={3} />
         </button>
 
         <div className="min-w-0 flex-1 text-center">
-          <p className="truncate text-sm font-black text-slate-800 sm:text-base">
+          <p className="truncate text-sm font-black text-foreground sm:text-base">
             {lesson.title}
           </p>
-          <p className="mt-0.5 text-[11px] font-bold text-slate-400">
+          <p className="mt-0.5 text-[11px] font-bold text-subtle">
             {blockLabels[currentBlock.type] ?? 'مرحله آموزشی'}
           </p>
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          <div className="hidden items-center gap-1.5 rounded-full border-2 border-slate-100 bg-white px-3 py-2 text-xs font-black text-[#7c5cff] shadow-sm sm:flex">
+          <div className="hidden items-center gap-1.5 rounded-full border-2 border-border bg-surface px-3 py-2 text-xs font-black text-brand shadow-sm sm:flex">
             <Sparkles size={16} />
             {rewards.xp}
           </div>
-          <div className="flex items-center gap-1.5 rounded-full border-2 border-slate-100 bg-white px-3 py-2 text-xs font-black text-[#d99100] shadow-sm">
-            <Coins size={16} className="fill-current text-amber-400" />
+          <div className="flex items-center gap-1.5 rounded-full border-2 border-border bg-surface px-3 py-2 text-xs font-black text-warning-strong shadow-sm">
+            <Coins size={16} className="fill-current text-warning-strong" />
             {rewards.coins}
           </div>
         </div>
       </header>
 
       <div className="relative mx-auto w-full max-w-3xl px-4 pb-10 sm:px-6">
-        <div className="mb-5 rounded-2xl border-2 border-white bg-white/90 p-3 shadow-sm backdrop-blur">
+        <div className="mb-5 rounded-2xl border-2 border-border bg-surface/90 p-3 shadow-sm backdrop-blur">
           <div className="mb-2 flex items-center justify-between text-xs font-black">
-            <span className="text-[#58b759]">پیشرفت درس</span>
-            <span className="text-slate-400">
+            <span className="text-success-soft-foreground">پیشرفت درس</span>
+            <span className="text-subtle">
               {currentIndex + 1} از {blocks.length}
             </span>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+          <div className="h-3 overflow-hidden rounded-full bg-surface-muted">
             <div
-              className="h-full rounded-full bg-gradient-to-l from-[#58cc59] to-[#8cdf58] transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-l from-success to-success-hover transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
-        <section className="overflow-hidden rounded-[30px] border-2 border-white bg-white/95 shadow-[0_20px_65px_rgba(38,61,89,0.12)] backdrop-blur">
+        <section className="overflow-hidden rounded-[30px] border-2 border-border bg-surface/95 shadow-[0_20px_65px_rgba(38,61,89,0.12)] backdrop-blur">
           {(pages[currentIndex]?.blocks ?? []).map((block, blockIndex, pageBlocks) => (
             <div key={block.id} className={blockIndex === pageBlocks.length - 1 ? undefined : '[&>div>button:last-child]:hidden'}>
               {renderBlock(block)}
             </div>
           ))}
           {currentIndex > 0 && (
-            <div className="border-t-2 border-dashed border-slate-100 px-5 py-4 sm:px-8">
+            <div className="border-t-2 border-dashed border-border px-5 py-4 sm:px-8">
               <button
                 type="button"
                 onClick={handlePrevious}
-                className="flex h-12 items-center gap-2 rounded-2xl border-2 border-slate-200 bg-white px-5 text-sm font-black text-slate-500 shadow-[0_4px_0_#e2e8f0] transition-all hover:border-slate-300 hover:text-slate-700 active:translate-y-1 active:shadow-none"
+                className="flex h-12 items-center gap-2 rounded-2xl border-2 border-border bg-surface px-5 text-sm font-black text-muted shadow-[0_4px_0_var(--border)] transition-all hover:border-border-strong hover:text-foreground active:translate-y-1 active:shadow-none"
               >
                 <ArrowRight size={18} strokeWidth={3} />
                 بازگشت به مرحله قبل

@@ -184,7 +184,7 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
 
   if (!config || grid.length === 0 || words.length === 0) {
     return (
-      <div className="p-8 text-center font-bold text-rose-500">
+      <div className="p-8 text-center font-bold text-danger">
         جدول کلمات کامل نیست.
       </div>
     );
@@ -200,19 +200,19 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
         <motion.div
           animate={{ rotate: [0, 8, -8, 0], scale: [1, 1.08, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="mx-auto mb-5 grid size-24 place-items-center rounded-[30px] bg-gradient-to-br from-[#ffe56b] to-[#ffb23f] text-white shadow-[0_8px_0_#e89b2e]"
+          className="mx-auto mb-5 grid size-24 place-items-center rounded-[30px] bg-gradient-to-br from-warning to-accent text-warning-foreground shadow-[0_8px_0_var(--warning-strong)]"
         >
           <Trophy size={48} />
         </motion.div>
-        <h2 className="text-2xl font-black text-slate-800">آفرین قهرمان!</h2>
-        <p className="mt-2 text-sm font-bold text-slate-500">
+        <h2 className="text-2xl font-black text-foreground">آفرین قهرمان!</h2>
+        <p className="mt-2 text-sm font-bold text-muted">
           همه کلمه‌ها را پیدا کردی.
         </p>
         <div className="my-6 flex justify-center gap-3">
-          <span className="rounded-full bg-teal-50 px-4 py-2 font-black text-teal-600">
+          <span className="rounded-full bg-info-soft px-4 py-2 font-black text-info">
             امتیاز {result.score}
           </span>
-          <span className="rounded-full bg-amber-50 px-4 py-2 font-black text-amber-600">
+          <span className="rounded-full bg-warning-soft px-4 py-2 font-black text-warning-soft-foreground">
             <Coins size={16} className="inline" /> {result.xp} XP
           </span>
         </div>
@@ -220,10 +220,10 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
           <button
             onClick={handleClaim}
             disabled={claiming || claimed}
-            className={`mb-3 flex h-13 w-full items-center justify-center gap-2 rounded-2xl font-black text-white shadow-[0_5px_0_var(--gift-shadow)] transition-transform active:translate-y-1 disabled:opacity-70 ${
+            className={`mb-3 flex h-13 w-full items-center justify-center gap-2 rounded-2xl font-black shadow-[0_5px_0_var(--gift-shadow)] transition-transform active:translate-y-1 disabled:opacity-70 ${
               claimed
-                ? 'bg-emerald-500 [--gift-shadow:#059669]'
-                : 'bg-amber-500 [--gift-shadow:#d97706]'
+                ? 'bg-success text-success-foreground [--gift-shadow:var(--success-strong)]'
+                : 'bg-warning-strong text-warning-foreground [--gift-shadow:var(--warning-strong)]'
             }`}
           >
             <Gift size={18} />
@@ -231,11 +231,11 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
           </button>
         )}
         {claimError && (
-          <p className="mb-3 text-xs font-bold text-rose-500">{claimError}</p>
+          <p className="mb-3 text-xs font-bold text-danger">{claimError}</p>
         )}
         <button
           onClick={onNext}
-          className="h-13 w-full rounded-2xl bg-[#58cc59] font-black text-white shadow-[0_5px_0_#3da83e] transition-transform active:translate-y-1"
+          className="h-13 w-full rounded-2xl bg-success font-black text-success-foreground shadow-[0_5px_0_var(--success-strong)] transition-transform active:translate-y-1"
         >
           ادامه درس
         </button>
@@ -247,18 +247,18 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
     <div className="relative overflow-hidden p-5 sm:p-8" dir="rtl">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
-          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-black text-teal-600">
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-info-soft px-3 py-1 text-xs font-black text-info">
             <Search size={15} /> جدول کلمات
           </div>
-          <h2 className="text-2xl font-black text-slate-800">کلمه‌ها را پیدا کن!</h2>
-          <p className="mt-1 text-sm font-bold leading-6 text-slate-500">
+          <h2 className="text-2xl font-black text-foreground">کلمه‌ها را پیدا کن!</h2>
+          <p className="mt-1 text-sm font-bold leading-6 text-muted">
             با کشیدن یا دو کلیک، ابتدا و انتهای هر کلمه را انتخاب کن.
           </p>
         </div>
         <motion.div
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 1.8, repeat: Infinity }}
-          className="grid size-14 shrink-0 place-items-center rounded-2xl bg-teal-100 text-3xl shadow-[0_5px_0_#7fd6cb]"
+          className="grid size-14 shrink-0 place-items-center rounded-2xl bg-info-soft text-3xl shadow-[0_5px_0_var(--info-soft)]"
         >
           🔠
         </motion.div>
@@ -271,7 +271,7 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
             <span
               key={word}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black transition-all ${
-                done ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'
+                done ? 'bg-success-soft text-success-soft-foreground' : 'bg-surface-muted text-muted'
               }`}
             >
               {done && <Check size={14} strokeWidth={3} />}
@@ -281,7 +281,7 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
         })}
       </div>
 
-      <div className="mx-auto w-fit rounded-3xl border-2 border-teal-100 bg-teal-50/40 p-3">
+      <div className="mx-auto w-fit rounded-3xl border-2 border-info-soft bg-info-soft/40 p-3">
         <div
           className="grid gap-1.5"
           style={{ gridTemplateColumns: `repeat(${grid[0]?.length ?? 0}, minmax(0, 1fr))` }}
@@ -301,12 +301,12 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
                   onPointerEnter={() => handlePointerEnter(cell)}
                   className={`grid size-9 place-items-center rounded-lg border-2 text-lg font-black transition-all sm:size-11 sm:text-xl ${
                     isFound
-                      ? 'border-emerald-300 bg-emerald-100 text-emerald-700'
+                      ? 'border-success bg-success-soft text-success-soft-foreground'
                       : isTentative
-                        ? 'border-teal-400 bg-teal-100 text-teal-800'
+                        ? 'border-info bg-info-soft text-info-soft-foreground'
                         : isAnchor
-                          ? 'border-teal-400 bg-white text-teal-700'
-                          : 'border-teal-100 bg-white text-slate-700 hover:border-teal-300'
+                          ? 'border-info bg-surface text-info-soft-foreground'
+                          : 'border-info-soft bg-surface text-foreground hover:border-info'
                   }`}
                   style={{ touchAction: 'none' }}
                 >
@@ -318,15 +318,15 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center justify-between rounded-2xl border border-slate-100 bg-white/80 p-4 text-sm font-black">
-        <span className="text-teal-600">
+      <div className="mt-6 flex items-center justify-between rounded-2xl border border-border bg-surface/80 p-4 text-sm font-black">
+        <span className="text-info">
           پیدا شده: {foundWords.size} از {words.length}
         </span>
-        <span className="text-slate-500">همه کلمه‌ها را کامل کن ⭐</span>
+        <span className="text-muted">همه کلمه‌ها را کامل کن ⭐</span>
       </div>
 
       {error && (
-        <div className="mt-4 flex items-center justify-between rounded-xl bg-rose-50 p-3 text-xs font-bold text-rose-600">
+        <div className="mt-4 flex items-center justify-between rounded-xl bg-danger-soft p-3 text-xs font-bold text-danger-soft-foreground">
           <span>{error}</span>
           <button onClick={() => setError('')}>
             <X size={16} />
@@ -334,7 +334,7 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
         </div>
       )}
       {submitting && (
-        <p className="mt-4 text-center text-xs font-bold text-slate-400">
+        <p className="mt-4 text-center text-xs font-bold text-subtle">
           در حال ثبت نتیجه...
         </p>
       )}
@@ -342,7 +342,7 @@ export default function WordSearchBlock({ blockId, payload, onNext }: Props) {
       <button
         type="button"
         onClick={reset}
-        className="mx-auto mt-5 flex items-center gap-2 text-xs font-black text-slate-400 hover:text-teal-600"
+        className="mx-auto mt-5 flex items-center gap-2 text-xs font-black text-subtle hover:text-info"
       >
         <RotateCcw size={15} /> شروع دوباره
       </button>

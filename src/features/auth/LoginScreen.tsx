@@ -51,17 +51,17 @@ type LoginStep = 'phone' | 'otp' | 'success';
 function BrandMark() {
   return (
     <div className="flex items-center justify-center gap-3">
-      <div className="relative grid size-12 place-items-center rounded-2xl bg-[#ffd84d] text-2xl shadow-[0_5px_0_#e9ad24]">
+      <div className="relative grid size-12 place-items-center rounded-2xl bg-warning text-2xl shadow-[0_5px_0_var(--warning-strong)]">
         <span aria-hidden="true">🪙</span>
         <Sparkles
           aria-hidden="true"
-          className="absolute -end-2 -top-2 fill-[#7c5cff] text-[#7c5cff]"
+          className="absolute -end-2 -top-2 fill-brand text-brand"
           size={18}
         />
       </div>
       <div>
-        <p className="text-2xl font-black leading-8 text-slate-800">پولینو</p>
-        <p className="text-[11px] font-bold text-slate-400">
+        <p className="text-2xl font-black leading-8 text-foreground">پولینو</p>
+        <p className="text-[11px] font-bold text-subtle">
           دنیای قهرمان‌های پول‌بلد
         </p>
       </div>
@@ -79,15 +79,15 @@ function MascotBubble({ step }: { step: LoginStep }) {
 
   return (
     <div className="relative mx-auto mb-6 flex max-w-sm items-end justify-center gap-3">
-      <div className="relative max-w-56 rounded-[20px] border-2 border-slate-100 bg-white px-4 py-3 text-sm font-bold leading-6 text-slate-600 shadow-sm">
-        <span className="absolute -end-2 bottom-5 size-4 rotate-45 border-e-2 border-t-2 border-slate-100 bg-white" />
+      <div className="relative max-w-56 rounded-[20px] border-2 border-border bg-surface px-4 py-3 text-sm font-bold leading-6 text-muted shadow-sm">
+        <span className="absolute -end-2 bottom-5 size-4 rotate-45 border-e-2 border-t-2 border-border bg-surface" />
         {message}
       </div>
-      <div className="relative grid size-20 shrink-0 place-items-center rounded-[28px] bg-gradient-to-br from-[#73df75] to-[#43bb54] shadow-[0_7px_0_#2f963c]">
+      <div className="relative grid size-20 shrink-0 place-items-center rounded-[28px] bg-gradient-to-br from-success-hover to-success shadow-[0_7px_0_var(--success-strong)]">
         <span className="text-4xl drop-shadow-sm" aria-hidden="true">
           🐢
         </span>
-        <span className="absolute -bottom-1 -start-1 grid size-7 place-items-center rounded-full border-2 border-white bg-[#ffd84d] text-sm">
+        <span className="absolute -bottom-1 -start-1 grid size-7 place-items-center rounded-full border-2 border-border bg-warning text-sm">
           🪙
         </span>
       </div>
@@ -107,7 +107,7 @@ function StepDots({ step }: { step: LoginStep }) {
         <span
           key={index}
           className={`h-2.5 rounded-full transition-all ${
-            index === activeStep ? 'w-8 bg-[#58cc59]' : 'w-2.5 bg-slate-200'
+            index === activeStep ? 'w-8 bg-success' : 'w-2.5 bg-border'
           }`}
         />
       ))}
@@ -129,18 +129,18 @@ function PhoneStep({
   return (
     <form onSubmit={onSubmit} noValidate>
       <div className="mb-7 text-center">
-        <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-[#eeeaff] text-[#7458e8]">
+        <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-brand-soft text-brand">
           <Phone size={27} strokeWidth={2.7} />
         </div>
-        <h1 className="text-2xl font-black leading-9 text-slate-800">
+        <h1 className="text-2xl font-black leading-9 text-foreground">
           ورود به پولینو
         </h1>
-        <p className="mt-2 text-sm font-medium leading-7 text-slate-500">
+        <p className="mt-2 text-sm font-medium leading-7 text-muted">
           شماره موبایل خودت یا یکی از والدینت رو وارد کن.
         </p>
       </div>
 
-      <label htmlFor="mobile" className="mb-2 block text-sm font-bold text-slate-600">
+      <label htmlFor="mobile" className="mb-2 block text-sm font-bold text-muted">
         شماره موبایل
       </label>
       <div className="relative">
@@ -158,19 +158,19 @@ function PhoneStep({
           placeholder="0912 345 6789"
           aria-invalid={Boolean(error)}
           aria-describedby={error ? 'mobile-error' : 'mobile-help'}
-          className={`h-16 w-full rounded-2xl border-2 bg-slate-50 px-14 text-center text-xl font-black tracking-[0.12em] text-slate-800 outline-none transition-all placeholder:text-base placeholder:font-medium placeholder:tracking-normal placeholder:text-slate-300 focus:bg-white ${
+          className={`h-16 w-full rounded-2xl border-2 bg-surface-muted px-14 text-center text-xl font-black tracking-[0.12em] text-foreground outline-none transition-all placeholder:text-base placeholder:font-medium placeholder:tracking-normal placeholder:text-subtle focus:bg-surface ${
             error
-              ? 'border-rose-300 focus:border-rose-400 focus:shadow-[0_0_0_4px_rgba(251,113,133,0.12)]'
-              : 'border-slate-200 focus:border-[#7c5cff] focus:shadow-[0_0_0_4px_rgba(124,92,255,0.12)]'
+              ? 'border-danger focus:border-danger focus:shadow-[0_0_0_4px_rgba(251,113,133,0.12)]'
+              : 'border-border focus:border-brand focus:shadow-[0_0_0_4px_rgba(124,92,255,0.12)]'
           }`}
         />
         <Phone
           aria-hidden="true"
-          className="absolute start-5 top-1/2 -translate-y-1/2 text-slate-400"
+          className="absolute start-5 top-1/2 -translate-y-1/2 text-subtle"
           size={21}
         />
         <span
-          className="absolute end-5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400"
+          className="absolute end-5 top-1/2 -translate-y-1/2 text-sm font-bold text-subtle"
           dir="ltr"
         >
           +98
@@ -178,22 +178,22 @@ function PhoneStep({
       </div>
 
       {error ? (
-        <p id="mobile-error" className="mt-2 text-xs font-bold leading-6 text-rose-500">
+        <p id="mobile-error" className="mt-2 text-xs font-bold leading-6 text-danger">
           {error}
         </p>
       ) : (
         <p
           id="mobile-help"
-          className="mt-2 flex items-center justify-center gap-1.5 text-xs font-medium text-slate-400"
+          className="mt-2 flex items-center justify-center gap-1.5 text-xs font-medium text-subtle"
         >
-          <ShieldCheck size={15} className="text-[#58cc59]" />
+          <ShieldCheck size={15} className="text-success" />
           شماره شما نزد پولینو امن می‌مونه.
         </p>
       )}
 
       <button
         type="submit"
-        className="mt-7 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#58cc59] text-base font-black text-white shadow-[0_6px_0_#3d9e42] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3d9e42]"
+        className="mt-7 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-success text-base font-black text-success-foreground shadow-[0_6px_0_var(--success-strong)] transition-all hover:bg-success-hover active:translate-y-1 active:shadow-[0_2px_0_var(--success-strong)]"
       >
         دریافت کد ورود
         <ArrowLeft size={20} strokeWidth={3} />
@@ -259,23 +259,23 @@ function OtpStep({
   return (
     <form onSubmit={onSubmit} noValidate>
       <div className="mb-6 text-center">
-        <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-[#fff2d8] text-[#e59a19]">
+        <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-warning-soft text-warning-soft-foreground">
           <MessageCircleMore size={28} strokeWidth={2.6} />
         </div>
-        <h1 className="text-2xl font-black leading-9 text-slate-800">
+        <h1 className="text-2xl font-black leading-9 text-foreground">
           کد ورود رو بنویس
         </h1>
-        <p className="mt-2 text-sm font-medium leading-7 text-slate-500">
+        <p className="mt-2 text-sm font-medium leading-7 text-muted">
           کد ۶ رقمی به این شماره پیامک شد:
         </p>
         <div className="mt-1 flex items-center justify-center gap-2">
-          <b className="text-sm text-slate-700" dir="ltr">
+          <b className="text-sm text-foreground" dir="ltr">
             {phone}
           </b>
           <button
             type="button"
             onClick={onEditPhone}
-            className="inline-flex items-center gap-1 text-xs font-bold text-[#7458e8] hover:text-[#5e43cf]"
+            className="inline-flex items-center gap-1 text-xs font-bold text-brand hover:text-brand-strong"
           >
             <Pencil size={13} />
             ویرایش
@@ -315,29 +315,29 @@ function OtpStep({
             }}
             aria-label={`رقم ${index + 1}`}
             aria-invalid={Boolean(error)}
-            className={`size-12 rounded-xl border-2 bg-slate-50 text-center text-2xl font-black text-slate-800 outline-none transition-all sm:size-14 ${
+            className={`size-12 rounded-xl border-2 bg-surface-muted text-center text-2xl font-black text-foreground outline-none transition-all sm:size-14 ${
               error
-                ? 'border-rose-300 focus:border-rose-400'
+                ? 'border-danger focus:border-danger'
                 : digit
-                  ? 'border-[#7c5cff] bg-[#f7f5ff]'
-                  : 'border-slate-200 focus:border-[#7c5cff] focus:bg-white focus:shadow-[0_0_0_3px_rgba(124,92,255,0.12)]'
+                  ? 'border-brand bg-brand-soft'
+                  : 'border-border focus:border-brand focus:bg-surface focus:shadow-[0_0_0_3px_rgba(124,92,255,0.12)]'
             }`}
           />
         ))}
       </div>
 
       {error && (
-        <p className="mt-3 text-center text-xs font-bold leading-6 text-rose-500">
+        <p className="mt-3 text-center text-xs font-bold leading-6 text-danger">
           {error}
         </p>
       )}
 
       <div className="mt-5 flex min-h-6 items-center justify-center text-xs font-bold">
         {secondsLeft > 0 ? (
-          <p className="flex items-center gap-1.5 text-slate-400">
+          <p className="flex items-center gap-1.5 text-subtle">
             <Clock3 size={15} />
             ارسال دوباره کد تا
-            <span className="text-slate-600" dir="ltr">
+            <span className="text-muted" dir="ltr">
               ۰۰:{secondsLeft.toLocaleString('fa-IR', {
                 minimumIntegerDigits: 2,
                 useGrouping: false,
@@ -348,7 +348,7 @@ function OtpStep({
           <button
             type="button"
             onClick={onResend}
-            className="font-black text-[#7458e8] hover:text-[#5e43cf]"
+            className="font-black text-brand hover:text-brand-strong"
           >
             ارسال دوباره کد
           </button>
@@ -357,13 +357,13 @@ function OtpStep({
 
       <button
         type="submit"
-        className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#58cc59] text-base font-black text-white shadow-[0_6px_0_#3d9e42] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3d9e42]"
+        className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-success text-base font-black text-success-foreground shadow-[0_6px_0_var(--success-strong)] transition-all hover:bg-success-hover active:translate-y-1 active:shadow-[0_2px_0_var(--success-strong)]"
       >
         ورود به پولینو
         <KeyRound size={20} strokeWidth={2.8} />
       </button>
 
-      <p className="mt-4 text-center text-[11px] font-medium leading-5 text-slate-400">
+      <p className="mt-4 text-center text-[11px] font-medium leading-5 text-subtle">
         کد ارسال‌شده را دقیق وارد کن.
       </p>
     </form>
@@ -373,25 +373,25 @@ function OtpStep({
 function SuccessStep({ onRestart }: { onRestart: () => void }) {
   return (
     <div className="py-3 text-center">
-      <div className="relative mx-auto mb-6 grid size-24 place-items-center rounded-full bg-[#e9fbe9]">
-        <div className="grid size-16 place-items-center rounded-full bg-[#58cc59] text-white shadow-[0_6px_0_#3d9e42]">
+      <div className="relative mx-auto mb-6 grid size-24 place-items-center rounded-full bg-success-soft">
+        <div className="grid size-16 place-items-center rounded-full bg-success text-success-foreground shadow-[0_6px_0_var(--success-strong)]">
           <Check size={35} strokeWidth={4} />
         </div>
         <Sparkles
-          className="absolute -end-1 top-1 fill-[#ffd84d] text-[#eeb82b]"
+          className="absolute -end-1 top-1 fill-warning text-warning-soft-foreground"
           size={25}
         />
       </div>
-      <h1 className="text-2xl font-black leading-9 text-slate-800">
+      <h1 className="text-2xl font-black leading-9 text-foreground">
         خوش اومدی قهرمان!
       </h1>
-      <p className="mx-auto mt-2 max-w-xs text-sm font-medium leading-7 text-slate-500">
+      <p className="mx-auto mt-2 max-w-xs text-sm font-medium leading-7 text-muted">
         ورودت با موفقیت انجام شد. حالا وقتشه مأموریت‌های پولینو رو شروع کنی.
       </p>
       <button
         type="button"
         onClick={onRestart}
-        className="mt-7 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#7c5cff] text-base font-black text-white shadow-[0_6px_0_#5d43c9] transition-all hover:bg-[#8567ff] active:translate-y-1 active:shadow-[0_2px_0_#5d43c9]"
+        className="mt-7 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-brand text-base font-black text-brand-foreground shadow-[0_6px_0_var(--brand-strong)] transition-all hover:bg-brand-hover active:translate-y-1 active:shadow-[0_2px_0_var(--brand-strong)]"
       >
         شروع ماجراجویی
         <ArrowLeft size={20} strokeWidth={3} />
@@ -543,11 +543,11 @@ export default function LoginScreen() {
   };
 
   return (
-    <main className="relative flex min-h-screen overflow-hidden bg-[#f6fbff] px-4 py-6 text-slate-800 sm:items-center sm:py-10">
-      <div className="pointer-events-none absolute -end-28 -top-32 size-80 rounded-full bg-[#dff8ee]" />
-      <div className="pointer-events-none absolute -bottom-36 -start-32 size-96 rounded-full bg-[#ece8ff]" />
-      <div className="pointer-events-none absolute end-[12%] top-[23%] hidden size-5 rotate-12 rounded-md bg-[#ffd84d] lg:block" />
-      <div className="pointer-events-none absolute start-[14%] top-[64%] hidden size-6 rotate-45 rounded-lg bg-[#ff9870]/50 lg:block" />
+    <main className="relative flex min-h-screen overflow-hidden bg-background px-4 py-6 text-foreground sm:items-center sm:py-10">
+      <div className="pointer-events-none absolute -end-28 -top-32 size-80 rounded-full bg-info-soft" />
+      <div className="pointer-events-none absolute -bottom-36 -start-32 size-96 rounded-full bg-brand-soft" />
+      <div className="pointer-events-none absolute end-[12%] top-[23%] hidden size-5 rotate-12 rounded-md bg-warning lg:block" />
+      <div className="pointer-events-none absolute start-[14%] top-[64%] hidden size-6 rotate-45 rounded-lg bg-accent-hover/50 lg:block" />
 
       <div className="relative mx-auto w-full max-w-md">
         {step !== 'success' && (
@@ -555,7 +555,7 @@ export default function LoginScreen() {
             type="button"
             onClick={step === 'otp' ? handleEditPhone : undefined}
             aria-label={step === 'otp' ? 'بازگشت به مرحله شماره موبایل' : 'بازگشت'}
-            className={`absolute start-0 top-1 grid size-10 place-items-center rounded-xl border-2 border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:border-slate-300 hover:text-slate-700 ${
+            className={`absolute start-0 top-1 grid size-10 place-items-center rounded-xl border-2 border-border bg-surface text-muted shadow-sm transition-colors hover:border-border-strong hover:text-foreground ${
               step === 'phone' ? 'invisible' : ''
             }`}
           >
@@ -570,7 +570,7 @@ export default function LoginScreen() {
 
         <MascotBubble step={step} />
 
-        <section className="rounded-[30px] border-2 border-white bg-white/95 p-5 shadow-[0_20px_65px_rgba(48,68,95,0.13)] backdrop-blur sm:p-8">
+        <section className="rounded-[30px] border-2 border-border bg-surface/95 p-5 shadow-[0_20px_65px_rgba(48,68,95,0.13)] backdrop-blur sm:p-8">
           {step !== 'success' && <StepDots step={step} />}
 
           {step === 'phone' && (
@@ -598,7 +598,7 @@ export default function LoginScreen() {
           {step === 'success' && <SuccessStep onRestart={handleRestart} />}
         </section>
 
-        <p className="mt-5 text-center text-xs font-bold leading-6 text-slate-400">
+        <p className="mt-5 text-center text-xs font-bold leading-6 text-subtle">
           با ورود به پولینو، قوانین استفاده و حریم خصوصی را می‌پذیری.
         </p>
       </div>

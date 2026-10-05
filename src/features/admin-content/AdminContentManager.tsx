@@ -69,6 +69,7 @@ type SectionDefinition = {
   subtitle: string;
   icon: LucideIcon;
   color: string;
+  foreground: string;
   shadow: string;
   listTitle: string;
 };
@@ -79,8 +80,9 @@ const sections: SectionDefinition[] = [
     title: 'ساخت دوره',
     subtitle: 'اطلاعات اصلی مسیر آموزشی',
     icon: School,
-    color: 'bg-[#7c5cff]',
-    shadow: 'shadow-[0_5px_0_#6245dc]',
+    color: 'bg-brand',
+    foreground: 'text-brand-foreground',
+    shadow: 'shadow-[0_5px_0_var(--brand-strong)]',
     listTitle: 'لیست دوره‌ها',
   },
   {
@@ -88,8 +90,9 @@ const sections: SectionDefinition[] = [
     title: 'ساخت درس',
     subtitle: 'افزودن درس به یک دوره',
     icon: BookOpen,
-    color: 'bg-[#16b8a6]',
-    shadow: 'shadow-[0_5px_0_#0c9082]',
+    color: 'bg-info',
+    foreground: 'text-info-foreground',
+    shadow: 'shadow-[0_5px_0_var(--info-strong)]',
     listTitle: 'لیست درس‌ها',
   },
   {
@@ -97,8 +100,9 @@ const sections: SectionDefinition[] = [
     title: 'ساخت بلاک',
     subtitle: 'محتوای مرحله‌ای هر درس',
     icon: Boxes,
-    color: 'bg-[#ff8a55]',
-    shadow: 'shadow-[0_5px_0_#e56f3d]',
+    color: 'bg-accent',
+    foreground: 'text-accent-foreground',
+    shadow: 'shadow-[0_5px_0_var(--accent-strong)]',
     listTitle: 'لیست بلاک‌ها',
   },
 ];
@@ -242,7 +246,7 @@ const initialBlockForm = {
 };
 
 const inputClassName =
-  'h-13 w-full rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 text-sm font-bold text-slate-800 outline-none transition-all placeholder:font-medium placeholder:text-slate-400 focus:border-[#7c5cff] focus:bg-white focus:shadow-[0_0_0_4px_rgba(124,92,255,0.1)]';
+  'h-13 w-full rounded-2xl border-2 border-border bg-surface-muted px-4 text-sm font-bold text-foreground outline-none transition-all placeholder:font-medium placeholder:text-subtle focus:border-brand focus:bg-surface focus:shadow-[0_0_0_4px_rgba(124,92,255,0.1)]';
 
 function getFieldErrors(issues: Array<{ path: PropertyKey[]; message: string }>) {
   return issues.reduce<FieldErrors>((errors, issue) => {
@@ -285,16 +289,16 @@ function FormField({
 }) {
   return (
     <div className="block">
-      <span className="mb-2 block text-sm font-black text-slate-700">
+      <span className="mb-2 block text-sm font-black text-foreground">
         {label}
       </span>
       {children}
       {error ? (
-        <span className="mt-2 block text-xs font-bold text-rose-500">
+        <span className="mt-2 block text-xs font-bold text-danger">
           {error}
         </span>
       ) : hint ? (
-        <span className="mt-2 block text-xs font-medium leading-5 text-slate-400">
+        <span className="mt-2 block text-xs font-medium leading-5 text-subtle">
           {hint}
         </span>
       ) : null}
@@ -310,12 +314,12 @@ function PublishToggle({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border-2 border-slate-100 bg-slate-50 p-4">
+    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border-2 border-border bg-surface-muted p-4">
       <span>
-        <span className="block text-sm font-black text-slate-700">
+        <span className="block text-sm font-black text-foreground">
           انتشار محتوا
         </span>
-        <span className="mt-1 block text-xs font-medium text-slate-400">
+        <span className="mt-1 block text-xs font-medium text-subtle">
           بعد از ساخت برای کاربران قابل نمایش باشد
         </span>
       </span>
@@ -323,7 +327,7 @@ function PublishToggle({
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
-        className="size-5 accent-[#58cc59]"
+        className="size-5 accent-success"
       />
     </label>
   );
@@ -338,8 +342,8 @@ function SubmitBanner({ status }: { status: SubmitStatus }) {
     <div
       className={`flex items-start gap-3 rounded-2xl border-2 p-4 ${
         isSuccess
-          ? 'border-green-100 bg-green-50 text-[#278f2b]'
-          : 'border-rose-100 bg-rose-50 text-rose-600'
+          ? 'border-success-soft bg-success-soft text-success-soft-foreground'
+          : 'border-danger-soft bg-danger-soft text-danger-soft-foreground'
       }`}
     >
       {isSuccess ? (
@@ -363,7 +367,7 @@ function SubmitButton({
     <button
       type="submit"
       disabled={loading}
-      className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#58cc59] text-base font-black text-white shadow-[0_6px_0_#3da83e] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3da83e] disabled:cursor-wait disabled:bg-slate-300 disabled:shadow-[0_6px_0_#cbd5e1]"
+      className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-success text-base font-black text-success-foreground shadow-[0_6px_0_var(--success-strong)] transition-all hover:bg-success-hover active:translate-y-1 active:shadow-[0_2px_0_var(--success-strong)] disabled:cursor-wait disabled:bg-border-strong disabled:shadow-[0_6px_0_var(--border-strong)]"
     >
       {loading ? (
         <LoaderCircle className="animate-spin" size={21} />
@@ -386,16 +390,16 @@ function ConfirmDelete({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
+      <div className="w-full max-w-sm rounded-3xl bg-surface p-6 shadow-2xl">
         <div className="mb-4 flex justify-center">
-          <div className="grid size-16 place-items-center rounded-full bg-rose-100">
-            <Trash2 size={28} className="text-rose-500" />
+          <div className="grid size-16 place-items-center rounded-full bg-danger-soft">
+            <Trash2 size={28} className="text-danger" />
           </div>
         </div>
-        <h3 className="mb-2 text-center text-lg font-black text-slate-800">
+        <h3 className="mb-2 text-center text-lg font-black text-foreground">
           حذف اطمینان
         </h3>
-        <p className="mb-6 text-center text-sm text-slate-500">
+        <p className="mb-6 text-center text-sm text-muted">
           آیا از حذف این مورد اطمینان دارید؟ این عمل قابل بازگشت نیست.
         </p>
         <div className="flex gap-3">
@@ -403,7 +407,7 @@ function ConfirmDelete({
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 rounded-2xl border-2 border-slate-200 bg-white py-3 text-sm font-black text-slate-600 transition-all hover:bg-slate-50 disabled:cursor-wait"
+            className="flex-1 rounded-2xl border-2 border-border bg-surface py-3 text-sm font-black text-muted transition-all hover:bg-surface-muted disabled:cursor-wait"
           >
             انصراف
           </button>
@@ -411,7 +415,7 @@ function ConfirmDelete({
             type="button"
             onClick={onConfirm}
             disabled={loading}
-            className="flex-1 rounded-2xl bg-rose-500 py-3 text-sm font-black text-white shadow-[0_4px_0_#dc2626] transition-all hover:bg-rose-600 active:translate-y-1 active:shadow-none disabled:cursor-wait"
+            className="flex-1 rounded-2xl bg-danger py-3 text-sm font-black text-danger-foreground shadow-[0_4px_0_var(--danger-strong)] transition-all hover:bg-danger-hover active:translate-y-1 active:shadow-none disabled:cursor-wait"
           >
             {loading ? 'در حال حذف...' : 'حذف'}
           </button>
@@ -433,10 +437,10 @@ function ActionButton({
   variant: 'edit' | 'delete' | 'back' | 'view';
 }) {
   const variants = {
-    edit: 'bg-amber-100 text-amber-600 hover:bg-amber-200 shadow-[0_2px_0_#f59e0b]',
-    delete: 'bg-rose-100 text-rose-600 hover:bg-rose-200 shadow-[0_2px_0_#ef4444]',
-    back: 'bg-slate-100 text-slate-600 hover:bg-slate-200 shadow-[0_2px_0_#94a3b8]',
-    view: 'bg-blue-100 text-blue-600 hover:bg-blue-200 shadow-[0_2px_0_#3b82f6]',
+    edit: 'bg-warning-soft text-warning-soft-foreground hover:bg-warning-soft shadow-[0_2px_0_var(--warning)]',
+    delete: 'bg-danger-soft text-danger-soft-foreground hover:bg-danger-soft shadow-[0_2px_0_var(--danger)]',
+    back: 'bg-surface-muted text-muted hover:bg-border shadow-[0_2px_0_var(--subtle-foreground)]',
+    view: 'bg-brand-soft text-brand hover:bg-brand-soft shadow-[0_2px_0_var(--cyan)]',
   };
 
   return (
@@ -454,13 +458,13 @@ function ActionButton({
 function StatusBadge({ published }: { published?: boolean }) {
   if (published) {
     return (
-      <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-black text-emerald-600">
+      <span className="rounded-full bg-success-soft px-2.5 py-1 text-[10px] font-black text-success-soft-foreground">
         منتشر شده
       </span>
     );
   }
   return (
-    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black text-slate-500">
+    <span className="rounded-full bg-surface-muted px-2.5 py-1 text-[10px] font-black text-muted">
       پیش‌نویس
     </span>
   );
@@ -1063,21 +1067,21 @@ export default function AdminContentManager() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden bg-[#f5fbff] text-slate-800"
+      className="relative min-h-screen overflow-hidden bg-background text-foreground"
       dir="rtl"
     >
-      <div className="pointer-events-none absolute -start-36 -top-36 size-96 rounded-full bg-[#ddf8ef]" />
-      <div className="pointer-events-none absolute -bottom-48 -end-32 size-[30rem] rounded-full bg-[#ece7ff]" />
-      <div className="pointer-events-none absolute end-[7%] top-60 hidden size-5 rotate-45 rounded bg-[#ff8a55]/35 lg:block" />
+      <div className="pointer-events-none absolute -start-36 -top-36 size-96 rounded-full bg-info-soft" />
+      <div className="pointer-events-none absolute -bottom-48 -end-32 size-[30rem] rounded-full bg-brand-soft" />
+      <div className="pointer-events-none absolute end-[7%] top-60 hidden size-5 rotate-45 rounded bg-accent/35 lg:block" />
 
       <header className="relative mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-8">
         <div className="flex items-center gap-3">
-          <div className="grid size-11 place-items-center rounded-2xl bg-[#7c5cff] text-white shadow-[0_4px_0_#6245dc]">
+          <div className="grid size-11 place-items-center rounded-2xl bg-brand text-brand-foreground shadow-[0_4px_0_var(--brand-strong)]">
             <GraduationCap size={24} strokeWidth={2.7} />
           </div>
           <div>
-            <p className="text-xl font-black text-slate-800">مدیریت پولینو</p>
-            <p className="text-[10px] font-bold text-slate-400">
+            <p className="text-xl font-black text-foreground">مدیریت پولینو</p>
+            <p className="text-[10px] font-bold text-subtle">
               ساخت محتوای آموزشی
             </p>
           </div>
@@ -1086,7 +1090,7 @@ export default function AdminContentManager() {
         <div className="flex items-center gap-2">
           <Link
             href="/course"
-            className="rounded-2xl border-2 border-slate-200 bg-white px-4 py-2.5 text-xs font-black text-slate-600 shadow-[0_3px_0_#e2e8f0] transition-all active:translate-y-1 active:shadow-none"
+            className="rounded-2xl border-2 border-border bg-surface px-4 py-2.5 text-xs font-black text-muted shadow-[0_3px_0_var(--border)] transition-all active:translate-y-1 active:shadow-none"
           >
             مشاهده دوره‌ها
           </Link>
@@ -1095,15 +1099,15 @@ export default function AdminContentManager() {
       </header>
 
       <div className="relative mx-auto w-full max-w-6xl px-4 pb-14 pt-3 sm:px-8 sm:pt-6">
-        <section className="relative mb-7 overflow-hidden rounded-[32px] border-2 border-white bg-white/95 p-6 shadow-[0_20px_65px_rgba(38,61,89,0.12)] backdrop-blur sm:p-8">
-          <div className="absolute -end-14 -top-16 size-48 rounded-full bg-[#eafffb]" />
+        <section className="relative mb-7 overflow-hidden rounded-[32px] border-2 border-border bg-surface/95 p-6 shadow-[0_20px_65px_rgba(38,61,89,0.12)] backdrop-blur sm:p-8">
+          <div className="absolute -end-14 -top-16 size-48 rounded-full bg-info-soft" />
           <Sparkles
-            className="absolute end-10 top-8 hidden text-[#16b8a6] sm:block"
+            className="absolute end-10 top-8 hidden text-info sm:block"
             size={32}
           />
           <div className="relative max-w-2xl">
             <div className="mb-3 flex items-center gap-3">
-              <div className="grid size-14 place-items-center rounded-2xl bg-[#58cc59] text-white shadow-[0_5px_0_#3da83e]">
+              <div className="grid size-14 place-items-center rounded-2xl bg-success text-success-foreground shadow-[0_5px_0_var(--success-strong)]">
                 {viewMode === 'list' ? (
                   <Layers3 size={28} strokeWidth={3} />
                 ) : (
@@ -1111,10 +1115,10 @@ export default function AdminContentManager() {
                 )}
               </div>
               <div>
-                <p className="mb-1 text-xs font-black text-[#58b759]">
+                <p className="mb-1 text-xs font-black text-success-soft-foreground">
                   {viewMode === 'list' ? 'مدیریت' : viewMode === 'create' ? 'ایجاد جدید' : 'ویرایش'}
                 </p>
-                <h1 className="text-2xl font-black leading-9 text-slate-800 sm:text-3xl">
+                <h1 className="text-2xl font-black leading-9 text-foreground sm:text-3xl">
                   {viewMode === 'list'
                     ? activeDefinition.listTitle
                     : viewMode === 'create'
@@ -1129,7 +1133,7 @@ export default function AdminContentManager() {
                 </h1>
               </div>
             </div>
-            <p className="text-sm font-medium leading-7 text-slate-500 sm:text-base">
+            <p className="text-sm font-medium leading-7 text-muted sm:text-base">
               {viewMode === 'list'
                 ? 'لیست موارد موجود. برای ویرایش یا حذف روی دکمه‌ها کلیک کنید.'
                 : activeSection === 'course'
@@ -1143,7 +1147,7 @@ export default function AdminContentManager() {
 
         <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
           <aside className="space-y-4">
-            <nav className="rounded-[28px] border-2 border-white bg-white/95 p-3 shadow-[0_14px_45px_rgba(38,61,89,0.1)]">
+            <nav className="rounded-[28px] border-2 border-border bg-surface/95 p-3 shadow-[0_14px_45px_rgba(38,61,89,0.1)]">
               {sections.map((section) => {
                 const Icon = section.icon;
                 const isActive = activeSection === section.id;
@@ -1155,36 +1159,36 @@ export default function AdminContentManager() {
                     onClick={() => handleSectionChange(section.id)}
                     className={`flex w-full items-center gap-3 rounded-2xl p-3 text-start transition-all ${
                       isActive
-                        ? 'bg-slate-50'
-                        : 'hover:bg-slate-50/70'
+                        ? 'bg-surface-muted'
+                        : 'hover:bg-surface-muted/70'
                     }`}
                   >
                     <span
-                      className={`grid size-11 shrink-0 place-items-center rounded-2xl text-white ${section.color} ${section.shadow}`}
+                      className={`grid size-11 shrink-0 place-items-center rounded-2xl ${section.color} ${section.foreground} ${section.shadow}`}
                     >
                       <Icon size={22} strokeWidth={2.7} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-black text-slate-700">
+                      <span className="block text-sm font-black text-foreground">
                         {section.title}
                       </span>
-                      <span className="mt-1 block truncate text-[11px] font-medium text-slate-400">
+                      <span className="mt-1 block truncate text-[11px] font-medium text-subtle">
                         {section.subtitle}
                       </span>
                     </span>
                     {isActive && (
-                      <span className="size-2 rounded-full bg-[#58cc59]" />
+                      <span className="size-2 rounded-full bg-success" />
                     )}
                   </button>
                 );
               })}
             </nav>
 
-            <section className="rounded-[24px] border-2 border-white bg-white/90 p-4 shadow-sm">
+            <section className="rounded-[24px] border-2 border-border bg-surface/90 p-4 shadow-sm">
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Layers3 size={18} className="text-[#7c5cff]" />
-                  <h2 className="text-sm font-black text-slate-700">
+                  <Layers3 size={18} className="text-brand" />
+                  <h2 className="text-sm font-black text-foreground">
                     اطلاعات مرجع
                   </h2>
                 </div>
@@ -1192,7 +1196,7 @@ export default function AdminContentManager() {
                   type="button"
                   onClick={() => void loadReferences()}
                   aria-label="به‌روزرسانی فهرست‌ها"
-                  className="grid size-8 place-items-center rounded-xl bg-slate-100 text-slate-500"
+                  className="grid size-8 place-items-center rounded-xl bg-surface-muted text-muted"
                 >
                   <RefreshCw
                     size={16}
@@ -1201,43 +1205,43 @@ export default function AdminContentManager() {
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-2xl bg-[#f1edff] p-3 text-center">
-                  <p className="text-xl font-black text-[#6748df]">
+                <div className="rounded-2xl bg-brand-soft p-3 text-center">
+                  <p className="text-xl font-black text-brand-soft-foreground">
                     {courses.length}
                   </p>
-                  <p className="mt-1 text-[11px] font-bold text-slate-500">
+                  <p className="mt-1 text-[11px] font-bold text-muted">
                     دوره
                   </p>
                 </div>
-                <div className="rounded-2xl bg-[#eafffb] p-3 text-center">
-                  <p className="text-xl font-black text-[#087d72]">
+                <div className="rounded-2xl bg-info-soft p-3 text-center">
+                  <p className="text-xl font-black text-info-soft-foreground">
                     {lessons.length}
                   </p>
-                  <p className="mt-1 text-[11px] font-bold text-slate-500">
+                  <p className="mt-1 text-[11px] font-bold text-muted">
                     درس
                   </p>
                 </div>
               </div>
               {referenceError && (
-                <p className="mt-3 text-xs font-bold leading-5 text-rose-500">
+                <p className="mt-3 text-xs font-bold leading-5 text-danger">
                   {referenceError}
                 </p>
               )}
             </section>
           </aside>
 
-          <section className="rounded-[30px] border-2 border-white bg-white/95 p-5 shadow-[0_18px_55px_rgba(38,61,89,0.11)] sm:p-8">
+          <section className="rounded-[30px] border-2 border-border bg-surface/95 p-5 shadow-[0_18px_55px_rgba(38,61,89,0.11)] sm:p-8">
             {/* List View */}
             {viewMode === 'list' && (
               <>
                 <div className="mb-6 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div
-                      className={`grid size-10 place-items-center rounded-xl text-white ${activeDefinition.color}`}
+                      className={`grid size-10 place-items-center rounded-xl ${activeDefinition.color} ${activeDefinition.foreground}`}
                     >
                       <ActiveIcon size={20} strokeWidth={2.7} />
                     </div>
-                    <h2 className="text-lg font-black text-slate-800">
+                    <h2 className="text-lg font-black text-foreground">
                       {activeDefinition.listTitle}
                     </h2>
                   </div>
@@ -1250,7 +1254,7 @@ export default function AdminContentManager() {
                         ? startCreateLesson()
                         : startCreateBlock()
                     }
-                    className="flex items-center gap-2 rounded-2xl bg-[#58cc59] px-4 py-2.5 text-xs font-black text-white shadow-[0_3px_0_#3da83e] transition-all active:translate-y-1 active:shadow-none"
+                    className="flex items-center gap-2 rounded-2xl bg-success px-4 py-2.5 text-xs font-black text-success-foreground shadow-[0_3px_0_var(--success-strong)] transition-all active:translate-y-1 active:shadow-none"
                   >
                     <Plus size={16} />
                     {activeSection === 'course'
@@ -1264,15 +1268,15 @@ export default function AdminContentManager() {
                 {activeSection === 'course' && (
                   <div className="space-y-3">
                     {courses.length === 0 ? (
-                      <div className="rounded-2xl border-2 border-dashed border-slate-200 py-12 text-center">
-                        <School size={32} className="mx-auto mb-3 text-slate-300" />
-                        <p className="text-sm font-bold text-slate-400">
+                      <div className="rounded-2xl border-2 border-dashed border-border py-12 text-center">
+                        <School size={32} className="mx-auto mb-3 text-subtle" />
+                        <p className="text-sm font-bold text-subtle">
                           هنوز دوره‌ای ساخته نشده
                         </p>
                         <button
                           type="button"
                           onClick={startCreateCourse}
-                          className="mt-3 text-xs font-black text-[#7c5cff] hover:underline"
+                          className="mt-3 text-xs font-black text-brand hover:underline"
                         >
                           اولین دوره را بسازید ←
                         </button>
@@ -1283,18 +1287,18 @@ export default function AdminContentManager() {
                         .map((course) => (
                           <div
                             key={course.id}
-                            className="group rounded-2xl border-2 border-slate-100 bg-white p-4 transition-all hover:border-[#7c5cff]/30 hover:shadow-md"
+                            className="group rounded-2xl border-2 border-border bg-surface p-4 transition-all hover:border-brand/30 hover:shadow-md"
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3 min-w-0">
-                                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#f1edff] text-[#7c5cff]">
+                                <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
                                   <School size={18} />
                                 </div>
                                 <div className="min-w-0">
-                                  <p className="text-sm font-black text-slate-800 truncate">
+                                  <p className="text-sm font-black text-foreground truncate">
                                     {course.title}
                                   </p>
-                                  <p className="text-xs text-slate-400">
+                                  <p className="text-xs text-subtle">
                                     {course.description?.slice(0, 60)}
                                     {course.description?.length > 60 ? '...' : ''}
                                   </p>
@@ -1302,7 +1306,7 @@ export default function AdminContentManager() {
                               </div>
                               <div className="flex items-center gap-2 shrink-0">
                                 <StatusBadge published={course.isPublished} />
-                                <span className="text-[10px] font-black text-slate-300">
+                                <span className="text-[10px] font-black text-subtle">
                                   #{course.order}
                                 </span>
                                 <ActionButton
@@ -1334,7 +1338,7 @@ export default function AdminContentManager() {
                 {activeSection === 'lesson' && (
                   <div className="space-y-4">
                     <div>
-                      <label className="mb-2 block text-xs font-black text-slate-700">
+                      <label className="mb-2 block text-xs font-black text-foreground">
                         فیلتر بر اساس دوره
                       </label>
                       <select
@@ -1353,15 +1357,15 @@ export default function AdminContentManager() {
                       </select>
                     </div>
                     {filteredLessons.length === 0 ? (
-                      <div className="rounded-2xl border-2 border-dashed border-slate-200 py-12 text-center">
-                        <BookOpen size={32} className="mx-auto mb-3 text-slate-300" />
-                        <p className="text-sm font-bold text-slate-400">
+                      <div className="rounded-2xl border-2 border-dashed border-border py-12 text-center">
+                        <BookOpen size={32} className="mx-auto mb-3 text-subtle" />
+                        <p className="text-sm font-bold text-subtle">
                           هنوز درسی وجود ندارد
                         </p>
                         <button
                           type="button"
                           onClick={startCreateLesson}
-                          className="mt-3 text-xs font-black text-[#16b8a6] hover:underline"
+                          className="mt-3 text-xs font-black text-info hover:underline"
                         >
                           اولین درس را بسازید ←
                         </button>
@@ -1370,18 +1374,18 @@ export default function AdminContentManager() {
                       filteredLessons.map((lesson) => (
                         <div
                           key={lesson.id}
-                          className="group rounded-2xl border-2 border-slate-100 bg-white p-4 transition-all hover:border-[#16b8a6]/30 hover:shadow-md"
+                          className="group rounded-2xl border-2 border-border bg-surface p-4 transition-all hover:border-info/30 hover:shadow-md"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3 min-w-0">
-                              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#eafffb] text-[#16b8a6]">
+                              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-info-soft text-info">
                                 <BookOpen size={18} />
                               </div>
                               <div className="min-w-0">
-                                <p className="text-sm font-black text-slate-800 truncate">
+                                <p className="text-sm font-black text-foreground truncate">
                                   {lesson.title}
                                 </p>
-                                <p className="text-xs text-slate-400">
+                                <p className="text-xs text-subtle">
                                   دوره #{lesson.courseId}
                                 </p>
                               </div>
@@ -1417,7 +1421,7 @@ export default function AdminContentManager() {
                   <div className="space-y-4">
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div>
-                        <label className="mb-2 block text-xs font-black text-slate-700">
+                        <label className="mb-2 block text-xs font-black text-foreground">
                           دوره
                         </label>
                         <select
@@ -1436,7 +1440,7 @@ export default function AdminContentManager() {
                         </select>
                       </div>
                       <div>
-                        <label className="mb-2 block text-xs font-black text-slate-700">
+                        <label className="mb-2 block text-xs font-black text-foreground">
                           درس
                         </label>
                         <select
@@ -1459,26 +1463,26 @@ export default function AdminContentManager() {
 
                     {lessonBlocksLoading ? (
                       <div className="flex justify-center py-12">
-                        <LoaderCircle size={32} className="animate-spin text-[#ff8a55]" />
+                        <LoaderCircle size={32} className="animate-spin text-accent" />
                       </div>
                     ) : blocks.length === 0 && selectedLessonForBlocks ? (
-                      <div className="rounded-2xl border-2 border-dashed border-slate-200 py-12 text-center">
-                        <Boxes size={32} className="mx-auto mb-3 text-slate-300" />
-                        <p className="text-sm font-bold text-slate-400">
+                      <div className="rounded-2xl border-2 border-dashed border-border py-12 text-center">
+                        <Boxes size={32} className="mx-auto mb-3 text-subtle" />
+                        <p className="text-sm font-bold text-subtle">
                           هنوز بلاکی برای این درس وجود ندارد
                         </p>
                         <button
                           type="button"
                           onClick={startCreateBlock}
-                          className="mt-3 text-xs font-black text-[#ff8a55] hover:underline"
+                          className="mt-3 text-xs font-black text-accent hover:underline"
                         >
                           اولین بلاک را بسازید ←
                         </button>
                       </div>
                     ) : blocks.length === 0 && !selectedLessonForBlocks ? (
-                      <div className="rounded-2xl border-2 border-dashed border-slate-200 py-12 text-center">
-                        <Boxes size={32} className="mx-auto mb-3 text-slate-300" />
-                        <p className="text-sm font-bold text-slate-400">
+                      <div className="rounded-2xl border-2 border-dashed border-border py-12 text-center">
+                        <Boxes size={32} className="mx-auto mb-3 text-subtle" />
+                        <p className="text-sm font-bold text-subtle">
                           دوره و درس را انتخاب کنید
                         </p>
                       </div>
@@ -1489,18 +1493,18 @@ export default function AdminContentManager() {
                           .map((block) => (
                             <div
                               key={block.id}
-                              className="group rounded-2xl border-2 border-slate-100 bg-white p-4 transition-all hover:border-[#ff8a55]/30 hover:shadow-md"
+                              className="group rounded-2xl border-2 border-border bg-surface p-4 transition-all hover:border-accent/30 hover:shadow-md"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3 min-w-0">
-                                  <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#fff0e9] text-[#ff8a55]">
+                                  <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
                                     <Boxes size={18} />
                                   </div>
                                   <div className="min-w-0">
-                                    <p className="text-sm font-black text-slate-800">
+                                    <p className="text-sm font-black text-foreground">
                                       {blockTypeLabels[block.type] || block.type}
                                     </p>
-                                    <p className="text-xs text-slate-400">
+                                    <p className="text-xs text-subtle">
                                       صفحه {block.pageNumber} · ترتیب {block.sortOrder}
                                     </p>
                                   </div>
@@ -1542,18 +1546,18 @@ export default function AdminContentManager() {
                   <button
                     type="button"
                     onClick={resetView}
-                    className="flex items-center gap-1.5 rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-600 shadow-[0_2px_0_#e2e8f0] transition-all hover:bg-slate-50 active:translate-y-1 active:shadow-none"
+                    className="flex items-center gap-1.5 rounded-xl border-2 border-border bg-surface px-3 py-2 text-xs font-black text-muted shadow-[0_2px_0_var(--border)] transition-all hover:bg-surface-muted active:translate-y-1 active:shadow-none"
                   >
                     <ArrowLeft size={14} />
                     بازگشت به لیست
                   </button>
                   <div
-                    className={`grid size-10 shrink-0 place-items-center rounded-xl text-white ${activeDefinition.color} ${activeDefinition.shadow}`}
+                    className={`grid size-10 shrink-0 place-items-center rounded-xl ${activeDefinition.color} ${activeDefinition.foreground} ${activeDefinition.shadow}`}
                   >
                     <ActiveIcon size={20} strokeWidth={2.7} />
                   </div>
                   <div>
-                    <h2 className="text-lg font-black text-slate-800">
+                    <h2 className="text-lg font-black text-foreground">
                       {viewMode === 'create'
                         ? activeDefinition.title
                         : `ویرایش ${
@@ -1564,7 +1568,7 @@ export default function AdminContentManager() {
                               : 'بلاک'
                           }`}
                     </h2>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-subtle">
                       {viewMode === 'create'
                         ? activeDefinition.subtitle
                         : activeDefinition.subtitle}
@@ -1929,8 +1933,8 @@ export default function AdminContentManager() {
                                 onClick={() => handleBlockTypeChange(type)}
                                 className={`rounded-2xl border-2 px-3 py-3 text-xs font-black transition-all ${
                                   isSelected
-                                    ? 'border-[#ff8a55] bg-[#fff0e9] text-[#d65f2f] shadow-[0_3px_0_#ff8a55]'
-                                    : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+                                    ? 'border-accent bg-accent-soft text-accent-soft-foreground shadow-[0_3px_0_var(--accent)]'
+                                    : 'border-border bg-surface text-muted hover:border-border-strong'
                                 }`}
                               >
                                 {blockTypeLabels[type]}
@@ -1950,8 +1954,8 @@ export default function AdminContentManager() {
                       errors={blockErrors}
                     />
 
-                    <div className="flex items-center gap-2 rounded-2xl bg-[#fff7d6] p-4 text-xs font-bold leading-6 text-[#8a6100]">
-                      <Coins size={19} className="shrink-0 text-amber-500" />
+                    <div className="flex items-center gap-2 rounded-2xl bg-warning-soft p-4 text-xs font-bold leading-6 text-warning-soft-foreground">
+                      <Coins size={19} className="shrink-0 text-warning-strong" />
                       بعد از ذخیره، ترتیب بلاک خودکار یک شماره افزایش پیدا می‌کند.
                     </div>
                     <SubmitBanner status={blockStatus} />

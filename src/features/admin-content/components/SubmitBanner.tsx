@@ -14,8 +14,8 @@ export function SubmitBanner({ status }: { status: SubmitStatus }) {
     <div
       className={`flex items-start gap-3 rounded-2xl border-2 p-4 ${
         isSuccess
-          ? 'border-green-100 bg-green-50 text-[#278f2b]'
-          : 'border-rose-100 bg-rose-50 text-rose-600'
+          ? 'border-success-soft bg-success-soft text-success-soft-foreground'
+          : 'border-danger-soft bg-danger-soft text-danger-soft-foreground'
       }`}
     >
       {isSuccess ? (

@@ -123,8 +123,8 @@ export default function AuthGuard({ children }: { children: ReactNode }) {
   if (pathname === '/login' || validatedPathname === pathname) return children;
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[#f6fbff]">
-      <p className="font-bold text-slate-500">در حال بررسی حساب کاربری...</p>
+    <main className="grid min-h-screen place-items-center bg-background">
+      <p className="font-bold text-muted">در حال بررسی حساب کاربری...</p>
     </main>
   );
 }

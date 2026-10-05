@@ -33,7 +33,7 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
       onClick={toggleTheme}
       aria-label={nextIsDark ? 'روشن‌کردن حالت نمایش' : 'تاریک‌کردن حالت نمایش'}
       title={nextIsDark ? 'حالت روشن' : 'حالت تاریک'}
-      className={`grid size-11 shrink-0 place-items-center rounded-2xl border-2 border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:border-[#7c5cff] hover:text-[#7c5cff] ${className}`}
+      className={`grid size-11 shrink-0 place-items-center rounded-2xl border-2 border-border bg-surface text-muted shadow-sm transition-colors hover:border-brand hover:text-brand ${className}`}
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span

@@ -41,7 +41,7 @@ export default function AnimationBlock({ payload, onNext }: Props) {
 
   return (
     <div className="flex min-h-[430px] flex-col items-center justify-center p-5 sm:p-8">
-      <div className="relative mb-5 flex aspect-video w-full max-w-xl items-center justify-center overflow-hidden rounded-[26px] border-4 border-[#ead8ff] bg-gradient-to-br from-[#f7f1ff] to-[#fff8e8] shadow-[0_7px_0_#cfb5f2]">
+      <div className="relative mb-5 flex aspect-video w-full max-w-xl items-center justify-center overflow-hidden rounded-[26px] border-4 border-brand-soft bg-gradient-to-br from-brand-soft to-warning-soft shadow-[0_7px_0_var(--brand-soft)]">
         {isVideo && (
           <video
             className="absolute inset-0 h-full w-full object-contain"
@@ -67,15 +67,15 @@ export default function AnimationBlock({ payload, onNext }: Props) {
           />
         )}
         {!isVideo && !isImage && !isLottie && (
-          <div className="relative grid size-28 animate-bounce place-items-center rounded-full bg-white/80 text-[#7c5cff] shadow-lg">
+          <div className="relative grid size-28 animate-bounce place-items-center rounded-full bg-surface/80 text-brand shadow-lg">
             <Clapperboard size={54} strokeWidth={2.3} />
-            <Sparkles className="absolute -end-2 -top-2 text-amber-400" size={28} />
+            <Sparkles className="absolute -end-2 -top-2 text-warning-strong" size={28} />
           </div>
         )}
       </div>
 
       {payload.caption && (
-        <p className="mb-7 max-w-lg text-center text-sm font-bold leading-7 text-slate-600 sm:text-base">
+        <p className="mb-7 max-w-lg text-center text-sm font-bold leading-7 text-muted sm:text-base">
           {payload.caption}
         </p>
       )}
@@ -83,7 +83,7 @@ export default function AnimationBlock({ payload, onNext }: Props) {
       <button
         type="button"
         onClick={onNext}
-        className="flex h-14 w-full max-w-sm items-center justify-center gap-2 rounded-2xl bg-[#7c5cff] text-base font-black text-white shadow-[0_6px_0_#6245dc] transition-all hover:bg-[#8769ff] active:translate-y-1 active:shadow-[0_2px_0_#6245dc]"
+        className="flex h-14 w-full max-w-sm items-center justify-center gap-2 rounded-2xl bg-brand text-base font-black text-brand-foreground shadow-[0_6px_0_var(--brand-strong)] transition-all hover:bg-brand-hover active:translate-y-1 active:shadow-[0_2px_0_var(--brand-strong)]"
       >
         ادامه درس
         <ArrowLeft size={20} strokeWidth={3} />

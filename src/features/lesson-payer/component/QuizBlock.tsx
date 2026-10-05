@@ -34,18 +34,18 @@ export default function QuizBlock({ blockId, payload, onNext }: Props) {
 
   function getOptionStyle(optionId: number, isCorrect: boolean) {
     if (selectedOptionId === null) {
-      return 'border-slate-200 bg-white text-slate-700 shadow-[0_4px_0_#e2e8f0] hover:-translate-y-0.5 hover:border-[#a997ff]';
+      return 'border-border bg-surface text-foreground shadow-[0_4px_0_var(--border)] hover:-translate-y-0.5 hover:border-brand-soft-foreground';
     }
 
     if (isCorrect) {
-      return 'border-[#58cc59] bg-[#edffed] text-[#278f2b] shadow-[0_4px_0_#58cc59]';
+      return 'border-success bg-success-soft text-success-soft-foreground shadow-[0_4px_0_var(--success)]';
     }
 
     if (selectedOptionId === optionId) {
-      return 'border-rose-400 bg-rose-50 text-rose-600 shadow-[0_4px_0_#fb7185]';
+      return 'border-danger bg-danger-soft text-danger-soft-foreground shadow-[0_4px_0_var(--danger)]';
     }
 
-    return 'border-slate-100 bg-slate-50 text-slate-400 opacity-65';
+    return 'border-border bg-surface-muted text-subtle opacity-65';
   }
 
   const handleCheck = async () => {
@@ -77,22 +77,22 @@ export default function QuizBlock({ blockId, payload, onNext }: Props) {
   return (
     <div className="flex min-h-[430px] flex-col justify-center p-5 sm:p-8">
       <div className="mb-6 text-center">
-        <div className="mx-auto mb-4 grid size-16 place-items-center rounded-[22px] bg-[#fff7d6] text-[#d99100] shadow-[0_4px_0_#f2c94c]">
+        <div className="mx-auto mb-4 grid size-16 place-items-center rounded-[22px] bg-warning-soft text-warning-strong shadow-[0_4px_0_var(--warning-strong)]">
           <HelpCircle size={32} strokeWidth={2.7} />
         </div>
-        <p className="mb-2 text-xs font-black text-[#7c5cff]">وقت فکر کردنه!</p>
-        <h2 className="text-lg font-black leading-8 text-slate-800 sm:text-xl">
+        <p className="mb-2 text-xs font-black text-brand">وقت فکر کردنه!</p>
+        <h2 className="text-lg font-black leading-8 text-foreground sm:text-xl">
           {payload.question}
         </h2>
         {payload.description && (
-          <p className="mt-2 text-sm font-medium leading-7 text-slate-500">
+          <p className="mt-2 text-sm font-medium leading-7 text-muted">
             {payload.description}
           </p>
         )}
       </div>
 
       {payload.image && (
-        <div className="mx-auto mb-5 h-44 w-full max-w-md overflow-hidden rounded-2xl bg-slate-100">
+        <div className="mx-auto mb-5 h-44 w-full max-w-md overflow-hidden rounded-2xl bg-surface-muted">
           <img
             src={payload.image}
             alt=""
@@ -137,22 +137,22 @@ export default function QuizBlock({ blockId, payload, onNext }: Props) {
           className={`mt-6 rounded-2xl border-2 p-4 ${
             checked
               ? isCorrectAnswer
-                ? 'border-green-100 bg-green-50'
-                : 'border-rose-100 bg-rose-50'
-              : 'border-slate-200 bg-white'
+                ? 'border-success-soft bg-success-soft'
+                : 'border-danger-soft bg-danger-soft'
+              : 'border-border bg-surface'
           }`}
         >
           <div className="mb-4 flex items-center gap-2">
             {checked && isCorrectAnswer ? (
-              <CheckCircle2 className="text-[#3baa40]" size={24} />
+              <CheckCircle2 className="text-success-strong" size={24} />
             ) : checked && !isCorrectAnswer ? (
-              <XCircle className="text-rose-500" size={24} />
+              <XCircle className="text-danger" size={24} />
             ) : null}
             <p
               className={`font-black ${
                 checked
-                  ? isCorrectAnswer ? 'text-[#278f2b]' : 'text-rose-600'
-                  : 'text-slate-500'
+                  ? isCorrectAnswer ? 'text-success-soft-foreground' : 'text-danger-soft-foreground'
+                  : 'text-muted'
               }`}
             >
               {checked
@@ -170,10 +170,10 @@ export default function QuizBlock({ blockId, payload, onNext }: Props) {
               type="button"
               onClick={handleCheck}
               disabled={isSubmitting}
-              className={`flex h-13 w-full items-center justify-center gap-2 rounded-2xl font-black text-white shadow-[0_5px_0_var(--button-shadow)] transition-all active:translate-y-1 active:shadow-none ${
+              className={`flex h-13 w-full items-center justify-center gap-2 rounded-2xl font-black shadow-[0_5px_0_var(--button-shadow)] transition-all active:translate-y-1 active:shadow-none ${
                 isSubmitting
-                  ? 'bg-slate-300 shadow-none cursor-wait'
-                  : 'bg-[#58cc59] [--button-shadow:#3da83e] hover:bg-[#61d562]'
+                  ? 'bg-border-strong text-foreground shadow-none cursor-wait'
+                  : 'bg-success text-success-foreground [--button-shadow:var(--success-strong)] hover:bg-success-hover'
               }`}
             >
               {isSubmitting ? (
@@ -192,7 +192,7 @@ export default function QuizBlock({ blockId, payload, onNext }: Props) {
             <button
               type="button"
               onClick={onNext}
-              className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#58cc59] [--button-shadow:#3da83e] text-sm font-black text-white shadow-[0_5px_0_#3da83e] transition-all active:translate-y-1 active:shadow-none"
+              className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-success [--button-shadow:var(--success-strong)] text-sm font-black text-success-foreground shadow-[0_5px_0_var(--success-strong)] transition-all active:translate-y-1 active:shadow-none"
             >
               ادامه
               <ArrowLeft size={19} strokeWidth={3} />
@@ -205,7 +205,7 @@ export default function QuizBlock({ blockId, payload, onNext }: Props) {
                 setChecked(false);
                 setSubmitResult(null);
               }}
-              className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-[#ff8a55] [--button-shadow:#e56f3d] text-sm font-black text-white shadow-[0_5px_0_#e56f3d] transition-all active:translate-y-1 active:shadow-none"
+              className="flex h-13 w-full items-center justify-center gap-2 rounded-2xl bg-accent [--button-shadow:var(--accent-strong)] text-sm font-black text-accent-foreground shadow-[0_5px_0_var(--accent-strong)] transition-all active:translate-y-1 active:shadow-none"
             >
               تلاش مجدد
               <ArrowLeft size={19} strokeWidth={3} />

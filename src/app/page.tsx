@@ -34,6 +34,7 @@ type Step = {
   subtitle: string;
   icon: typeof UserRound;
   accent: string;
+  accentForeground: string;
 };
 
 type NameInputProps = {
@@ -57,21 +58,24 @@ const steps: Step[] = [
     title: 'دوست داری چی صدات کنیم؟',
     subtitle: 'اسمت رو بنویس تا ماجراجویی‌مون رو شروع کنیم.',
     icon: UserRound,
-    accent: 'bg-[#7c5cff]',
+    accent: 'bg-brand',
+    accentForeground: 'text-brand-foreground',
   },
   {
     id: 'age',
     title: 'چند سالته؟',
     subtitle: 'سنت رو انتخاب کن تا تجربه‌ای مخصوص خودت بسازیم.',
     icon: CakeSlice,
-    accent: 'bg-[#ff8a55]',
+    accent: 'bg-accent',
+    accentForeground: 'text-accent-foreground',
   },
   {
     id: 'grade',
     title: 'کلاس چندمی هستی؟',
     subtitle: 'تا تمرین‌ها و جایزه‌های مناسب خودت رو ببینی.',
     icon: GraduationCap,
-    accent: 'bg-[#16b8a6]',
+    accent: 'bg-info',
+    accentForeground: 'text-info-foreground',
   },
 ];
 
@@ -85,13 +89,13 @@ const maximumAge = 12;
 function NameInput({ value, onChange }: NameInputProps) {
   return (
     <label className="block">
-      <span className="mb-3 block text-sm font-bold text-slate-600">
+      <span className="mb-3 block text-sm font-bold text-muted">
         نام و نام خانوادگی
       </span>
       <div className="group relative">
         <UserRound
           aria-hidden="true"
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-[#7c5cff]"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-subtle transition-colors group-focus-within:text-brand"
           size={22}
         />
         <input
@@ -100,11 +104,11 @@ function NameInput({ value, onChange }: NameInputProps) {
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder="مثلاً آوا محمدی"
-          className="h-16 w-full rounded-2xl border-2 border-slate-200 bg-slate-50 pr-12 pl-4 text-lg font-bold text-slate-800 outline-none transition-all placeholder:font-medium placeholder:text-slate-400 focus:border-[#7c5cff] focus:bg-white focus:shadow-[0_0_0_4px_rgba(124,92,255,0.12)]"
+          className="h-16 w-full rounded-2xl border-2 border-border bg-surface-muted pr-12 pl-4 text-lg font-bold text-foreground outline-none transition-all placeholder:font-medium placeholder:text-subtle focus:border-brand focus:bg-surface focus:shadow-[0_0_0_4px_rgba(124,92,255,0.12)]"
         />
       </div>
-      <p className="mt-3 flex items-center gap-2 text-xs font-medium text-slate-400">
-        <Sparkles size={14} className="text-amber-400" />
+      <p className="mt-3 flex items-center gap-2 text-xs font-medium text-subtle">
+        <Sparkles size={14} className="text-warning-strong" />
         هر اسمی که دوست داری وارد کن
       </p>
     </label>
@@ -116,7 +120,7 @@ function AgePicker({ value, onChange }: AgePickerProps) {
 
   return (
     <div className="mx-auto max-w-sm">
-      <p className="mb-4 text-center text-sm font-bold text-slate-500">
+      <p className="mb-4 text-center text-sm font-bold text-muted">
         سن خودت را با دکمه‌ها انتخاب کن
       </p>
       <div className="flex items-center justify-center gap-5" dir="ltr">
@@ -125,19 +129,19 @@ function AgePicker({ value, onChange }: AgePickerProps) {
           onClick={() => onChange(Math.max(minimumAge, selectedAge - 1))}
           disabled={selectedAge <= minimumAge}
           aria-label="کم کردن سن"
-          className="grid size-14 place-items-center rounded-2xl border-2 border-[#ff8a55] bg-white text-[#ff8a55] shadow-[0_5px_0_#e56f3d] transition-all active:translate-y-1 active:shadow-[0_1px_0_#e56f3d] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 disabled:shadow-[0_5px_0_#cbd5e1]"
+          className="grid size-14 place-items-center rounded-2xl border-2 border-accent bg-surface text-accent shadow-[0_5px_0_var(--accent-strong)] transition-all active:translate-y-1 active:shadow-[0_1px_0_var(--accent-strong)] disabled:cursor-not-allowed disabled:border-border disabled:text-subtle disabled:shadow-[0_5px_0_var(--border-strong)]"
         >
           <Minus size={26} strokeWidth={3.5} />
         </button>
         <div
-          className="grid size-28 place-items-center rounded-[32px] border-4 border-[#ffb08b] bg-[#fff4ee] text-center shadow-[0_7px_0_#ff8a55]"
+          className="grid size-28 place-items-center rounded-[32px] border-4 border-accent-soft bg-accent-soft text-center shadow-[0_7px_0_var(--accent)]"
           aria-live="polite"
         >
           <span>
-            <span className="block text-4xl font-black text-[#e76531]">
+            <span className="block text-4xl font-black text-accent-soft-foreground">
               {selectedAge}
             </span>
-            <span className="mt-1 block text-sm font-black text-[#a94d2a]">
+            <span className="mt-1 block text-sm font-black text-accent-soft-foreground">
               سال
             </span>
           </span>
@@ -147,12 +151,12 @@ function AgePicker({ value, onChange }: AgePickerProps) {
           onClick={() => onChange(Math.min(maximumAge, selectedAge + 1))}
           disabled={selectedAge >= maximumAge}
           aria-label="زیاد کردن سن"
-          className="grid size-14 place-items-center rounded-2xl border-2 border-[#ff8a55] bg-white text-[#ff8a55] shadow-[0_5px_0_#e56f3d] transition-all active:translate-y-1 active:shadow-[0_1px_0_#e56f3d] disabled:cursor-not-allowed disabled:border-slate-200 disabled:text-slate-300 disabled:shadow-[0_5px_0_#cbd5e1]"
+          className="grid size-14 place-items-center rounded-2xl border-2 border-accent bg-surface text-accent shadow-[0_5px_0_var(--accent-strong)] transition-all active:translate-y-1 active:shadow-[0_1px_0_var(--accent-strong)] disabled:cursor-not-allowed disabled:border-border disabled:text-subtle disabled:shadow-[0_5px_0_var(--border-strong)]"
         >
           <Plus size={26} strokeWidth={3.5} />
         </button>
       </div>
-      <p className="mt-5 text-center text-xs font-bold text-slate-400">
+      <p className="mt-5 text-center text-xs font-bold text-subtle">
         مناسب برای بچه‌های {minimumAge} تا {maximumAge} سال
       </p>
     </div>
@@ -174,12 +178,12 @@ function GradeSelect({ value, onChange }: GradeSelectProps) {
             aria-pressed={isSelected}
             className={`relative flex min-h-40 flex-col items-center justify-center rounded-2xl border-2 px-3 py-4 font-black transition-all active:translate-y-1 ${
               isSelected
-                ? 'translate-y-[-2px] border-[#16b8a6] bg-[#eafffb] text-[#087d72] shadow-[0_5px_0_#16b8a6]'
-                : 'border-slate-200 bg-white text-slate-600 shadow-[0_4px_0_#e2e8f0] hover:-translate-y-0.5 hover:border-[#72d9cd]'
+                ? 'translate-y-[-2px] border-info bg-info-soft text-info-soft-foreground shadow-[0_5px_0_var(--info)]'
+                : 'border-border bg-surface text-muted shadow-[0_4px_0_var(--border)] hover:-translate-y-0.5 hover:border-info-soft'
             }`}
           >
             {isSelected && (
-              <span className="absolute start-2 top-2 z-10 grid size-6 place-items-center rounded-full bg-[#16b8a6] text-white">
+              <span className="absolute start-2 top-2 z-10 grid size-6 place-items-center rounded-full bg-info text-info-foreground">
                 <Check size={15} strokeWidth={4} />
               </span>
             )}
@@ -208,7 +212,7 @@ function StatPill({
   color: string;
 }) {
   return (
-    <div className="flex items-center gap-1.5 rounded-full border-2 border-slate-100 bg-white px-3 py-2 text-sm font-black text-slate-600 shadow-sm">
+    <div className="flex items-center gap-1.5 rounded-full border-2 border-border bg-surface px-3 py-2 text-sm font-black text-muted shadow-sm">
       <span className={color}>{icon}</span>
       {value}
     </div>
@@ -224,15 +228,15 @@ function Mascot({ step }: { step: number }) {
 
   return (
     <div className="relative mx-auto mb-6 flex max-w-md items-center justify-center gap-3 sm:gap-5">
-      <div className="relative grid size-20 shrink-0 place-items-center rounded-[28px] bg-gradient-to-br from-[#ffd94a] to-[#ffaf36] text-4xl shadow-[0_7px_0_#e99320] sm:size-24 sm:text-5xl">
+      <div className="relative grid size-20 shrink-0 place-items-center rounded-[28px] bg-gradient-to-br from-warning to-accent text-4xl shadow-[0_7px_0_var(--warning-strong)] sm:size-24 sm:text-5xl">
         🪙
         <Star
-          className="absolute -left-2 -top-2 fill-[#7c5cff] text-[#7c5cff]"
+          className="absolute -left-2 -top-2 fill-brand text-brand"
           size={24}
         />
       </div>
-      <div className="relative rounded-2xl border-2 border-slate-200 bg-white px-4 py-3 text-sm font-bold leading-7 text-slate-600 shadow-sm sm:text-base">
-        <span className="absolute -right-2 top-7 size-4 rotate-45 border-r-2 border-t-2 border-slate-200 bg-white" />
+      <div className="relative rounded-2xl border-2 border-border bg-surface px-4 py-3 text-sm font-bold leading-7 text-muted shadow-sm sm:text-base">
+        <span className="absolute -right-2 top-7 size-4 rotate-45 border-r-2 border-t-2 border-border bg-surface" />
         {messages[step]}
       </div>
     </div>
@@ -278,28 +282,28 @@ export default function OnboardingFlow() {
   if (isComplete) {
     return (
       <main
-        className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f5fbff] p-4 text-slate-800"
+        className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 text-foreground"
         dir="rtl"
       >
-        <div className="absolute -right-24 -top-24 size-72 rounded-full bg-[#dff9f2]" />
-        <div className="absolute -bottom-32 -left-20 size-80 rounded-full bg-[#eee9ff]" />
-        <section className="relative w-full max-w-lg rounded-[32px] border-2 border-white bg-white/90 p-7 text-center shadow-[0_24px_70px_rgba(42,60,90,0.14)] backdrop-blur sm:p-10">
-          <div className="mx-auto mb-6 grid size-28 place-items-center rounded-full bg-gradient-to-br from-[#ffe56b] to-[#ffb33f] shadow-[0_8px_0_#e89b2e]">
-            <Trophy size={58} className="text-white drop-shadow" strokeWidth={2.5} />
+        <div className="absolute -right-24 -top-24 size-72 rounded-full bg-info-soft" />
+        <div className="absolute -bottom-32 -left-20 size-80 rounded-full bg-brand-soft" />
+        <section className="relative w-full max-w-lg rounded-[32px] border-2 border-border bg-surface/90 p-7 text-center shadow-[0_24px_70px_rgba(42,60,90,0.14)] backdrop-blur sm:p-10">
+          <div className="mx-auto mb-6 grid size-28 place-items-center rounded-full bg-gradient-to-br from-warning to-accent shadow-[0_8px_0_var(--warning-strong)]">
+            <Trophy size={58} className="text-warning-foreground drop-shadow" strokeWidth={2.5} />
           </div>
-          <div className="mb-3 flex items-center justify-center gap-2 text-[#7c5cff]">
+          <div className="mb-3 flex items-center justify-center gap-2 text-brand">
             <PartyPopper size={22} />
             <span className="text-sm font-black">مرحله آشنایی کامل شد!</span>
           </div>
-          <h1 className="mb-3 text-3xl font-black text-slate-800 sm:text-4xl">
+          <h1 className="mb-3 text-3xl font-black text-foreground sm:text-4xl">
             آفرین {formData.name.split(' ')[0]}!
           </h1>
-          <p className="mx-auto mb-7 max-w-sm font-medium leading-8 text-slate-500">
+          <p className="mx-auto mb-7 max-w-sm font-medium leading-8 text-muted">
             حساب تو آماده‌ست. وقتشه با بازی و جایزه، مدیریت پول رو یاد بگیری.
           </p>
           <button
             type="button"
-            className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#58cc59] text-base font-black text-white shadow-[0_6px_0_#3da83e] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3da83e]"
+            className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-success text-base font-black text-success-foreground shadow-[0_6px_0_var(--success-strong)] transition-all hover:bg-success-hover active:translate-y-1 active:shadow-[0_2px_0_var(--success-strong)]"
           >
             بریم سراغ اولین مأموریت
             <ArrowLeft size={20} strokeWidth={3} />
@@ -311,34 +315,34 @@ export default function OnboardingFlow() {
 
   return (
     <main
-      className="relative min-h-screen overflow-hidden bg-[#f5fbff] text-slate-800"
+      className="relative min-h-screen overflow-hidden bg-background text-foreground"
       dir="rtl"
     >
-      <div className="pointer-events-none absolute -right-36 -top-36 size-96 rounded-full bg-[#ddf8ef]" />
-      <div className="pointer-events-none absolute -bottom-48 -left-32 size-[30rem] rounded-full bg-[#ece7ff]" />
-      <div className="pointer-events-none absolute left-[8%] top-[20%] hidden size-4 rotate-12 rounded bg-amber-300 lg:block" />
-      <div className="pointer-events-none absolute right-[10%] top-[48%] hidden size-5 rotate-45 rounded bg-[#ff8a55]/40 lg:block" />
+      <div className="pointer-events-none absolute -right-36 -top-36 size-96 rounded-full bg-info-soft" />
+      <div className="pointer-events-none absolute -bottom-48 -left-32 size-[30rem] rounded-full bg-brand-soft" />
+      <div className="pointer-events-none absolute left-[8%] top-[20%] hidden size-4 rotate-12 rounded bg-warning lg:block" />
+      <div className="pointer-events-none absolute right-[10%] top-[48%] hidden size-5 rotate-45 rounded bg-accent/40 lg:block" />
 
       <header className="relative mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-8">
         <div className="flex items-center gap-3">
-          <div className="grid size-11 place-items-center rounded-2xl bg-[#58cc59] text-xl shadow-[0_4px_0_#3da83e]">
+          <div className="grid size-11 place-items-center rounded-2xl bg-success text-xl shadow-[0_4px_0_var(--success-strong)]">
             🪙
           </div>
           <div>
-            <p className="text-xl font-black text-slate-800">پولینو</p>
-            <p className="text-[10px] font-bold text-slate-400">قهرمان پول‌های من</p>
+            <p className="text-xl font-black text-foreground">پولینو</p>
+            <p className="text-[10px] font-bold text-subtle">قهرمان پول‌های من</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <StatPill
             icon={<Heart size={18} className="fill-current" />}
             value={String(hearts)}
-            color="text-rose-400"
+            color="text-danger"
           />
           <StatPill
             icon={<Coins size={18} className="fill-current" />}
             value={String(coins)}
-            color="text-amber-400"
+            color="text-warning-strong"
           />
         </div>
       </header>
@@ -350,41 +354,41 @@ export default function OnboardingFlow() {
               type="button"
               onClick={handleBack}
               aria-label="مرحله قبل"
-              className="grid size-10 shrink-0 place-items-center rounded-xl border-2 border-slate-200 bg-white text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-700"
+              className="grid size-10 shrink-0 place-items-center rounded-xl border-2 border-border bg-surface text-muted transition-colors hover:border-border-strong hover:text-foreground"
             >
               <ArrowLeft className="rotate-180" size={20} strokeWidth={3} />
             </button>
           ) : (
             <div className="size-10 shrink-0" />
           )}
-          <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-200">
+          <div className="h-3 flex-1 overflow-hidden rounded-full bg-border">
             <div
-              className="h-full rounded-full bg-gradient-to-l from-[#58cc59] to-[#8cdf58] transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-l from-success to-success-hover transition-all duration-500"
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
             />
           </div>
-          <span className="w-10 text-center text-xs font-black text-slate-400">
+          <span className="w-10 text-center text-xs font-black text-subtle">
             {currentStep + 1}/{steps.length}
           </span>
         </div>
 
         <Mascot step={currentStep} />
 
-        <section className="rounded-[28px] border-2 border-white bg-white/95 p-5 shadow-[0_18px_60px_rgba(38,61,89,0.12)] backdrop-blur sm:p-8">
+        <section className="rounded-[28px] border-2 border-border bg-surface/95 p-5 shadow-[0_18px_60px_rgba(38,61,89,0.12)] backdrop-blur sm:p-8">
           <div className="mb-7 flex items-start gap-4">
             <div
-              className={`grid size-12 shrink-0 place-items-center rounded-2xl text-white shadow-md ${currentStepData.accent}`}
+              className={`grid size-12 shrink-0 place-items-center rounded-2xl shadow-md ${currentStepData.accent} ${currentStepData.accentForeground}`}
             >
               <CurrentIcon size={25} strokeWidth={2.6} />
             </div>
             <div>
-              <p className="mb-1 text-xs font-black text-[#58b759]">
+              <p className="mb-1 text-xs font-black text-success-soft-foreground">
                 مرحله {currentStep + 1} از {steps.length}
               </p>
-              <h1 className="text-xl font-black leading-8 text-slate-800 sm:text-2xl">
+              <h1 className="text-xl font-black leading-8 text-foreground sm:text-2xl">
                 {currentStepData.title}
               </h1>
-              <p className="mt-1 text-sm font-medium leading-6 text-slate-500">
+              <p className="mt-1 text-sm font-medium leading-6 text-muted">
                 {currentStepData.subtitle}
               </p>
             </div>
@@ -415,12 +419,12 @@ export default function OnboardingFlow() {
             )}
           </div>
 
-          <div className="mt-7 border-t-2 border-dashed border-slate-100 pt-5">
+          <div className="mt-7 border-t-2 border-dashed border-border pt-5">
             <button
               type="button"
               onClick={handleNext}
               disabled={!isCurrentStepValid}
-              className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#58cc59] text-base font-black text-white shadow-[0_6px_0_#3da83e] transition-all hover:bg-[#61d562] active:translate-y-1 active:shadow-[0_2px_0_#3da83e] disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-[0_6px_0_#cbd5e1]"
+              className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-success text-base font-black text-success-foreground shadow-[0_6px_0_var(--success-strong)] transition-all hover:bg-success-hover active:translate-y-1 active:shadow-[0_2px_0_var(--success-strong)] disabled:cursor-not-allowed disabled:bg-border disabled:text-subtle disabled:shadow-[0_6px_0_var(--border-strong)]"
             >
               {currentStep === steps.length - 1 ? (
                 <>
@@ -437,8 +441,8 @@ export default function OnboardingFlow() {
           </div>
         </section>
 
-        <p className="mt-5 flex items-center justify-center gap-2 text-center text-xs font-bold text-slate-400">
-          <Star size={14} className="fill-amber-300 text-amber-300" />
+        <p className="mt-5 flex items-center justify-center gap-2 text-center text-xs font-bold text-subtle">
+          <Star size={14} className="fill-warning text-warning" />
           با کامل کردن پروفایلت ۲۰ سکه جایزه می‌گیری
         </p>
       </div>
