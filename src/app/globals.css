@@ -1,26 +1,333 @@
 @import "tailwindcss";
-/* src/app/globals.css */
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Poolino color palette — semantic design tokens.
+
+   Usage rule: components consume semantic utilities (bg-surface, text-foreground,
+   bg-brand, text-muted, border-border, shadow-card, rounded-card) instead of
+   inline hex. Light values live on :root; dark values override under
+   [data-theme="dark"] / .dark. Change a token here to retheme the whole app.
+--------------------------------------------------------------------------- */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  /* Surfaces & text */
+  --background: #f5fbff;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f9;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --foreground: #1e293b;
+  --muted-foreground: #64748b;
+  --subtle-foreground: #94a3b8;
+  --faint-foreground: #cbd5e1;
+  --overlay: rgba(15, 23, 42, 0.45);
+
+  /* Brand (purple) */
+  --brand: #7c5cff;
+  --brand-hover: #8769ff;
+  --brand-strong: #6245dc;
+  --brand-soft: #f1edff;
+  --brand-soft-foreground: #6748df;
+  --brand-foreground: #ffffff;
+
+  /* Accent (orange) */
+  --accent: #ff8a55;
+  --accent-hover: #ff9870;
+  --accent-strong: #e56f3d;
+  --accent-soft: #fff0e9;
+  --accent-soft-foreground: #d65f2f;
+  --accent-foreground: #ffffff;
+
+  /* Success (green) */
+  --success: #58cc59;
+  --success-hover: #61d562;
+  --success-strong: #3da83e;
+  --success-soft: #edffed;
+  --success-soft-foreground: #278f2b;
+  --success-foreground: #ffffff;
+
+  /* Info (teal) */
+  --info: #16b8a6;
+  --info-hover: #1aaf9f;
+  --info-strong: #0c9082;
+  --info-soft: #eafffb;
+  --info-soft-foreground: #087d72;
+  --info-foreground: #ffffff;
+
+  /* Cyan */
+  --cyan: #06b6d4;
+  --cyan-strong: #0891b2;
+  --cyan-soft: #e7fbff;
+  --cyan-soft-foreground: #0e7490;
+  --cyan-foreground: #ffffff;
+
+  /* Warning (amber) */
+  --warning: #ffbe3d;
+  --warning-hover: #ffc95c;
+  --warning-strong: #d99a00;
+  --warning-soft: #fff7d6;
+  --warning-soft-foreground: #a56b00;
+  --warning-foreground: #ffffff;
+
+  /* Pink */
+  --pink: #ef6aa8;
+  --pink-hover: #f387ba;
+  --pink-strong: #ca4384;
+  --pink-soft: #fff0f7;
+  --pink-soft-foreground: #b83d79;
+  --pink-foreground: #ffffff;
+
+  /* Danger (red) */
+  --danger: #ef4444;
+  --danger-hover: #f35b5b;
+  --danger-strong: #dc2626;
+  --danger-soft: #fef2f2;
+  --danger-soft-foreground: #b91c1c;
+  --danger-foreground: #ffffff;
+
+  /* Elevation */
+  --elevation-card: 0 20px 65px rgba(38, 61, 89, 0.12);
+  --elevation-soft: 0 8px 25px rgba(42, 60, 90, 0.1);
+}
+
+:root[data-theme="dark"],
+:root.dark {
+  color-scheme: dark;
+
+  --background: #0b1120;
+  --surface: #151d2e;
+  --surface-muted: #1c2537;
+  --border: #2a3548;
+  --border-strong: #3b4761;
+  --foreground: #e6edf7;
+  --muted-foreground: #97a6bd;
+  --subtle-foreground: #6b7a93;
+  --faint-foreground: #46536b;
+  --overlay: rgba(2, 6, 23, 0.65);
+
+  --brand: #8b78ff;
+  --brand-hover: #9c8bff;
+  --brand-strong: #6d55e0;
+  --brand-soft: #241f45;
+  --brand-soft-foreground: #b9a8ff;
+  --brand-foreground: #ffffff;
+
+  --accent: #ff9a6b;
+  --accent-hover: #ffab82;
+  --accent-strong: #e56f3d;
+  --accent-soft: #35241a;
+  --accent-soft-foreground: #ffb08b;
+  --accent-foreground: #2a1408;
+
+  --success: #5ecf63;
+  --success-hover: #74d878;
+  --success-strong: #3da83e;
+  --success-soft: #142c19;
+  --success-soft-foreground: #86db8b;
+  --success-foreground: #0c1f0e;
+
+  --info: #2ec4b3;
+  --info-hover: #43cfc0;
+  --info-strong: #0c9082;
+  --info-soft: #10302f;
+  --info-soft-foreground: #78dccf;
+  --info-foreground: #06201d;
+
+  --cyan: #22c9e6;
+  --cyan-strong: #0891b2;
+  --cyan-soft: #0f2a33;
+  --cyan-soft-foreground: #67e8f9;
+  --cyan-foreground: #04222a;
+
+  --warning: #ffc95c;
+  --warning-hover: #ffd47a;
+  --warning-strong: #d99a00;
+  --warning-soft: #33270d;
+  --warning-soft-foreground: #ffd77a;
+  --warning-foreground: #2b1e00;
+
+  --pink: #f07fb4;
+  --pink-hover: #f495c2;
+  --pink-strong: #ca4384;
+  --pink-soft: #351a29;
+  --pink-soft-foreground: #f7aacf;
+  --pink-foreground: #2a0d1b;
+
+  --danger: #f26464;
+  --danger-hover: #f47d7d;
+  --danger-strong: #dc2626;
+  --danger-soft: #3a1a1c;
+  --danger-soft-foreground: #fca5a5;
+  --danger-foreground: #2a0a0a;
+
+  --elevation-card: 0 20px 65px rgba(0, 0, 0, 0.45);
+  --elevation-soft: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-iran-yekan-x);
-}
+  --color-muted: var(--muted-foreground);
+  --color-subtle: var(--subtle-foreground);
+  --color-faint: var(--faint-foreground);
+  --color-overlay: var(--overlay);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-soft-foreground: var(--brand-soft-foreground);
+  --color-brand-foreground: var(--brand-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-foreground: var(--accent-soft-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
+  --color-success-strong: var(--success-strong);
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-foreground: var(--success-soft-foreground);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-info: var(--info);
+  --color-info-hover: var(--info-hover);
+  --color-info-strong: var(--info-strong);
+  --color-info-soft: var(--info-soft);
+  --color-info-soft-foreground: var(--info-soft-foreground);
+  --color-info-foreground: var(--info-foreground);
+
+  --color-cyan: var(--cyan);
+  --color-cyan-strong: var(--cyan-strong);
+  --color-cyan-soft: var(--cyan-soft);
+  --color-cyan-soft-foreground: var(--cyan-soft-foreground);
+  --color-cyan-foreground: var(--cyan-foreground);
+
+  --color-warning: var(--warning);
+  --color-warning-hover: var(--warning-hover);
+  --color-warning-strong: var(--warning-strong);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-soft-foreground: var(--warning-soft-foreground);
+  --color-warning-foreground: var(--warning-foreground);
+
+  --color-pink: var(--pink);
+  --color-pink-hover: var(--pink-hover);
+  --color-pink-strong: var(--pink-strong);
+  --color-pink-soft: var(--pink-soft);
+  --color-pink-soft-foreground: var(--pink-soft-foreground);
+  --color-pink-foreground: var(--pink-foreground);
+
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+  --color-danger-strong: var(--danger-strong);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-soft-foreground: var(--danger-soft-foreground);
+  --color-danger-foreground: var(--danger-foreground);
+
+  --font-sans: var(--font-iran-yekan-x);
+
+  --shadow-card: var(--elevation-card);
+  --shadow-soft: var(--elevation-soft);
+  --radius-card: 28px;
+  --radius-panel: 24px;
+  --radius-chip: 22px;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-iran-yekan-x), Arial, sans-serif;
+}
+
+/* ---------------------------------------------------------------------------
+   Dark-mode compatibility bridge (temporary).
+
+   The codebase still uses inline neutral utilities (bg-white, text-slate-*,
+   border-slate-*, near-white accent hexes). Rather than edit every file at once,
+   remap those specific utilities to the semantic tokens only under dark mode.
+   Migrate components to token utilities (bg-surface, text-foreground, ...) and
+   delete this block when it is empty.
+--------------------------------------------------------------------------- */
+
+:root[data-theme="dark"],
+:root.dark {
+  /* Neutral surfaces */
+  & .bg-white { background-color: var(--surface); }
+  & .bg-white\/95 { background-color: color-mix(in srgb, var(--surface) 95%, transparent); }
+  & .bg-white\/90 { background-color: color-mix(in srgb, var(--surface) 90%, transparent); }
+  & .bg-white\/80 { background-color: color-mix(in srgb, var(--surface) 80%, transparent); }
+  & .bg-white\/70 { background-color: color-mix(in srgb, var(--surface) 70%, transparent); }
+  & .bg-slate-50 { background-color: var(--surface-muted); }
+  & .bg-slate-100 { background-color: var(--surface-muted); }
+  & .bg-slate-200 { background-color: var(--border); }
+  & .bg-slate-300 { background-color: var(--border-strong); }
+  & .bg-gray-50 { background-color: var(--surface-muted); }
+  & .bg-gray-300 { background-color: var(--border); }
+
+  /* Neutral text */
+  & .text-slate-800 { color: var(--foreground); }
+  & .text-slate-700 { color: var(--foreground); }
+  & .text-slate-600 { color: var(--muted-foreground); }
+  & .text-slate-500 { color: var(--muted-foreground); }
+  & .text-slate-400 { color: var(--subtle-foreground); }
+  & .text-slate-300 { color: var(--subtle-foreground); }
+  & .text-slate-200 { color: var(--faint-foreground); }
+  & .text-gray-700 { color: var(--muted-foreground); }
+
+  /* Neutral borders */
+  & .border-white { border-color: var(--border); }
+  & .border-white\/70 { border-color: var(--border); }
+  & .border-slate-100 { border-color: var(--border); }
+  & .border-slate-200 { border-color: var(--border); }
+  & .border-slate-300 { border-color: var(--border-strong); }
+  & .border-gray-300 { border-color: var(--border); }
+
+  /* Page shell */
+  & .bg-\[\#f5fbff\], & .bg-\[\#f6fbff\] { background-color: var(--background); }
+
+  /* Soft brand/accent tints that would otherwise glare on dark */
+  & .bg-\[\#f1edff\], & .bg-\[\#ece7ff\], & .bg-\[\#eee9ff\],
+  & .bg-\[\#f7f5ff\], & .bg-\[\#fafaff\], & .bg-\[\#f0e6ff\],
+  & .bg-\[\#ece8ff\], & .bg-\[\#eeeaff\] { background-color: var(--brand-soft); }
+
+  & .bg-\[\#eafffb\], & .bg-\[\#e7fbff\], & .bg-\[\#f3fdff\],
+  & .bg-\[\#ddf8ef\], & .bg-\[\#dff8ee\], & .bg-\[\#dff9f2\],
+  & .bg-\[\#effcf9\] { background-color: var(--info-soft); }
+
+  & .bg-\[\#fff7d6\], & .bg-\[\#fffaf0\], & .bg-\[\#fffdf5\],
+  & .bg-\[\#fffdf7\], & .bg-\[\#fff2d8\], & .bg-\[\#fff1dc\],
+  & .bg-\[\#fff2bd\] { background-color: var(--warning-soft); }
+
+  & .bg-\[\#edffed\], & .bg-\[\#effcef\], & .bg-\[\#e9fbe9\] {
+    background-color: var(--success-soft);
+  }
+
+  & .bg-\[\#fff0e9\], & .bg-\[\#ffe9df\], & .bg-\[\#fff4ee\] {
+    background-color: var(--accent-soft);
+  }
+
+  & .bg-\[\#fff0f7\] { background-color: var(--pink-soft); }
+
+  /* State variants on neutral utilities */
+  & .focus\:bg-white:focus { background-color: var(--surface); }
+  & .hover\:bg-slate-50:hover, & .hover\:bg-gray-50:hover { background-color: var(--surface-muted); }
+  & .hover\:bg-slate-200:hover { background-color: var(--border); }
+  & .hover\:bg-slate-300:hover { background-color: var(--border-strong); }
+  & .hover\:text-slate-700:hover { color: var(--foreground); }
+  & .hover\:border-slate-300:hover { border-color: var(--border-strong); }
+  & .disabled\:bg-slate-200:disabled, & .disabled\:bg-slate-300:disabled,
+  & .disabled\:bg-gray-300:disabled { background-color: var(--border); }
+  & .disabled\:text-slate-300:disabled, & .disabled\:text-slate-400:disabled { color: var(--subtle-foreground); }
+  & .disabled\:border-slate-200:disabled { border-color: var(--border); }
 }

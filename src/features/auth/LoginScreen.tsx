@@ -17,6 +17,7 @@ import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { api, ApiError, VerifyOtpResponse } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 60;
@@ -562,8 +563,9 @@ export default function LoginScreen() {
           </button>
         )}
 
-        <div className="mb-6 pt-1">
+        <div className="mb-6 flex items-center justify-between pt-1">
           <BrandMark />
+          <ThemeToggle />
         </div>
 
         <MascotBubble step={step} />

@@ -20,6 +20,22 @@ Poolino (پولینو) is a Persian financial-literacy platform for Iranian chil
 - The `@/*` TypeScript alias maps to `src/*`.
 - `allowImportingTsExtensions` is enabled so Node-native TypeScript tests can import explicit `.ts` files.
 
+## Theming and Color Tokens
+
+The palette is centralized as semantic CSS custom properties in `src/app/globals.css`: light values on `:root`, dark overrides under `:root[data-theme="dark"], :root.dark`. `@theme inline` exposes them as Tailwind utilities (`bg-surface`, `text-foreground`, `text-muted`, `border-border`, `bg-brand`, `text-brand-soft-foreground`, `bg-success-soft`, `shadow-card`, `rounded-card`, etc.). Change a token once to retheme the whole app.
+
+- Semantic groups: surfaces/text (`--background`, `--surface`, `--surface-muted`, `--border`, `--border-strong`, `--foreground`, `--muted-foreground`, `--subtle-foreground`, `--faint-foreground`), and role colors brand/accent/success/info/cyan/warning/pink/danger, each with a base, `-hover`, `-strong`, `-soft`, `-soft-foreground`, and `-foreground`.
+- Prefer these token utilities in new code instead of inline hex. The existing codebase still uses inline hexes (`bg-[#7c5cff]`, `text-slate-500`, `bg-white`, ...).
+- A temporary **dark-mode compatibility bridge** at the end of `globals.css` remaps the current inline neutral utilities (`bg-white`, `bg-white/95`, `bg-slate-50/100/200/300`, `text-slate-200..800`, `border-white/slate-*`, state variants) and the near-white accent tints to tokens, only under dark mode. Migrate components to token utilities and shrink this block; delete it when empty.
+
+Dark mode plumbing:
+
+- `src/store/themeStore.ts`: persisted Zustand store (key `poolino-theme`) with `theme: 'light' | 'dark' | 'system'`, `setTheme`, `toggleTheme`, `applyTheme`, and `resolveTheme`. `applyTheme` sets `documentElement.dataset.theme`, toggles the `dark` class, and `colorScheme`.
+- `src/components/ThemeProvider.tsx`: applies the stored theme on change and listens to the system scheme when preference is `system`.
+- `src/components/ThemeToggle.tsx`: reusable toggle button; reads live state via `useSyncExternalStore` on a `data-theme`/`class` MutationObserver. Placed in course, profile, login, and admin headers.
+- `src/app/layout.tsx` embeds a render-blocking `themeInitScript` (reads `localStorage` before paint) plus `suppressHydrationWarning` on `<html>` to avoid a flash of the wrong theme.
+- `@custom-variant dark` is overridden so `dark:` utilities key off `[data-theme="dark"]`/`.dark` rather than Tailwind's default `prefers-color-scheme`.
+
 Important directories:
 
 - `src/app`: App Router pages and global layout.

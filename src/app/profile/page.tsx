@@ -11,6 +11,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import { api, type UserProfile } from '@/lib/api';
+import ThemeToggle from '@/components/ThemeToggle';
 
 type ProfileForm = {
   firstName: string;
@@ -123,11 +124,13 @@ export default function ProfilePage() {
             <ArrowRight size={18} />
             بازگشت به دوره‌ها
           </Link>
-          <div className="grid size-12 place-items-center rounded-2xl bg-[#7c5cff] text-white shadow-[0_5px_0_#6245dc]">
-            <UserRound size={25} />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <div className="grid size-12 place-items-center rounded-2xl bg-[#7c5cff] text-white shadow-[0_5px_0_#6245dc]">
+              <UserRound size={25} />
+            </div>
           </div>
         </div>
-
         <section className="rounded-[32px] border-2 border-white bg-white/95 p-6 shadow-[0_20px_65px_rgba(38,61,89,0.12)] backdrop-blur sm:p-9">
           <div className="mb-8">
             <p className="mb-1 text-xs font-black text-[#58b759]">حساب کاربری من</p>

@@ -1,5 +1,6 @@
 import { GraduationCap } from 'lucide-react';
 import Link from 'next/link';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export function AdminHeader() {
   return (
@@ -16,12 +17,15 @@ export function AdminHeader() {
         </div>
       </div>
 
-      <Link
-        href="/course"
-        className="rounded-2xl border-2 border-slate-200 bg-white px-4 py-2.5 text-xs font-black text-slate-600 shadow-[0_3px_0_#e2e8f0] transition-all active:translate-y-1 active:shadow-none"
-      >
-        مشاهده دوره‌ها
-      </Link>
+      <div className="flex items-center gap-2">
+        <Link
+          href="/course"
+          className="rounded-2xl border-2 border-slate-200 bg-white px-4 py-2.5 text-xs font-black text-slate-600 shadow-[0_3px_0_#e2e8f0] transition-all active:translate-y-1 active:shadow-none"
+        >
+          مشاهده دوره‌ها
+        </Link>
+        <ThemeToggle />
+      </div>
     </header>
   );
 }

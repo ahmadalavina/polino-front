@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import CourseCard from '@/components/CourseCard';
+import ThemeToggle from '@/components/ThemeToggle';
 import { api } from '@/lib/api';
 import { useGameStore } from '@/store/gameStore';
 import { useAuthStore } from '@/store/authStore';
@@ -139,6 +140,7 @@ export default function CourseListPage() {
               <ShieldCheck size={20} />
             </Link>
           )}
+          <ThemeToggle />
           <Link
             href="/profile"
             aria-label="ویرایش پروفایل"
