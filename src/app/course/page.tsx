@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   BookOpen,
   Coins,
-  Heart,
   RefreshCw,
   Search,
   Sparkles,
@@ -13,6 +12,7 @@ import {
   UserRound,
   ShieldCheck,
   X,
+  Zap,
 } from 'lucide-react';
 import CourseCard from '@/components/CourseCard';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -66,9 +66,26 @@ export default function CourseListPage() {
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
-  const hearts = useGameStore((state) => state.hearts);
+  const [xp, setXp] = useState(0);
   const coins = useGameStore((state) => state.coins);
   const role = useAuthStore((state) => state.profile?.role);
+
+  useEffect(() => {
+    let isActive = true;
+
+    api
+      .getMyProfile()
+      .then((profile) => {
+        if (isActive && profile?.xp !== undefined) setXp(profile.xp);
+      })
+      .catch(() => {
+        /* مقدار پیش‌فرض صفر باقی می‌ماند */
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [reloadKey]);
 
   useEffect(() => {
     let isActive = true;
@@ -149,8 +166,8 @@ export default function CourseListPage() {
             <UserRound size={20} />
           </Link>
           <div className="flex items-center gap-1.5 rounded-full border-2 border-border bg-surface px-3 py-2 text-sm font-black text-muted shadow-sm">
-            <Heart size={18} className="fill-current text-danger" />
-            {hearts}
+            <Zap size={18} className="fill-current text-brand" />
+            {xp}
           </div>
           <div className="flex items-center gap-1.5 rounded-full border-2 border-border bg-surface px-3 py-2 text-sm font-black text-muted shadow-sm">
             <Coins size={18} className="fill-current text-warning-strong" />
