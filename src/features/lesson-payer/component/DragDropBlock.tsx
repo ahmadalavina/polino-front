@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useRef, useState, useCallback } from 'react';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -8,88 +8,106 @@ import {
   RotateCcw,
   XCircle,
 } from 'lucide-react';
-import { api, type CompleteGameDto } from '@/lib/api';
+import { api } from '@/lib/api';
 import { useGameStore } from '@/store/gameStore';
-import type { DragDropPayload } from '@/types/lesson';
+import type { DragDropTarget } from '@/types/lesson';
+import {
+  createDragDropCompletionRequest,
+  isDragDropTargetCorrect,
+  parseDragDropPayload,
+  tryBeginDragDropSubmission,
+} from '@/features/drag-drop-game/dragDropGame';
 
 interface Props {
   blockId: number;
-  payload: DragDropPayload;
+  payload: unknown;
   onNext: () => void;
 }
 
 export default function DragDropBlock({ blockId, payload, onNext }: Props) {
-  const [placements, setPlacements] = useState<Array<number | null>>(() =>
-    payload.targets.map(() => null),
-  );
-  const [selectedItem, setSelectedItem] = useState<number | null>(null);
+  const config = useMemo(() => {
+    const parsed = parseDragDropPayload(payload);
+    return parsed.success ? parsed.data : null;
+  }, [payload]);
+
+  const [placements, setPlacements] = useState<Record<string, string | null>>({});
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<boolean | null>(null);
+  const [error, setError] = useState('');
+  const startedAt = useRef(new Date().toISOString());
+  const submitGuard = useRef(false);
 
-  const usedItems = useMemo(
-    () => new Set(placements.filter((item): item is number => item !== null)),
+  const items = config?.items ?? [];
+  const targets = config?.targets ?? [];
+
+  const usedItemIds = useMemo(
+    () => new Set(Object.values(placements).filter((id): id is string => id !== null)),
     [placements],
   );
-  const isComplete = placements.every((item) => item !== null);
-  const isCorrect = placements.every(
-    (itemIndex, targetIndex) =>
-      itemIndex !== null &&
-      itemIndex === targetIndex,
+  const isComplete = targets.length > 0 && targets.every((target) => placements[target.id]);
+  const isCorrect = targets.every((target) =>
+    isDragDropTargetCorrect(target, placements[target.id] ?? null),
   );
 
-  function placeItem(itemIndex: number, targetIndex: number) {
+  function placeItem(itemId: string, target: DragDropTarget) {
     setPlacements((current) => {
-      const next = current.map((value) =>
-        value === itemIndex ? null : value,
-      );
-      next[targetIndex] = itemIndex;
+      const next: Record<string, string | null> = { ...current };
+      for (const key of Object.keys(next)) {
+        if (next[key] === itemId) next[key] = null;
+      }
+      next[target.id] = itemId;
       return next;
     });
-    setSelectedItem(null);
+    setSelectedItemId(null);
     setChecked(false);
   }
 
-  function removePlacement(targetIndex: number) {
-    setPlacements((current) =>
-      current.map((value, index) => (index === targetIndex ? null : value)),
-    );
+  function removePlacement(targetId: string) {
+    setPlacements((current) => ({ ...current, [targetId]: null }));
     setChecked(false);
   }
 
   function reset() {
-    setPlacements(payload.targets.map(() => null));
-    setSelectedItem(null);
+    setPlacements({});
+    setSelectedItemId(null);
     setChecked(false);
     setSubmitResult(null);
+    setError('');
+    startedAt.current = new Date().toISOString();
+    submitGuard.current = false;
   }
 
   const handleSubmit = useCallback(async () => {
     if (!isComplete || isSubmitting) return;
+    if (!tryBeginDragDropSubmission(submitGuard)) return;
     setIsSubmitting(true);
-    const dto: CompleteGameDto = {
-      //@ts-ignore
-      gameType: 'drag_drop',
-      matchedPairIds: placements
-        .map((itemIndex, targetIndex) =>
-          itemIndex === targetIndex ? `${targetIndex}` : null,
-        )
-        .filter(Boolean) as string[],
-      attempts: 1,
-      mistakes: isCorrect ? 0 : 1,
-    };
+    setError('');
+    const dto = createDragDropCompletionRequest(
+      targets
+        .map((target) => {
+          const itemId = placements[target.id];
+          return itemId ? { itemId, targetId: target.id } : null;
+        })
+        .filter((placement): placement is { itemId: string; targetId: string } => placement !== null),
+      startedAt.current,
+      new Date().toISOString(),
+    );
     try {
       const response = await api.completeGame(blockId, dto);
       setSubmitResult(response.completed);
       if (response.balance) {
         useGameStore.getState().setBalance(response.balance);
       }
-    } catch {
+    } catch (e) {
+      submitGuard.current = false;
+      setError(e instanceof Error ? e.message : 'ثبت نتیجه ناموفق بود.');
       setSubmitResult(false);
     } finally {
       setIsSubmitting(false);
     }
-  }, [isComplete, isSubmitting, placements, isCorrect, blockId]);
+  }, [isComplete, isSubmitting, targets, placements, blockId]);
 
   function handlePrimaryAction() {
     if (checked) {
@@ -105,6 +123,14 @@ export default function DragDropBlock({ blockId, payload, onNext }: Props) {
     setChecked(true);
   }
 
+  if (!config || items.length === 0 || targets.length === 0) {
+    return (
+      <div className="p-8 text-center font-bold text-danger">
+        بلوک کشیدن و رها کردن کامل نیست.
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[430px] p-5 sm:p-8">
       <div className="mb-6 text-center">
@@ -115,7 +141,7 @@ export default function DragDropBlock({ blockId, payload, onNext }: Props) {
           هر گزینه رو به جای درست ببر
         </h2>
         <p className="text-sm font-bold leading-7 text-muted">
-          {payload.instruction ?? 'گزینه‌ها را بکش یا لمس کن و در کادر درست قرار بده.'}
+          {config.introduction ?? 'گزینه‌ها را بکش یا لمس کن و در کادر درست قرار بده.'}
         </p>
       </div>
 
@@ -123,21 +149,21 @@ export default function DragDropBlock({ blockId, payload, onNext }: Props) {
         <div className="rounded-[22px] border-2 border-border bg-surface-muted p-4">
           <p className="mb-3 text-xs font-black text-subtle">گزینه‌ها</p>
           <div className="space-y-3">
-            {payload.items.map((item, itemIndex) => {
-              const isUsed = usedItems.has(itemIndex);
-              const isSelected = selectedItem === itemIndex;
+            {items.map((item) => {
+              const isUsed = usedItemIds.has(item.id);
+              const isSelected = selectedItemId === item.id;
 
               return (
                 <button
-                  key={`${item}-${itemIndex}`}
+                  key={item.id}
                   type="button"
                   draggable={!isUsed}
                   disabled={isUsed}
                   onDragStart={(event) => {
-                    event.dataTransfer.setData('text/plain', String(itemIndex));
+                    event.dataTransfer.setData('text/plain', item.id);
                     event.dataTransfer.effectAllowed = 'move';
                   }}
-                  onClick={() => setSelectedItem(isSelected ? null : itemIndex)}
+                  onClick={() => setSelectedItemId(isSelected ? null : item.id)}
                   className={`flex min-h-14 w-full items-center gap-2 rounded-2xl border-2 px-4 text-start text-sm font-black transition-all ${
                     isUsed
                       ? 'cursor-not-allowed border-border bg-surface-muted text-subtle'
@@ -147,7 +173,7 @@ export default function DragDropBlock({ blockId, payload, onNext }: Props) {
                   }`}
                 >
                   <GripVertical size={18} className="shrink-0 text-subtle" />
-                  {item}
+                  {item.content}
                 </button>
               );
             })}
@@ -157,31 +183,29 @@ export default function DragDropBlock({ blockId, payload, onNext }: Props) {
         <div className="rounded-[22px] border-2 border-info-soft bg-info-soft p-4">
           <p className="mb-3 text-xs font-black text-cyan-strong">جای پاسخ‌ها</p>
           <div className="space-y-3">
-            {payload.targets.map((target, targetIndex) => {
-              const itemIndex = placements[targetIndex];
-              const hasItem = itemIndex !== null;
-              const targetIsCorrect =
-                hasItem && payload.items[itemIndex] === target;
+            {targets.map((target) => {
+              const itemId = placements[target.id] ?? null;
+              const hasItem = itemId !== null;
+              const placedItem = items.find((item) => item.id === itemId);
+              const targetIsCorrect = isDragDropTargetCorrect(target, itemId);
 
               return (
                 <button
-                  key={`${target}-${targetIndex}`}
+                  key={target.id}
                   type="button"
                   onDragOver={(event) => event.preventDefault()}
                   onDrop={(event) => {
                     event.preventDefault();
-                    const droppedItem = Number(
-                      event.dataTransfer.getData('text/plain'),
-                    );
-                    if (Number.isInteger(droppedItem)) {
-                      placeItem(droppedItem, targetIndex);
+                    const droppedItemId = event.dataTransfer.getData('text/plain');
+                    if (droppedItemId) {
+                      placeItem(droppedItemId, target);
                     }
                   }}
                   onClick={() => {
-                    if (selectedItem !== null) {
-                      placeItem(selectedItem, targetIndex);
+                    if (selectedItemId !== null) {
+                      placeItem(selectedItemId, target);
                     } else if (hasItem) {
-                      removePlacement(targetIndex);
+                      removePlacement(target.id);
                     }
                   }}
                   className={`flex min-h-16 w-full items-center justify-between gap-3 rounded-2xl border-2 border-dashed px-4 text-start transition-all ${
@@ -196,10 +220,10 @@ export default function DragDropBlock({ blockId, payload, onNext }: Props) {
                 >
                   <span>
                     <span className="block text-[11px] font-bold opacity-70">
-                      {target}
+                      {target.label}
                     </span>
                     <span className="mt-1 block text-sm font-black">
-                      {hasItem ? payload.items[itemIndex] : 'اینجا قرار بده'}
+                      {placedItem ? placedItem.content : 'اینجا قرار بده'}
                     </span>
                   </span>
                   {checked &&
@@ -228,8 +252,14 @@ export default function DragDropBlock({ blockId, payload, onNext }: Props) {
           {submitResult
             ? 'عالی بود! همه گزینه‌ها درست هستند.'
             : checked && !isCorrect
-            ? 'بعضی گزینه‌ها درست نیستند؛ در حال بررسی...'
+            ? 'بعضی گزینه‌ها درست نیستند؛ دوباره امتحان کن.'
             : 'بعضی گزینه‌ها درست نیستند؛ دوباره امتحان کن.'}
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-5 rounded-2xl bg-danger-soft px-4 py-3 text-center text-sm font-black text-danger">
+          {error}
         </div>
       )}
 

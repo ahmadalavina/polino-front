@@ -51,6 +51,7 @@ import {
   lessonBlockUpdateSchema,
 } from './schemas';
 import { basketGameDefaults } from '@/features/basket-game/basketGame';
+import { dragDropDefaults } from '@/features/drag-drop-game/dragDropGame';
 import { wordSearchDefaults } from '@/features/word-search-game/wordSearchGame';
 import BlockPayloadEditor from './components/BlockPayloadEditor';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -157,11 +158,6 @@ const blockPresets: Partial<Record<BlockType, Record<string, unknown>>> = {
     url: 'videos/example.mp4',
     caption: 'توضیح ویدیو',
   },
-  drag_drop: {
-    instruction: 'هر گزینه را در جای درست قرار بده.',
-    items: [],
-    targets: [],
-  },
 };
 
 Object.assign(blockTypeLabels, {
@@ -224,6 +220,7 @@ Object.assign(blockPresets, {
   },
   basket_game: basketGameDefaults,
   word_search: wordSearchDefaults,
+  drag_drop: dragDropDefaults,
 });
 
 const initialCourseForm = {

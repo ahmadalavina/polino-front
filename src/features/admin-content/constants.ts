@@ -57,9 +57,16 @@ export const blockPresets: Record<string, unknown> = {
     caption: 'توضیح ویدیو',
   },
   drag_drop: {
-    instruction: 'هر گزینه را در جای درست قرار بده.',
-    items: [],
-    targets: [],
+    introduction: 'هر سکه را به جای درستش بکش.',
+    items: [
+      { id: 'item-coin', content: 'سکه' },
+      { id: 'item-note', content: 'اسکناس' },
+    ],
+    targets: [
+      { id: 'target-saving', label: 'پس‌انداز', acceptsItemId: 'item-coin' },
+      { id: 'target-spending', label: 'هزینه', acceptsItemId: 'item-note' },
+    ],
+    scoring: { correct: 10, wrong: 0, maxScore: 100 },
   },
   drop_down: { introduction: '', label: '', options: [] },
   question_block: { introduction: '', label: '', options: [] },

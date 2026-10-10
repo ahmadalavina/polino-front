@@ -81,10 +81,42 @@ export interface MediaPayload {
   caption?: string;
 }
 
+export interface DragDropItem {
+  id: string;
+  content: string;
+}
+
+export interface DragDropTarget {
+  id: string;
+  label: string;
+  acceptsItemId?: string;
+}
+
+export interface DragDropScoring {
+  correct?: number;
+  wrong?: number;
+  maxScore?: number;
+}
+
 export interface DragDropPayload {
-  items: string[];
-  targets: string[];
+  introduction?: string;
+  items?: DragDropItem[];
+  targets?: DragDropTarget[];
+  scoring?: DragDropScoring;
+  /** @deprecated legacy guidance field; migrated into `introduction` on read. */
   instruction?: string;
+}
+
+export interface DragDropPlacement {
+  itemId: string;
+  targetId: string;
+}
+
+export interface DragDropCompletionRequest {
+  gameType: 'drag_drop';
+  dragDropPlacements: DragDropPlacement[];
+  startedAt?: string;
+  completedAt?: string;
 }
 
 export interface CoinHuntPayload {

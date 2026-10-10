@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import type {
   DialogPayload,
-  DragDropPayload,
   ImagePayload,
   LessonBlock,
   LessonData,
@@ -198,7 +197,7 @@ export default function LessonPlayer({ lesson, onExit, onFinish }: Props) {
           <DragDropBlock
             key={block.id}
             blockId={block.id}
-            payload={block.payload as DragDropPayload}
+            payload={block.payload}
             onNext={handleNext}
           />
         );

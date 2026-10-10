@@ -817,123 +817,220 @@ function DragDropForm({
   onChange: (p: Record<string, unknown>) => void;
 }) {
   const items = useMemo(
-    () => (Array.isArray(payload.items) ? payload.items : []) as string[],
+    () =>
+      (Array.isArray(payload.items) ? payload.items : []).map((item, index) =>
+        typeof item === "string"
+          ? { id: `item-${index + 1}`, content: item }
+          : (item as Record<string, unknown>),
+      ),
     [payload.items],
   );
   const targets = useMemo(
-    () => (Array.isArray(payload.targets) ? payload.targets : []) as string[],
+    () =>
+      (Array.isArray(payload.targets) ? payload.targets : []).map((target, index) =>
+        typeof target === "string"
+          ? { id: `target-${index + 1}`, label: target }
+          : (target as Record<string, unknown>),
+      ),
     [payload.targets],
   );
+  const scoring = useMemo(
+    () => (payload.scoring ?? {}) as Record<string, unknown>,
+    [payload.scoring],
+  );
+
+  const commitItems = (next: Record<string, unknown>[]) =>
+    onChange({ ...payload, items: next });
+  const commitTargets = (next: Record<string, unknown>[]) =>
+    onChange({ ...payload, targets: next });
 
   function addItem() {
-    onChange({ ...payload, items: [...items, ""] });
+    commitItems([...items, { id: `item-${items.length + 1}`, content: "" }]);
   }
-  function updateItem(index: number, value: string) {
-    const updated = items.map((item, i) => (i === index ? value : item));
-    onChange({ ...payload, items: updated });
+  function updateItem(index: number, patch: Record<string, unknown>) {
+    commitItems(items.map((item, i) => (i === index ? { ...item, ...patch } : item)));
   }
   function removeItem(index: number) {
-    onChange({ ...payload, items: items.filter((_, i) => i !== index) });
+    commitItems(items.filter((_, i) => i !== index));
   }
 
   function addTarget() {
-    onChange({ ...payload, targets: [...targets, ""] });
+    commitTargets([...targets, { id: `target-${targets.length + 1}`, label: "" }]);
   }
-  function updateTarget(index: number, value: string) {
-    const updated = targets.map((t, i) => (i === index ? value : t));
-    onChange({ ...payload, targets: updated });
+  function updateTarget(index: number, patch: Record<string, unknown>) {
+    commitTargets(
+      targets.map((target, i) => (i === index ? { ...target, ...patch } : target)),
+    );
   }
   function removeTarget(index: number) {
-    onChange({ ...payload, targets: targets.filter((_, i) => i !== index) });
+    commitTargets(targets.filter((_, i) => i !== index));
+  }
+
+  function updateScoring(field: string, value: number) {
+    onChange({ ...payload, scoring: { ...scoring, [field]: value } });
   }
 
   return (
-    <Section title="تنظیمات کشیدن و رها کردن">
-      <label className="block">
-        <FieldLabel>راهنما</FieldLabel>
-        <textarea
-          rows={2}
-          value={String(payload.instruction ?? "")}
-          onChange={(e) =>
-            onChange({ ...payload, instruction: e.target.value })
-          }
-          placeholder="هر گزینه را در جای درست قرار بده."
-          className={textareaClass}
-        />
-      </label>
+    <div className="space-y-5">
+      <Section title="تنظیمات کشیدن و رها کردن">
+        <label className="block">
+          <FieldLabel>راهنما</FieldLabel>
+          <textarea
+            rows={2}
+            value={String(payload.introduction ?? payload.instruction ?? "")}
+            onChange={(e) =>
+              onChange({ ...payload, introduction: e.target.value })
+            }
+            placeholder="هر گزینه را در جای درست قرار بده."
+            className={textareaClass}
+          />
+        </label>
+      </Section>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-black text-muted">
-            گزینه‌های قابل کشیدن
-          </span>
-          <button
-            type="button"
-            onClick={addItem}
-            className="flex items-center gap-1 rounded-xl border-2 border-dashed border-border px-3 py-1.5 text-xs font-black text-subtle transition-all hover:border-cyan hover:text-cyan"
-          >
-            <Plus size={14} />
-            افزودن گزینه
-          </button>
-        </div>
+      <Section title="گزینه‌های قابل کشیدن">
+        <p className="text-xs font-bold leading-6 text-subtle">
+          هر گزینه یک شناسه و یک متن دارد؛ شناسه برای ثبت پاسخ استفاده می‌شود.
+        </p>
         {items.map((item, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <GripVertical size={16} className="text-subtle" />
-            <input
-              type="text"
-              value={item}
-              onChange={(e) => updateItem(i, e.target.value)}
-              placeholder={`گزینه ${i + 1}`}
-              className="flex-1 h-11 rounded-xl border-2 border-border bg-surface-muted px-3 text-sm font-bold outline-none transition-all focus:border-cyan focus:bg-surface"
-            />
-            <button
-              type="button"
-              onClick={() => removeItem(i)}
-              className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-danger-soft bg-surface text-danger transition-all hover:border-danger hover:text-danger"
-            >
-              <Trash2 size={17} />
-            </button>
+          <div key={i} className="rounded-2xl border-2 border-cyan-soft bg-cyan-soft/40 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="flex items-center gap-2 text-xs font-black text-muted">
+                <GripVertical size={15} /> گزینه {i + 1}
+              </span>
+              <button
+                type="button"
+                onClick={() => removeItem(i)}
+                className="grid size-9 shrink-0 place-items-center rounded-xl border-2 border-danger-soft bg-surface text-danger transition-all hover:border-danger"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className="block">
+                <FieldLabel>شناسه</FieldLabel>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={String(item.id ?? "")}
+                  onChange={(e) => updateItem(i, { id: e.target.value })}
+                  placeholder="item-coin"
+                  className={fieldClass}
+                />
+              </label>
+              <label className="block">
+                <FieldLabel>متن گزینه</FieldLabel>
+                <input
+                  type="text"
+                  value={String(item.content ?? "")}
+                  onChange={(e) => updateItem(i, { content: e.target.value })}
+                  placeholder={`گزینه ${i + 1}`}
+                  className={fieldClass}
+                />
+              </label>
+            </div>
           </div>
         ))}
-      </div>
+        <button
+          type="button"
+          onClick={addItem}
+          className="flex items-center gap-1 rounded-xl border-2 border-dashed border-border px-3 py-1.5 text-xs font-black text-subtle transition-all hover:border-cyan hover:text-cyan"
+        >
+          <Plus size={14} />
+          افزودن گزینه
+        </button>
+      </Section>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-black text-muted">
-            اهداف (مقصدها)
-          </span>
-          <button
-            type="button"
-            onClick={addTarget}
-            className="flex items-center gap-1 rounded-xl border-2 border-dashed border-border px-3 py-1.5 text-xs font-black text-subtle transition-all hover:border-cyan hover:text-cyan"
-          >
-            <Plus size={14} />
-            افزودن هدف
-          </button>
-        </div>
+      <Section title="اهداف (مقصدها)">
+        <p className="text-xs font-bold leading-6 text-subtle">
+          برای هر هدف مشخص کن کدام گزینه پاسخ درست است.
+        </p>
         {targets.map((target, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <span className="w-6 text-center text-xs font-black text-subtle">
-              {i + 1}
-            </span>
-            <input
-              type="text"
-              value={target}
-              onChange={(e) => updateTarget(i, e.target.value)}
-              placeholder={`هدف ${i + 1}`}
-              className="flex-1 h-11 rounded-xl border-2 border-border bg-surface-muted px-3 text-sm font-bold outline-none transition-all focus:border-cyan focus:bg-surface"
-            />
-            <button
-              type="button"
-              onClick={() => removeTarget(i)}
-              className="grid size-11 shrink-0 place-items-center rounded-xl border-2 border-danger-soft bg-surface text-danger transition-all hover:border-danger hover:text-danger"
-            >
-              <Trash2 size={17} />
-            </button>
+          <div key={i} className="rounded-2xl border-2 border-info-soft bg-info-soft/40 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="flex items-center gap-2 text-xs font-black text-muted">
+                <GripVertical size={15} /> هدف {i + 1}
+              </span>
+              <button
+                type="button"
+                onClick={() => removeTarget(i)}
+                className="grid size-9 shrink-0 place-items-center rounded-xl border-2 border-danger-soft bg-surface text-danger transition-all hover:border-danger"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className="block">
+                <FieldLabel>شناسه</FieldLabel>
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={String(target.id ?? "")}
+                  onChange={(e) => updateTarget(i, { id: e.target.value })}
+                  placeholder="target-saving"
+                  className={fieldClass}
+                />
+              </label>
+              <label className="block">
+                <FieldLabel>برچسب هدف</FieldLabel>
+                <input
+                  type="text"
+                  value={String(target.label ?? "")}
+                  onChange={(e) => updateTarget(i, { label: e.target.value })}
+                  placeholder={`هدف ${i + 1}`}
+                  className={fieldClass}
+                />
+              </label>
+            </div>
+            <label className="mt-2 block">
+              <FieldLabel>گزینه درست</FieldLabel>
+              <select
+                value={String(target.acceptsItemId ?? "")}
+                onChange={(e) =>
+                  updateTarget(i, { acceptsItemId: e.target.value || undefined })
+                }
+                className={fieldClass}
+              >
+                <option value="">— انتخاب کنید —</option>
+                {items.map((item, itemIndex) => (
+                  <option key={itemIndex} value={String(item.id ?? "")}>
+                    {String(item.content ?? item.id ?? `گزینه ${itemIndex + 1}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         ))}
-      </div>
-    </Section>
+        <button
+          type="button"
+          onClick={addTarget}
+          className="flex items-center gap-1 rounded-xl border-2 border-dashed border-border px-3 py-1.5 text-xs font-black text-subtle transition-all hover:border-cyan hover:text-cyan"
+        >
+          <Plus size={14} />
+          افزودن هدف
+        </button>
+      </Section>
+
+      <Section title="امتیازدهی">
+        <div className="grid grid-cols-3 gap-3">
+          <NumberInput
+            label="پاسخ درست"
+            value={Number(scoring.correct ?? 0)}
+            onChange={(v) => updateScoring("correct", v)}
+          />
+          <NumberInput
+            label="پاسخ نادرست"
+            value={Number(scoring.wrong ?? 0)}
+            onChange={(v) => updateScoring("wrong", v)}
+          />
+          <NumberInput
+            label="سقف امتیاز"
+            value={Number(scoring.maxScore ?? 0)}
+            onChange={(v) => updateScoring("maxScore", v)}
+            min={0}
+          />
+        </div>
+      </Section>
+    </div>
   );
 }
 
@@ -1825,32 +1922,58 @@ function MediaPreview({
 }
 
 function DragDropPreview({ payload }: { payload: Record<string, unknown> }) {
-  const items = (Array.isArray(payload.items) ? payload.items : []) as string[];
-  const targets = (Array.isArray(payload.targets) ? payload.targets : []) as string[];
+  const items = (
+    Array.isArray(payload.items) ? payload.items : []
+  ).map((item, index) =>
+    typeof item === "string"
+      ? { id: `item-${index + 1}`, content: item }
+      : (item as Record<string, unknown>),
+  );
+  const targets = (
+    Array.isArray(payload.targets) ? payload.targets : []
+  ).map((target, index) =>
+    typeof target === "string"
+      ? { id: `target-${index + 1}`, label: target }
+      : (target as Record<string, unknown>),
+  );
+  const byId = new Map(items.map((item) => [String(item.id ?? ""), item]));
   return (
     <div className="p-4">
       <p className="mb-3 text-xs font-bold text-muted">
-        {String(payload.instruction ?? "راهنما...")}
+        {String(payload.introduction ?? payload.instruction ?? "راهنما...")}
       </p>
       <div className="mb-3 flex flex-wrap gap-2">
-        {(items.length > 0 ? items : ["گزینه ۱", "گزینه ۲"]).map((item, i) => (
-          <span
-            key={i}
-            className="cursor-grab rounded-xl border-2 border-cyan-soft bg-cyan-soft px-3 py-2 text-xs font-bold text-cyan-soft-foreground shadow-sm"
-          >
-            {String(item)}
-          </span>
-        ))}
+        {(items.length > 0 ? items : [{ id: "1", content: "گزینه ۱" }, { id: "2", content: "گزینه ۲" }]).map(
+          (item, i) => (
+            <span
+              key={i}
+              className="cursor-grab rounded-xl border-2 border-cyan-soft bg-cyan-soft px-3 py-2 text-xs font-bold text-cyan-soft-foreground shadow-sm"
+            >
+              {String(item.content ?? "")}
+            </span>
+          ),
+        )}
       </div>
       <div className="space-y-2">
-        {(targets.length > 0 ? targets : ["هدف ۱", "هدف ۲"]).map((target, i) => (
-          <div
-            key={i}
-            className="rounded-xl border-2 border-dashed border-border bg-surface-muted px-4 py-3 text-xs font-bold text-subtle"
-          >
-            {String(target)}
-          </div>
-        ))}
+        {(targets.length > 0
+          ? targets
+          : [{ id: "1", label: "هدف ۱" }, { id: "2", label: "هدف ۲" }]
+        ).map((target, i) => {
+          const accepted = byId.get(String(target.acceptsItemId ?? ""));
+          return (
+            <div
+              key={i}
+              className="flex items-center justify-between gap-2 rounded-xl border-2 border-dashed border-border bg-surface-muted px-4 py-3 text-xs font-bold text-subtle"
+            >
+              <span>{String(target.label ?? "")}</span>
+              {accepted && (
+                <span className="rounded-lg bg-success-soft px-2 py-1 text-[11px] font-black text-success-soft-foreground">
+                  {String(accepted.content ?? "")}
+                </span>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

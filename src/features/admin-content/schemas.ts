@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { basketGamePayloadSchema } from '@/features/basket-game/basketGame';
+import { dragDropPayloadSchema } from '@/features/drag-drop-game/dragDropGame';
 import { memoryFinancialPayloadSchema } from '@/features/memory-financial-game/memoryFinancialGame';
 import { storyPayloadSchema } from '@/features/story-block/storyContent';
 import { wordSearchPayloadSchema } from '@/features/word-search-game/wordSearchGame';
@@ -104,5 +105,6 @@ export function validateBlockPayload(type: string, payload: unknown) {
   if (type === 'memory_financial') return memoryFinancialPayloadSchema.safeParse(payload);
   if (type === 'word_search') return wordSearchPayloadSchema.safeParse(payload);
   if (type === 'story') return storyPayloadSchema.safeParse(payload);
+  if (type === 'drag_drop') return dragDropPayloadSchema.safeParse(payload);
   return z.record(z.string(), z.unknown()).safeParse(payload);
 }

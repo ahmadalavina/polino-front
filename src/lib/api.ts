@@ -11,6 +11,7 @@ import type {
 import type {
   BasketGameCompletionRequest,
   CourseDetail,
+  DragDropCompletionRequest,
   LessonData,
   Lesson,
   LessonBlock,
@@ -214,6 +215,7 @@ export type UserProfile = {
 export type CompleteGameDto =
   | BasketGameCompletionRequest
   | WordSearchCompletionRequest
+  | DragDropCompletionRequest
   | {
       gameType: 'coin_hunt' | 'memory_financial' | 'basket_game' | 'auction';
       collectedItemIds?: string[];

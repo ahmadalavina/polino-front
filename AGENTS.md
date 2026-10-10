@@ -188,3 +188,27 @@ Known incomplete points in `memory_financial` (remaining, fix target for "تکم
 - **Legacy compatibility:** the old single-text shape (`{ title, text }`) is still accepted by `storyPayloadSchema` and migrated on read into `content: [{ type: 'text', value }]` by `parseStoryPayload`. The renderer parses through `parseStoryPayload`, so legacy blocks keep working without a server migration; re-saving a block in admin writes the new shape.
 - Images resolve through `resolveMediaUrl` on the play side (relative paths are prefixed with `NEXT_PUBLIC_API_BASE_URL`); admin preview shows the raw URL.
 - No completion call — like `dialog`/`image`, the block just calls `onNext`.
+
+### Drag & drop = `drag_drop` («کشیدن و رها کردن»)
+
+- Renderer: `DragDropBlock` in `src/features/lesson-payer/component/DragDropBlock.tsx`; dispatched by `LessonPlayer`.
+- Logic/validation: `src/features/drag-drop-game/dragDropGame.ts` (`dragDropPayloadSchema`, `parseDragDropPayload`, `isDragDropTargetCorrect`, `createDragDropCompletionRequest`, `dragDropDefaults`) and `tests/drag-drop-game.test.ts`. Admin routes `drag_drop` through `validateBlockPayload` (`schemas.ts`) to `dragDropPayloadSchema`.
+- Admin editor: `DragDropForm` / `DragDropPreview` in `src/features/admin-content/components/BlockPayloadEditor.tsx`. Block preset is `dragDropDefaults` in `AdminContentManager.tsx` (mirrored, dead code, in `constants.ts`).
+- Payload shape (**id-based**, not index-based):
+  ```jsonc
+  {
+    "introduction": "هر سکه را به جای درستش بکش.",
+    "items": [
+      { "id": "item-coin", "content": "سکه" },
+      { "id": "item-note", "content": "اسکناس" }
+    ],
+    "targets": [
+      { "id": "target-saving", "label": "پس‌انداز", "acceptsItemId": "item-coin" },
+      { "id": "target-spending", "label": "هزینه", "acceptsItemId": "item-note" }
+    ],
+    "scoring": { "correct": 10, "wrong": 0, "maxScore": 100 }
+  }
+  ```
+- Correctness is driven by `target.acceptsItemId === placedItemId` (see `isDragDropTargetCorrect`), **never** by array index. `scoring.correct`/`scoring.wrong` default to `10`/`0` on read.
+- **Completion contract:** submit via `dragDropPlacements: [{ itemId, targetId }]` (`createDragDropCompletionRequest`), `gameType: 'drag_drop'`, plus `startedAt`/`completedAt`. The server scores by `acceptsItemId`; the legacy index-based body (`matchedPairIds`/`attempts`/`mistakes`) must not be sent.
+- **Legacy compatibility:** old payloads stored as `{ instruction, items: string[], targets: string[] }` are normalized on read (strings → `{ id: 'item-N'/'target-N', content/label }`, `instruction` → `introduction`). They carry **no** answer mapping, so `acceptsItemId` is absent and every placement is scored wrong until the admin re-saves the block with the id-based shape.
