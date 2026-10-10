@@ -45,9 +45,29 @@ export interface QuizPayload {
   options: QuestionOption[];
 }
 
+export type StoryContentAlign = 'start' | 'center' | 'end';
+
+export interface StoryTextContent {
+  type: 'text';
+  value: string;
+}
+
+export interface StoryImageContent {
+  type: 'image';
+  url: string;
+  alt?: string;
+  caption?: string;
+  width?: number;
+  align?: StoryContentAlign;
+}
+
+export type StoryContentItem = StoryTextContent | StoryImageContent;
+
 export interface StoryPayload {
   title?: string;
-  text: string;
+  content?: StoryContentItem[];
+  /** @deprecated legacy single-text story; migrated into `content` on read. */
+  text?: string;
 }
 
 export interface RewardPayload {

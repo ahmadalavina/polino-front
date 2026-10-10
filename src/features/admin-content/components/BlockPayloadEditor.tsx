@@ -561,25 +561,183 @@ function StoryForm({
   payload: Record<string, unknown>;
   onChange: (p: Record<string, unknown>) => void;
 }) {
+  const content = Array.isArray(payload.content)
+    ? (payload.content as Record<string, unknown>[])
+    : [];
+
+  const commit = (next: Record<string, unknown>[]) =>
+    onChange({ ...payload, content: next });
+
+  const updateItem = (index: number, patch: Record<string, unknown>) =>
+    commit(content.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+
+  const addItem = (type: "text" | "image") =>
+    commit([
+      ...content,
+      type === "text"
+        ? { type: "text", value: "" }
+        : { type: "image", url: "", alt: "", caption: "", width: 320, align: "center" },
+    ]);
+
+  const removeItem = (index: number) =>
+    commit(content.filter((_, i) => i !== index));
+
+  const moveItem = (index: number, direction: -1 | 1) => {
+    const destination = index + direction;
+    if (destination < 0 || destination >= content.length) return;
+    const next = [...content];
+    [next[index], next[destination]] = [next[destination], next[index]];
+    commit(next);
+  };
+
   return (
-    <Section title="تنظیمات داستان">
-      <TextInput
-        label="عنوان داستان"
-        value={String(payload.title ?? "")}
-        onChange={(v) => onChange({ ...payload, title: v })}
-        placeholder="عنوان داستان"
-      />
-      <label className="block">
-        <FieldLabel>متن داستان</FieldLabel>
-        <textarea
-          rows={4}
-          value={String(payload.text ?? "")}
-          onChange={(e) => onChange({ ...payload, text: e.target.value })}
-          placeholder="متن داستان را اینجا وارد کنید..."
-          className={textareaClass}
+    <div className="space-y-5">
+      <Section title="عنوان داستان">
+        <TextInput
+          label="عنوان (اختیاری)"
+          value={String(payload.title ?? "")}
+          onChange={(v) => onChange({ ...payload, title: v || undefined })}
+          placeholder="عنوان داستان"
         />
-      </label>
-    </Section>
+      </Section>
+
+      <Section title="بخش‌های داستان">
+        <p className="text-xs font-bold leading-6 text-subtle">
+          داستان از بخش‌های متن و تصویر ساخته می‌شود و به‌ترتیب نمایش داده می‌شوند.
+        </p>
+
+        {content.length === 0 && (
+          <div className="rounded-2xl border-2 border-dashed border-warning-soft bg-warning-soft/50 p-6 text-center">
+            <BookOpen className="mx-auto mb-2 text-warning-strong" size={30} />
+            <p className="text-sm font-black text-muted">
+              هنوز بخشی به داستان اضافه نشده است.
+            </p>
+          </div>
+        )}
+
+        {content.map((item, index) => (
+          <div
+            key={index}
+            className="rounded-2xl border-2 border-warning-soft bg-warning-soft p-4"
+          >
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="grid size-8 place-items-center rounded-xl bg-warning-strong text-sm font-black text-warning-foreground">
+                  {index + 1}
+                </span>
+                <p className="text-sm font-black text-foreground">
+                  {item.type === "image" ? "تصویر" : "متن"}
+                </p>
+              </div>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  disabled={index === 0}
+                  onClick={() => moveItem(index, -1)}
+                  aria-label="انتقال به بالا"
+                  className="grid size-9 place-items-center rounded-xl bg-surface text-muted transition disabled:opacity-30"
+                >
+                  <ArrowUp size={16} />
+                </button>
+                <button
+                  type="button"
+                  disabled={index === content.length - 1}
+                  onClick={() => moveItem(index, 1)}
+                  aria-label="انتقال به پایین"
+                  className="grid size-9 place-items-center rounded-xl bg-surface text-muted transition disabled:opacity-30"
+                >
+                  <ArrowDown size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeItem(index)}
+                  aria-label={`حذف بخش ${index + 1}`}
+                  className="grid size-9 place-items-center rounded-xl border-2 border-danger-soft bg-surface text-danger transition hover:border-danger hover:text-danger-soft-foreground"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+
+            {item.type === "image" ? (
+              <div className="grid gap-3">
+                <TextInput
+                  label="آدرس تصویر"
+                  value={String(item.url ?? "")}
+                  onChange={(value) => updateItem(index, { url: value })}
+                  placeholder="/assets/story/coin.png"
+                  dir="ltr"
+                />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <TextInput
+                    label="متن جایگزین (اختیاری)"
+                    value={String(item.alt ?? "")}
+                    onChange={(value) => updateItem(index, { alt: value || undefined })}
+                    placeholder="سکه"
+                  />
+                  <TextInput
+                    label="توضیح زیر تصویر (اختیاری)"
+                    value={String(item.caption ?? "")}
+                    onChange={(value) => updateItem(index, { caption: value || undefined })}
+                    placeholder="پس‌انداز کن!"
+                  />
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <NumberInput
+                    label="عرض (اختیاری)"
+                    value={Number(item.width ?? 0)}
+                    onChange={(value) => updateItem(index, { width: value || undefined })}
+                    min={1}
+                  />
+                  <label className="block">
+                    <FieldLabel>چینش</FieldLabel>
+                    <select
+                      value={String(item.align ?? "center")}
+                      onChange={(e) => updateItem(index, { align: e.target.value })}
+                      className={fieldClass}
+                    >
+                      <option value="start">شروع</option>
+                      <option value="center">وسط</option>
+                      <option value="end">پایان</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            ) : (
+              <label className="block">
+                <FieldLabel>متن</FieldLabel>
+                <textarea
+                  rows={4}
+                  value={String(item.value ?? "")}
+                  onChange={(e) => updateItem(index, { value: e.target.value })}
+                  placeholder="متن داستان را اینجا وارد کنید..."
+                  className={textareaClass}
+                />
+              </label>
+            )}
+          </div>
+        ))}
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => addItem("text")}
+            className="flex items-center gap-1.5 rounded-xl bg-warning-soft px-3 py-2 text-xs font-black text-warning-soft-foreground transition hover:bg-warning-soft"
+          >
+            <Plus size={15} />
+            افزودن متن
+          </button>
+          <button
+            type="button"
+            onClick={() => addItem("image")}
+            className="flex items-center gap-1.5 rounded-xl bg-warning-soft px-3 py-2 text-xs font-black text-warning-soft-foreground transition hover:bg-warning-soft"
+          >
+            <Plus size={15} />
+            افزودن تصویر
+          </button>
+        </div>
+      </Section>
+    </div>
   );
 }
 
@@ -1559,15 +1717,56 @@ function QuizPreview({ payload }: { payload: Record<string, unknown> }) {
 }
 
 function StoryPreview({ payload }: { payload: Record<string, unknown> }) {
+  const content = Array.isArray(payload.content)
+    ? (payload.content as Record<string, unknown>[])
+    : [];
+
   return (
     <div className="p-4">
       <div className="rounded-2xl border-2 border-warning-soft bg-warning-soft p-4">
-        <p className="mb-1 text-sm font-black text-warning-soft-foreground">
+        <p className="mb-2 text-sm font-black text-warning-soft-foreground">
           {String(payload.title ?? "عنوان داستان...")}
         </p>
-        <p className="text-xs font-medium leading-7 text-muted">
-          {String(payload.text ?? "متن داستان...")}
-        </p>
+        {content.length === 0 && (
+          <p className="text-xs font-medium leading-7 text-muted">
+            هنوز بخشی به داستان اضافه نشده است.
+          </p>
+        )}
+        <div className="space-y-3">
+          {content.map((item, index) =>
+            item.type === "image" ? (
+              <div key={index} className="overflow-hidden rounded-xl border-2 border-brand-soft bg-surface">
+                {item.url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={String(item.url)}
+                    alt={String(item.alt ?? "")}
+                    className="h-28 w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div className="grid h-28 place-items-center text-brand/30">
+                    <ImageIcon size={28} />
+                  </div>
+                )}
+                {item.caption ? (
+                  <p className="px-3 py-2 text-center text-[11px] font-bold text-muted">
+                    {String(item.caption)}
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <p
+                key={index}
+                className="whitespace-pre-line text-xs font-medium leading-7 text-foreground"
+              >
+                {String(item.value ?? "")}
+              </p>
+            ),
+          )}
+        </div>
       </div>
     </div>
   );

@@ -167,3 +167,24 @@ Known incomplete points in `memory_financial` (remaining, fix target for "تکم
 - Reward eligibility is announced in the response (`reward.claimEndpoint`, e.g. `/rewards/lessons/{lessonId}/claim`); actual granting is a separate `POST /rewards/lessons/{lessonId}/claim` call. No frontend claim wiring exists yet.
 
 **Compatibility:** legacy `word_search` blocks stored with the old shape (`grid: string[]` + `words[].cells`) are normalized on read, but `cells` is ignored, so the server may lack answer coordinates until the admin re-saves (PATCH) the block. Existing word-search blocks should be re-saved once. Normalize word comparisons with `normalizeWordSearchWord` (strips whitespace and `\u200c`).
+
+### Story = `story` («داستان»)
+
+- Renderer: `StoryBlock` in `src/features/lesson-payer/component/StoryBlock.tsx`; dispatched by `LessonPlayer`.
+- Logic/validation: `src/features/story-block/storyContent.ts` (`storyPayloadSchema`, `parseStoryPayload`, `storyDefaults`) and `tests/story-block.test.ts`. Admin routes `story` through `validateBlockPayload` (`schemas.ts`) to `storyPayloadSchema`.
+- Admin editor: `StoryForm` / `StoryPreview` in `src/features/admin-content/components/BlockPayloadEditor.tsx`. Block preset lives in `AdminContentManager.tsx` (`blockPresets.story`), mirrored (dead code) in `constants.ts`.
+- Payload shape (ordered rich content, not a single text field):
+  ```jsonc
+  {
+    "title": "عنوان داستان",
+    "content": [
+      { "type": "text",  "value": "متن قبل از تصویر..." },
+      { "type": "image", "url": "/assets/story/coin.png", "alt": "سکه", "caption": "پس‌انداز کن!", "width": 320, "align": "center" },
+      { "type": "text",  "value": "متن بعد از تصویر..." }
+    ]
+  }
+  ```
+- `content[]` is a discriminated union on `type`: `text` (`value`) or `image` (`url`, optional `alt`/`caption`/`width`/`align`). `align ∈ start|center|end` (mapped to RTL-aware flex in the renderer). Order is preserved and rendered top-to-bottom.
+- **Legacy compatibility:** the old single-text shape (`{ title, text }`) is still accepted by `storyPayloadSchema` and migrated on read into `content: [{ type: 'text', value }]` by `parseStoryPayload`. The renderer parses through `parseStoryPayload`, so legacy blocks keep working without a server migration; re-saving a block in admin writes the new shape.
+- Images resolve through `resolveMediaUrl` on the play side (relative paths are prefixed with `NEXT_PUBLIC_API_BASE_URL`); admin preview shows the raw URL.
+- No completion call — like `dialog`/`image`, the block just calls `onNext`.

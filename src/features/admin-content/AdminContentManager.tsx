@@ -132,7 +132,17 @@ const blockPresets: Partial<Record<BlockType, Record<string, unknown>>> = {
   },
   story: {
     title: 'عنوان داستان',
-    text: 'متن داستان را اینجا وارد کنید.',
+    content: [
+      { type: 'text', value: 'متن داستان را اینجا وارد کنید.' },
+      {
+        type: 'image',
+        url: '/assets/story/coin.png',
+        alt: 'سکه',
+        caption: 'پس‌انداز کن!',
+        width: 320,
+        align: 'center',
+      },
+    ],
   },
   reward: {
     xp: 20,

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { basketGamePayloadSchema } from '@/features/basket-game/basketGame';
 import { memoryFinancialPayloadSchema } from '@/features/memory-financial-game/memoryFinancialGame';
+import { storyPayloadSchema } from '@/features/story-block/storyContent';
 import { wordSearchPayloadSchema } from '@/features/word-search-game/wordSearchGame';
 
 const optionalText = z
@@ -102,5 +103,6 @@ export function validateBlockPayload(type: string, payload: unknown) {
   if (type === 'basket_game') return basketGamePayloadSchema.safeParse(payload);
   if (type === 'memory_financial') return memoryFinancialPayloadSchema.safeParse(payload);
   if (type === 'word_search') return wordSearchPayloadSchema.safeParse(payload);
+  if (type === 'story') return storyPayloadSchema.safeParse(payload);
   return z.record(z.string(), z.unknown()).safeParse(payload);
 }
